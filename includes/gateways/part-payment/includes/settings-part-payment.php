@@ -64,6 +64,6 @@ return array(
 		'type'        => 'checkbox',
 		'label'       => __( 'Enable logging', 'woocommerce-gateway-arvato' ),
 		'default'     => 'no',
-		'description' => sprintf( __( 'Log Arvato Part Payment events, such as IPN requests, inside <code>%s</code>', 'woocommerce-gateway-arvato' ), wc_get_log_file_path( 'arvato-part-payment' ) )
+		'description' => sprintf( __( 'Log Arvato Part Payment events inside <code>%s</code>', 'woocommerce-gateway-arvato' ), wc_get_log_file_path( 'arvato-part-payment' ) )
 	),
 );
