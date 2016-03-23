@@ -14,7 +14,7 @@ By Krokedil - http://krokedil.com/
 
 Arvato payment gateway for WooCommerce
 
-== INSTALLATION	 ==
+== INSTALLATION ==
 
 1. Download and unzip the latest release zip file.
 2. If you use the WordPress plugin uploader to install this plugin skip to step 4.
@@ -22,4 +22,4 @@ Arvato payment gateway for WooCommerce
 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
 5. Go to --> WooCommerce --> Settings --> Checkout and configure your Arvato settings.
 
-== CREDITS	 ==
+== CREDITS ==
