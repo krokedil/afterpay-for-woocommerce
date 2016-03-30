@@ -135,7 +135,7 @@ function init_wc_gateway_arvato_invoice_class() {
 				)
 			);
 			*/
-
+			
 			echo '<pre>';
 			print_r( $response );
 			echo '</pre>';
