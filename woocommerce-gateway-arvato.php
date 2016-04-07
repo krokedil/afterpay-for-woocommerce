@@ -68,3 +68,5 @@ function woocommerce_gateway_arvato_disabled_notices() {
 include_once( 'includes/gateways/invoice/class-wc-gateway-arvato-invoice.php' );
 include_once( 'includes/gateways/part-payment/class-wc-gateway-arvato-part-payment.php' );
 include_once( 'includes/gateways/account/class-wc-gateway-arvato-account.php' );
+
+include_once( 'includes/class-cancel-reservation.php' );
