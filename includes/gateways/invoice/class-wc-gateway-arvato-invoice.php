@@ -64,7 +64,7 @@ function init_wc_gateway_arvato_invoice_class() {
 				if ( empty( self::$log ) ) {
 					self::$log = new WC_Logger();
 				}
-				self::$log->add( 'arvato-invoice', $message );
+				self::$log->add( 'arvato', $message );
 			}
 		}
 
@@ -73,20 +73,6 @@ function init_wc_gateway_arvato_invoice_class() {
 		 */
 		public function init_form_fields() {
 			$this->form_fields = include( 'includes/settings-invoice.php' );
-		}
-
-		/**
-		 * Outputs Gateway Form Fields.
-		 */
-		public function payment_fields() {
-			?>
-			<p class="form-row form-row-wide validate-required">
-				<input type="text" name="arvato_pre_check_customer" id="arvato_pre_check_customer" placeholder="Personal number" />
-			</p>
-			<p class="form-row form-row-wide">
-				<input type="submit" for="arvato_pre_check_customer" value="Fetch customer information" />
-			</p>
-			<?php
 		}
 
 		function footer_debug() {
