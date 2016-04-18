@@ -19,11 +19,15 @@ function init_wc_gateway_arvato_invoice_class() {
 	 * Provides Arvato Invoice Payment Gateway for WooCommerce.
 	 *
 	 * @class       WC_Gateway_Arvato_Invoice
-	 * @extends     WC_Payment_Gateway
+	 * @extends     WC_Gateway_Arvato_Factory
 	 * @version     0.1
 	 * @author      Krokedil
 	 */
-	class WC_Gateway_Arvato_Invoice extends WC_Payment_Gateway {
+	class WC_Gateway_Arvato_Invoice extends WC_Gateway_Arvato_Factory {
+
+		/** @var bool Whether or not logging is enabled */
+		public static $log_enabled = false;
+
 		/**
 		 * Constructor for the gateway.
 		 */
@@ -33,23 +37,30 @@ function init_wc_gateway_arvato_invoice_class() {
 			$this->has_fields         = true;
 			$this->method_title       = __( 'Arvato Invoice', 'woocommerce-gateway-arvato' );
 			$this->method_description = __( 'Allows payments through Arvato Invoice.', 'woocommerce-gateway-arvato' );
-
-			$this->endpoint_checkout = 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl';
-			$this->endpoint_order_management = 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl';
+			$this->supports           = array(
+				'products',
+				'refunds'
+			);
 
 			// Load the settings.
 			$this->init_form_fields();
 			$this->init_settings();
 
 			// Define user set variables
-			$this->title        = $this->get_option( 'title' );
-			$this->description  = $this->get_option( 'description' );
-			$this->client_id    = $this->get_option( 'client_id' );
-			$this->username     = $this->get_option( 'username' );
-			$this->password     = $this->get_option( 'password' );
+			$this->title       = $this->get_option( 'title' );
+			$this->description = $this->get_option( 'description' );
+			$this->client_id   = $this->get_option( 'client_id' );
+			$this->username    = $this->get_option( 'username' );
+			$this->password    = $this->get_option( 'password' );
+			$this->debug       = $this->get_option( 'debug' );
+
+			self::$log_enabled = $this->debug;
 
 			// Actions
-			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
+			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array(
+				$this,
+				'process_admin_options'
+			) );
 			// add_action( 'wp_footer', array( $this, 'footer_debug' ) );
 
 			// Filters
@@ -57,6 +68,7 @@ function init_wc_gateway_arvato_invoice_class() {
 
 		/**
 		 * Logging method.
+		 *
 		 * @param string $message
 		 */
 		public static function log( $message ) {
@@ -69,59 +81,59 @@ function init_wc_gateway_arvato_invoice_class() {
 		}
 
 		/**
-		 * Initialise Gateway Settings Form Fields.
+		 * Check if payment method is available for current customer
 		 */
-		public function init_form_fields() {
-			$this->form_fields = include( 'includes/settings-invoice.php' );
+		public function is_available() {
+			return true;
 		}
 
 		function footer_debug() {
-			$soap_client_1 = new SoapClient( $this->endpoint_checkout );
+			$soap_client_1 = new SoapClient( 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl' );
 
 			// PreCheckCustomer
 
 			$args_1 = array(
-				'User' => array(
+				'User'         => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'Customer' => array(
-					'Address' => array(
+				'Customer'     => array(
+					'Address'                 => array(
 						'CountryCode' => 'SE',
-						'PostalCode' => 75649,
+						'PostalCode'  => 75649,
 						'PostalPlace' => 'UPPSALA',
-						'Street' => 'Ågatan'
+						'Street'      => 'Ågatan'
 					),
-					'CustomerCategory' => 'Person',
-					'Email' => 'lars.arvidsson@arvato.com',
-					'FirstName' => 'Nils GunnarThird Name',
-					'LastName' => 'Nyman',
-					'MobilePhone' => '0708581465',
-					'Organization_PersonalNo' => '4403171111'
+					'CustomerCategory'        => 'Person',
+					'Email'                   => 'lars.arvidsson@arvato.com',
+					'FirstName'               => 'Nils GunnarThird Name',
+					'LastName'                => 'Nyman',
+					'MobilePhone'             => '0708581465',
+					'Organization_PersonalNo' => '4502251111'
 				),
 				'OrderDetails' => array(
-					'Amount' => 24000,
-					'CurrencyCode' => 'SEK',
-					'OrderChannelType' => 'Internet',
+					'Amount'            => 24000,
+					'CurrencyCode'      => 'SEK',
+					'OrderChannelType'  => 'Internet',
 					'OrderDeliveryType' => 'Normal',
-					'OrderLines' => array(
+					'OrderLines'        => array(
 						array(
-							'GrossUnitPrice' => 24000,
+							'GrossUnitPrice'  => 24000,
 							'ItemDescription' => 'Blah',
-							'ItemID' => 99,
-							'ItemGroupId' => '9999',
-							'LineNumber' => 1,
-							'NetUnitPrice' => 24000,
-							'Quantity' => 1,
-							'VatPercent' => 0
+							'ItemID'          => 99,
+							'ItemGroupId'     => '9999',
+							'LineNumber'      => 1,
+							'NetUnitPrice'    => 24000,
+							'Quantity'        => 1,
+							'VatPercent'      => 0
 						)
 					)
 				)
 			);
 
 			$response_1 = $soap_client_1->PreCheckCustomer( $args_1 );
-			
+
 			echo '<pre style="color: #fff">';
 			echo '<h1>Response: PreCheckCustomer</h1>';
 			print_r( $response_1 );
@@ -130,23 +142,23 @@ function init_wc_gateway_arvato_invoice_class() {
 			// CreateContract
 
 			$args_2 = array(
-				'User' => array(
+				'User'        => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'CheckoutID' => $response_1->CheckoutID,
+				'CheckoutID'  => $response_1->CheckoutID,
 				'PaymentInfo' => array(
-					'PaymentMethod' => 'Account',
+					'PaymentMethod'   => 'Account',
 					'InstallmentInfo' => array(
 						'AccountProfileNo' => 1,
-						'Amount' => 24000
+						'Amount'           => 24000
 					)
 				)
 			);
 
-			$soap_client_2 = new SoapClient( $this->endpoint_checkout );
-			$response_2 = $soap_client_2->CreateContract( $args_2 );
+			$soap_client_2 = new SoapClient( 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl' );
+			$response_2    = $soap_client_2->CreateContract( $args_2 );
 
 			echo '<pre style="color: #fff">';
 			echo '<h1>Response: CreateContract</h1>';
@@ -154,27 +166,27 @@ function init_wc_gateway_arvato_invoice_class() {
 			echo '</pre>';
 
 			// CompleteCheckout
-			$order_no =  strval( rand(1000, 1000000) );
+			$order_no = strval( rand( 1000, 1000000 ) );
 
 			$args_3 = array(
-				'User' => array(
+				'User'            => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'CheckoutID' => $response_1->CheckoutID,
-				'OrderNo' => $order_no,
-				'CustomerNo' => $response_1->Customer->CustomerNo,
-				'Amount' => 24000,
+				'CheckoutID'      => $response_1->CheckoutID,
+				'OrderNo'         => $order_no,
+				'CustomerNo'      => $response_1->Customer->CustomerNo,
+				'Amount'          => 24000,
 				'TotalOrderValue' => '24000',
-				'PaymentInfo' => array(
+				'PaymentInfo'     => array(
 					'PaymentMethod' => 'Account'
 				),
-				'OrderDate' => '2016-03-30'
+				'OrderDate'       => '2016-03-30'
 			);
 
-			$soap_client_3 = new SoapClient( $this->endpoint_checkout );
-			$response_3 = $soap_client_3->CompleteCheckout( $args_3 );
+			$soap_client_3 = new SoapClient( 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl' );
+			$response_3    = $soap_client_3->CompleteCheckout( $args_3 );
 
 			echo '<pre style="color: #fff">';
 			echo '<h1>Response: CompleteCheckout</h1>';
@@ -184,45 +196,45 @@ function init_wc_gateway_arvato_invoice_class() {
 			// CaptureFull
 
 			$args_4 = array(
-				'User' => array(
+				'User'             => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'TransactionID' => $response_3->TransactionID,
-				'Amount' => 1394,
-				'PaymentInfo' => array(
+				'TransactionID'    => $response_3->TransactionID,
+				'Amount'           => 1394,
+				'PaymentInfo'      => array(
 					'PaymentMethod' => 'Account'
 				),
-				'ContractDate' => '2016-04-05',
-				'OrderDetails' => array(
-					'Amount' => 24000,
-					'TotalOrderValue' => 24000,
-					'CurrencyCode' => 'SEK',
-					'OrderChannelType' => 'Internet',
+				'ContractDate'     => '2016-04-05',
+				'OrderDetails'     => array(
+					'Amount'            => 24000,
+					'TotalOrderValue'   => 24000,
+					'CurrencyCode'      => 'SEK',
+					'OrderChannelType'  => 'Internet',
 					'OrderDeliveryType' => 'Normal',
-					'OrderLines' => array(
+					'OrderLines'        => array(
 						array(
-							'GrossUnitPrice' => 24000,
+							'GrossUnitPrice'  => 24000,
 							'ItemDescription' => 'Blah',
-							'ItemID' => 99,
-							'ItemGroupId' => '9999',
-							'LineNumber' => 1,
-							'NetUnitPrice' => 24000,
-							'Quantity' => 1,
-							'VatPercent' => 0
+							'ItemID'          => 99,
+							'ItemGroupId'     => '9999',
+							'LineNumber'      => 1,
+							'NetUnitPrice'    => 24000,
+							'Quantity'        => 1,
+							'VatPercent'      => 0
 						)
 					),
-					'OrderNo' => $order_no,
+					'OrderNo'           => $order_no,
 				),
-				'YourRef' => 'Britta Skoog',
-				'OurRef' => 'Ann Holm',
-				'StatcodeNum' => 12,
+				'YourRef'          => 'Britta Skoog',
+				'OurRef'           => 'Ann Holm',
+				'StatcodeNum'      => 12,
 				'StatcodeAlphaNum' => 'Blått'
 			);
 
 			$soap_client_4 = new SoapClient( $this->endpoint_order_management );
-			$response_4 = $soap_client_4->CaptureFull( $args_4 );
+			$response_4    = $soap_client_4->CaptureFull( $args_4 );
 
 			echo '<pre style="color: #fff">';
 			echo '<h1>Response: CaptureFull</h1>';
@@ -232,64 +244,77 @@ function init_wc_gateway_arvato_invoice_class() {
 
 		/**
 		 * Process the payment and return the result.
+		 *
 		 * @param  int $order_id
+		 *
 		 * @return array
 		 */
-		public function process_payment( $order_id ) {
-			$order = new WC_Order( $order_id );
+		public function process_paymenttt( $order_id ) {
+			// Use WC_Arvato_Complete_Checkout class to process the payment
+			// Must previously perform PreCheckCustomer
+			// CheckoutID and CustomerNo are required and returned from PreCheckCustomer
+			$wc_arvato_complete_checkout = new WC_Arvato_Complete_Checkout();
+
+			// If error
+			wc_add_notice( __( 'Payment error:', 'woothemes' ) . $error_message, 'error' );
+
+			return;
+
+
+			$order       = new WC_Order( $order_id );
 			$soap_client = new SoapClient( $this->endpoint_checkout );
 
 			// PreCheckCustomer
-			$args_pre_check_customer = array(
-				'User' => array(
+			$args_pre_check_customer     = array(
+				'User'         => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'Customer' => array(
-					'Address' => array(
+				'Customer'     => array(
+					'Address'                 => array(
 						'CountryCode' => 'SE',
 					),
-					'CustomerCategory' => 'Person',
-					'Email' => 'lars.arvidsson@arvato.com',
-					'MobilePhone' => '0708581465',
+					'CustomerCategory'        => 'Person',
+					'Email'                   => 'lars.arvidsson@arvato.com',
+					'MobilePhone'             => '0708581465',
 					'Organization_PersonalNo' => '4502251111'
 				),
 				'OrderDetails' => array(
-					'Amount' => $order->get_total(),
-					'CurrencyCode' => 'SEK',
-					'OrderChannelType' => 'Internet',
+					'Amount'            => $order->get_total(),
+					'CurrencyCode'      => 'SEK',
+					'OrderChannelType'  => 'Internet',
 					'OrderDeliveryType' => 'Normal',
-					'OrderLines' => $this->format_order_lines( $order_id )
+					'OrderLines'        => $this->format_order_lines( $order_id )
 				)
 			);
 			$pre_check_customer_response = $soap_client->PreCheckCustomer( $args_pre_check_customer );
 
-			error_log( 'RESPONSE PRE CHECK CUSTOMER: ' . var_export( $pre_check_customer_response, true ) );
+			// error_log( 'RESPONSE PRE CHECK CUSTOMER: ' . var_export( $pre_check_customer_response, true ) );
 
 			add_post_meta( $order->id, '_arvato_customer_no', $pre_check_customer_response->Customer->CustomerNo );
 
 			// CompleteCheckout
 
 			$args_complete_checkout = array(
-				'User' => array(
+				'User'        => array(
 					'ClientID' => 7852,
 					'Password' => 'm8K1Dfuj',
 					'Username' => 'WooComTestSE'
 				),
-				'CheckoutID' => $pre_check_customer_response->CheckoutID,
-				'OrderNo' => $order->id,
-				'CustomerNo' => $pre_check_customer_response->Customer->CustomerNo,
-				'Amount' => $order->get_total(),
+				'CheckoutID'  => $pre_check_customer_response->CheckoutID,
+				'OrderNo'     => $order->id,
+				'CustomerNo'  => $pre_check_customer_response->Customer->CustomerNo,
+				'Amount'      => $order->get_total(),
 				'PaymentInfo' => array(
 					'PaymentMethod' => 'Invoice'
 				),
-				'OrderDate' => date( 'Y-m-d', $order->order_date )
+				'OrderDate'   => date( 'Y-m-d', $order->order_date )
 			);
 
 			$response_complete_checkout = $soap_client->CompleteCheckout( $args_complete_checkout );
 
-			error_log( 'RESPONSE COMPLETE CHECKOUT: ' . var_export( $response_complete_checkout, true ) );
+			// error_log( 'RESPONSE COMPLETE CHECKOUT: ' . var_export( $response_complete_checkout, true ) );
 
 			if ( $response_complete_checkout->IsSuccess ) {
 				/*
@@ -375,21 +400,21 @@ function init_wc_gateway_arvato_invoice_class() {
 		 * Format WooCommerce order lines for Arvato
 		 */
 		public function format_order_lines( $order_id ) {
-			$order = new WC_Order( $order_id );
+			$order       = new WC_Order( $order_id );
 			$order_lines = array();
 
 			if ( sizeof( $order->get_items() ) > 0 ) {
 				foreach ( $order->get_items() as $item_key => $item ) {
-					$_product = $order->get_product_from_item( $item );
+					$_product      = $order->get_product_from_item( $item );
 					$order_lines[] = array(
-						'GrossUnitPrice' => $order->get_item_total( $item, true ),
+						'GrossUnitPrice'  => $order->get_item_total( $item, true ),
 						'ItemDescription' => $item['name'],
-						'ItemID' => $_product->id,
-						'ItemGroupId' => '9999',
-						'LineNumber' => $item_key,
-						'NetUnitPrice' => $order->get_item_total( $item, false ),
-						'Quantity' => $item['qty'],
-						'VatPercent' => $order->get_item_tax( $item ) / $order->get_item_total( $item, false )
+						'ItemID'          => $_product->id,
+						'ItemGroupId'     => '9999',
+						'LineNumber'      => $item_key,
+						'NetUnitPrice'    => $order->get_item_total( $item, false ),
+						'Quantity'        => $item['qty'],
+						'VatPercent'      => $order->get_item_tax( $item ) / $order->get_item_total( $item, false )
 					);
 				}
 			}
@@ -397,6 +422,7 @@ function init_wc_gateway_arvato_invoice_class() {
 			return $order_lines;
 		}
 	}
+
 }
 
 /**
@@ -405,9 +431,11 @@ function init_wc_gateway_arvato_invoice_class() {
  * @wp_hook woocommerce_payment_gateways
  *
  * @param  $methods Array All registered payment methods
+ *
  * @return $methods Array All registered payment methods
  */
 function add_arvato_invoice_method( $methods ) {
 	$methods[] = 'WC_Gateway_Arvato_Invoice';
+
 	return $methods;
 }

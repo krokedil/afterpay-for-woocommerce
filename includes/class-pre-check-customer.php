@@ -30,11 +30,6 @@ class WC_Arvato_Pre_Check_Customer {
 
 	function slbd() {
 		?>
-		<?php
-		echo '<pre>';
-		print_r( WC()->cart->cart_contents );
-		echo '</pre>';
-		?>
 		<form id="arvato-pre-check-customer" class="arvato-pre-check-customer">
 			<p class="form-row form-row-wide validate-required">
 				<input type="text" name="arvato-pre-check-customer-pn" id="arvato-pre-check-customer-pn"
@@ -65,55 +60,58 @@ class WC_Arvato_Pre_Check_Customer {
 			exit( 'Nonce can not be verified.' );
 		}
 
-		$data = array(
-			'something' => 'else'
-		);
+		$data = array();
 
-		if ( sizeof( $order->get_items() ) > 0 ) {
-			foreach ( $order->get_items() as $item_key => $item ) {
-				$_product = $order->get_product_from_item( $item );
-				$order_lines[] = array(
-					'GrossUnitPrice' => $order->get_item_total( $item, true ),
-					'ItemDescription' => $item['name'],
-					'ItemID' => $_product->id,
-					'ItemGroupId' => '9999',
-					'LineNumber' => $item_key,
-					'NetUnitPrice' => $order->get_item_total( $item, false ),
-					'Quantity' => $item['qty'],
-					'VatPercent' => $order->get_item_tax( $item ) / $order->get_item_total( $item, false )
-				);
-			}
-		}
+		$personal_number = $_REQUEST['personal_number'];
 
-		return $order_lines;
+		// Needed to get Arvato account information
+		$payment_method = $_REQUEST['payment_method'];
+		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+
+		// Prepare order lines for Arvato
+		$order_lines_processor = new WC_Arvato_Process_Order_Lines();
+		$order_lines = $order_lines_processor->get_order_lines();
+
+		// Live or test checkout endpoint, based on payment gateway settings
+		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST :
+			ARVATO_CHECKOUT_LIVE;
+
 		// PreCheckCustomer
-		$soap_client = new SoapClient( 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl' );
+		$soap_client = new SoapClient( $checkout_endpoint );
 		$args_pre_check_customer = array(
 			'User' => array(
-				'ClientID' => 7852,
-				'Password' => 'm8K1Dfuj',
-				'Username' => 'WooComTestSE'
+				'ClientID' => $payment_method_settings['client_id'],
+				'Username' => $payment_method_settings['username'],
+				'Password' => $payment_method_settings['password']
 			),
 			'Customer' => array(
 				'Address' => array(
 					'CountryCode' => 'SE',
 				),
 				'CustomerCategory' => 'Person',
-				'Email' => 'lars.arvidsson@arvato.com',
-				'MobilePhone' => '0708581465',
-				'Organization_PersonalNo' => '4502251111'
+				'Organization_PersonalNo' => $personal_number
 			),
 			'OrderDetails' => array(
-				'Amount' => WC()->cart->get_total(),
+				'Amount' => WC()->cart->total,
 				'CurrencyCode' => 'SEK',
 				'OrderChannelType' => 'Internet',
 				'OrderDeliveryType' => 'Normal',
-				'OrderLines' => $this->format_order_lines( $order_id )
+				'OrderLines' => $order_lines
 			)
 		);
 		$pre_check_customer_response = $soap_client->PreCheckCustomer( $args_pre_check_customer );
+		$data['response'] = $pre_check_customer_response;
 
-		wp_send_json_success( $data );
+		if ( $pre_check_customer_response->IsSuccess ) {
+			// Set session data
+			WC()->session->set( 'arvato_checkout_id', $pre_check_customer_response->CheckoutID );
+			WC()->session->set( 'arvato_customer_no', $pre_check_customer_response->Customer->CustomerNo );
+
+			// Send success
+			wp_send_json_success( $data );
+		} else {
+			wp_send_json_error( $data );
+		}
 
 		wp_die();
 	}

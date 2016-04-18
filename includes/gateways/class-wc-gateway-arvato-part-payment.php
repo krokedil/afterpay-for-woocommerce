@@ -46,13 +46,6 @@ function init_wc_gateway_arvato_part_payment_class() {
 
 			// Filters
 		}
-
-		/**
-		 * Initialise Gateway Settings Form Fields.
-		 */
-		public function init_form_fields() {
-			$this->form_fields = include( 'includes/settings-part-payment.php' );
-		}
 	}
 }
 

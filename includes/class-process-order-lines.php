@@ -15,13 +15,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WC_Arvato_Process_Order_Lines {
 
 	/**
-	 * @param bool $order_id
+	 * Get order lines from order or cart
+	 *
+	 * @param  bool  $order_id
+	 * @return array $order_lines
 	 */
 	public function get_order_lines( $order_id = false ) {
 		if ( $order_id ) {
-			$this->get_order_lines_from_order( $order_id );
+			return $this->get_order_lines_from_order( $order_id );
 		} else {
-			$this->get_order_lines_from_cart();
+			return $this->get_order_lines_from_cart();
 		}
 	}
 

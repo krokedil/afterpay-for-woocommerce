@@ -65,9 +65,35 @@ function woocommerce_gateway_arvato_disabled_notices() {
 	echo '</div>';
 }
 
-include_once( 'includes/gateways/invoice/class-wc-gateway-arvato-invoice.php' );
-include_once( 'includes/gateways/part-payment/class-wc-gateway-arvato-part-payment.php' );
-include_once( 'includes/gateways/account/class-wc-gateway-arvato-account.php' );
+include_once( 'includes/gateways/class-wc-gateway-arvato-factory.php' );
+include_once( 'includes/gateways/class-wc-gateway-arvato-invoice.php' );
+include_once( 'includes/gateways/class-wc-gateway-arvato-part-payment.php' );
+include_once( 'includes/gateways/class-wc-gateway-arvato-account.php' );
 
 include_once( 'includes/class-pre-check-customer.php' );
 include_once( 'includes/class-cancel-reservation.php' );
+include_once( 'includes/class-complete-checkout.php' );
+include_once( 'includes/class-capture.php' );
+
+include_once( 'includes/class-process-order-lines.php' );
+
+
+/**
+ * Define server endpoints
+ */
+define(
+	'ARVATO_CHECKOUT_LIVE',
+	'https://api.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'
+);
+define(
+	'ARVATO_CHECKOUT_TEST',
+	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'
+);
+define(
+	'ARVATO_ORDER_MANAGEMENT_LIVE',
+	'https://api.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
+);
+define(
+	'ARVATO_ORDER_MANAGEMENT_TEST',
+	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
+);

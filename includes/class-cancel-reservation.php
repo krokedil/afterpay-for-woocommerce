@@ -6,7 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Cancel Arvato reservation
  *
- * Check if order was created using Arvato and if yes, cancel Arvato order when WooCommerce order is marked cancelled.
+ * Check if order was created using Arvato and if yes, cancel Arvato reservation when WooCommerce order is marked
+ * cancelled.
  *
  * @class WC_Arvato_Cancel_Reservation
  * @version 1.0.0
@@ -18,9 +19,6 @@ class WC_Arvato_Cancel_Reservation {
 
 	/** @var int */
 	private $order_id = '';
-
-	/** @var string */
-	private $endpoint_checkout = 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl';
 
 	/**
 	 * WC_Arvato_Cancel_Reservation constructor.
@@ -88,9 +86,8 @@ class WC_Arvato_Cancel_Reservation {
 
 		// Get settings for payment method used to create this order.
 		$payment_method_settings = $this->get_payment_method_settings();
-
-		error_log( var_export( $payment_method_settings, true ) );
-
+		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST :
+			ARVATO_CHECKOUT_LIVE;
 
 		// Check if logging is enabled
 		$this->log_enabled = $payment_method_settings['debug'];
@@ -105,12 +102,12 @@ class WC_Arvato_Cancel_Reservation {
 			'OrderNo'    => $this->order_id
 		);
 
-		$soap_client = new SoapClient( $this->endpoint_checkout );
+		$soap_client = new SoapClient( $checkout_endpoint );
 		$response    = $soap_client->CancelReservation( $cancel_reservation_args );
 
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			add_post_meta( $this->order_id, '_arvato_reservation_cancelled', time() );
+			add_post_meta( $this->order_id, '_arvato_reservation_cancelled', current_time( 'mysql' ) );
 
 			$order->add_order_note( __(
 				'Arvato reservation was successfully cancelled.',
