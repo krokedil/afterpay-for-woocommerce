@@ -62,7 +62,7 @@ function init_wc_gateway_arvato_invoice_class() {
 				$this,
 				'process_admin_options'
 			) );
-			add_action( 'wp_footer', array( $this, 'footer_debug' ) );
+			// add_action( 'wp_footer', array( $this, 'footer_debug' ) );
 
 			// Filters
 		}
@@ -92,9 +92,11 @@ function init_wc_gateway_arvato_invoice_class() {
 
 		function footer_debug() {
 			$order = wc_get_order( 193 );
+			foreach ( $order->get_shipping_methods() as $shipping_method_key => $shipping_method_value ) {
 				echo '<pre style="color:#fff">';
-				print_r( $order->get_fees() );
+				print_r( $shipping_method_key );
 				echo '</pre>';
+			}
 
 			$processor = new WC_Arvato_Process_Order_Lines;
 			echo '<pre style="color:#fff">';

@@ -48,11 +48,11 @@ class WC_Arvato_Process_Order_Lines {
 					'GrossUnitPrice'  => $order->get_item_total( $item, true ),
 					'ItemDescription' => $item['name'],
 					'ItemID'          => $_product->id,
+					'ItemGroupId'     => $_product->id,
 					'LineNumber'      => $item_key,
 					'NetUnitPrice'    => $order->get_item_total( $item, false ),
 					'Quantity'        => $item['qty'],
-					'VatPercent'      => round( $order->get_item_tax( $item ) / $order->get_item_total( $item, false
-							), 4 ) * 100
+					'VatPercent'      => round( $order->get_item_tax( $item ) / $order->get_item_total( $item, false ), 4 ) * 100
 				);
 			}
 		}
@@ -65,7 +65,8 @@ class WC_Arvato_Process_Order_Lines {
 				$order_lines[] = array(
 					'GrossUnitPrice'  => $shipping_method_tax + $shipping_method_value['cost'],
 					'ItemDescription' => $shipping_method_value['name'],
-					'ItemID'          => $shipping_method_value['method_id'],
+					'ItemID'          => $shipping_method_key,
+					'ItemGroupId'     => $shipping_method_key,
 					'LineNumber'      => $shipping_method_key,
 					'NetUnitPrice'    => $shipping_method_value['cost'],
 					'Quantity'        => 1,
@@ -81,6 +82,7 @@ class WC_Arvato_Process_Order_Lines {
 					'GrossUnitPrice'  => round( ( $order_fee_value['line_tax'] + $order_fee_value['line_total'] ), 2 ),
 					'ItemDescription' => $order_fee_value['name'],
 					'ItemID'          => $order_fee_key,
+					'ItemGroupId'     => $order_fee_key,
 					'LineNumber'      => $order_fee_key,
 					'NetUnitPrice'    => $order_fee_value['line_total'],
 					'Quantity'        => 1,
@@ -153,6 +155,7 @@ class WC_Arvato_Process_Order_Lines {
 		}
 
 		error_log( 'CART ORDER LINES: ' . var_export( $order_lines, true ) );
+
 		return $order_lines;
 	}
 
