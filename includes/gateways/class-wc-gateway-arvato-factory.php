@@ -125,5 +125,57 @@ function init_wc_gateway_arvato_factory_class() {
 			}
 		}
 
+		/**
+		 * Process a refund if supported.
+		 *
+		 * @param  int    $order_id
+		 * @param  float  $amount
+		 * @param  string $reason
+		 * @return bool True or false based on success, or a WP_Error object
+		 */
+		public function process_refund( $order_id, $amount = null, $reason = '' ) {
+			$order = wc_get_order( $order_id );
+
+			if ( is_wp_error( $this->can_refund_order( $order, $amount ) ) ) {
+				return $this->can_refund_order( $order, $amount );
+			}
+
+			include_once( plugin_dir_path( __DIR__ ) . 'class-refund.php' );
+
+			// Use WC_Arvato_Complete_Checkout class to process the payment
+			// Must previously perform PreCheckCustomer
+			// CheckoutID and CustomerNo are required and returned from PreCheckCustomer
+			$wc_arvato_refund = new WC_Arvato_Refund( $order_id, $this->id );
+
+			$result = $wc_arvato_refund->refund_invoice( $order_id, $amount, $reason );
+
+			if ( is_wp_error( $result ) ) {
+				$this->log( 'Refund Failed: ' . $result->get_error_message() );
+				return new WP_Error( 'error', $result->get_error_message() );
+			}
+			
+			return true;
+		}
+
+		/**
+		 * Can the order be refunded via Arvato AfterPay?
+		 * @param  WC_Order $order
+		 * @return bool
+		 */
+		public function can_refund_order( $order, $amount ) {
+			// Check if there's a transaction ID (invoice number)
+			if ( ! $order->get_transaction_id() ) {
+				return new WP_Error( 'error', __( 'Refund failed: No Arvato invoice number ID.', 'woocommerce' ) );
+			}
+
+			// At the moment, only full refund is possible, because we can't send refunded order lines to Arvato
+			if ( $amount != $order->get_total() ) {
+				return new WP_Error( 'error', __( 'Refund failed: Only full order amount can be refunded.',
+					'woocommerce' ) );
+			}
+
+			return true;
+		}
+
 	}
 }

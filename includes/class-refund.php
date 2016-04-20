@@ -4,9 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Cancel Arvato reservation
+ * Refund Arvato invoice
  *
- * Check if order was created using Arvato and if yes, cancel Arvato order when WooCommerce order is marked cancelled.
+ * Check if refund is possible, then process it. Currently only supports RefundFull.
  *
  * @class WC_Arvato_Refund
  * @version 1.0.0
@@ -16,36 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WC_Arvato_Refund {
 
-	/**
-	 * Mandatory fields
-	 * Member name
-	 * - CustomerNo (custom field _arvato_customer_no)
-	 * - OrderNo (available in woocommerce_order_status_cancelled hook)
-	 *
-	 * User (pulled using get_option)
-	 * - ClientID
-	 * - Password
-	 * - Username
-	 */
-
 	/** @var int */
 	private $order_id = '';
-
-	/**
-	 * WC_Arvato_Cancel_Reservation constructor.
-	 */
-	public function __construct() {
-		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_full' ) );
-	}
-
-	/**
-	 * Grab Arvato customer number.
-	 *
-	 * @return string
-	 */
-	public function get_customer_no() {
-		return get_post_meta( $this->order_id, '_arvato_customer_no', true );
-	}
 
 	/**
 	 * Grab Arvato reservation ID.
@@ -86,11 +58,12 @@ class WC_Arvato_Refund {
 	}
 
 	/**
-	 * Process reservation cancellation.
+	 * Process refund.
 	 *
 	 * @param $order_id
+	 * @return boolean
 	 */
-	public function capture_full( $order_id ) {
+	public function refund_invoice( $order_id, $amount = null, $reason = '' ) {
 		$this->order_id = $order_id;
 		$order = wc_get_order( $this->order_id );
 
@@ -99,80 +72,56 @@ class WC_Arvato_Refund {
 			return;
 		}
 
-		// If this reservation was already cancelled, do nothing.
-		if ( get_post_meta( $this->order_id, '_arvato_reservation_captured', true ) ) {
-			return;
-		}
-
 		// Get settings for payment method used to create this order.
 		$payment_method_settings = $this->get_payment_method_settings();
-		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MANAGEMENT_TEST :
-			ARVATO_ORDER_MANAGEMENT_LIVE;
 
-		$payment_method_id = $order->payment_method;
-		switch ( $payment_method_id ) {
-			case 'arvato_invoice':
-				$payment_method = 'Invoice';
-				break;
-			case 'arvato_account':
-				$payment_method = 'Account';
-				break;
-			case 'arvato_part_payment':
-				$payment_method = 'Installment';
-				break;
-		}
-
-		// Prepare order lines for Arvato
-		$order_lines_processor = new WC_Arvato_Process_Order_Lines();
-		$order_lines = $order_lines_processor->get_order_lines( $order_id );
-		error_log( var_export( $order_lines, true ) );
+		$order_maintenance_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MAINTENANCE_TEST :
+			ARVATO_ORDER_MAINTENANCE_LIVE;
 
 		// Check if logging is enabled
 		$this->log_enabled = $payment_method_settings['debug'];
 
-		$capture_full_args = array(
+		$refund_args = array(
 			'User'       => array(
 				'ClientID' => $payment_method_settings['client_id'],
 				'Username' => $payment_method_settings['username'],
 				'Password' => $payment_method_settings['password']
 			),
-			'ReservationID'    => $this->get_reservation_id(),
-			'PaymentInfo'      => array(
-				'PaymentMethod' => $payment_method
-			),
-			'ContractDate'     => date( 'Y-m-d', strtotime( $order->order_date ) ),
-			'OrderDetails'     => array(
-				'Amount'            => $order->get_total(),
-				'TotalOrderValue'   => $order->get_total(),
-				'CurrencyCode'      => $order->get_order_currency(),
-				'OrderChannelType'  => 'Internet',
-				'OrderDeliveryType' => 'Normal',
-				'OrderLines'        => $order_lines,
-				'OrderNo'           => $this->order_id,
-			),
-			'YourRef'          => 'Britta Skoog',
-			'OurRef'           => 'Ann Holm',
-			'StatcodeNum'      => 12,
-			'StatcodeAlphaNum' => 'Blått'
+			'ReservationID' => $this->get_reservation_id(),
+			'InvoiceNumber' => $order->get_transaction_id(),
 		);
 
-		$soap_client = new SoapClient( $checkout_endpoint );
-		$response    = $soap_client->CaptureFull( $capture_full_args );
+		$soap_client = new SoapClient( $order_maintenance_endpoint );
+
+		if ( $amount != $order->get_total() ) {
+			$refund_args['OrderDetails']['Amount'] = $amount;
+			$refund_args['OrderDetails']['OrderNo'] = $order_id;
+			$refund_args['OrderDetails']['CurrencyCode'] = $order->get_order_currency();
+			$refund_args['OrderDetails']['OrderChannelType'] = 'Internet';
+			$refund_args['OrderDetails']['OrderDeliveryType'] = 'Normal';
+
+			$response = $soap_client->RefundPartial( $refund_args );
+		} else {
+			$refund_args['OrderNo'] = $order_id;
+			$response = $soap_client->RefundFull( $refund_args );
+		}
+
+
+		error_log( var_export( $response, true ) );
 
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			add_post_meta( $this->order_id, '_arvato_reservation_captured', current_time( 'mysql' ) );
-			add_post_meta( $this->order_id, '_arvato_invoice_number', $response->InvoiceNumber );
+			update_post_meta( $this->order_id, '_arvato_invoice_refunded', current_time( 'mysql' ) );
+			$order->add_order_note(	__( 'Arvato refund was successfully processed.', 'woocommerce-gateway-arvato' ) );
 
-			$order->add_order_note(
-				sprintf( __( 'Arvato reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-arvato' ), $response->InvoiceNumber )
-			);
-
+			return $response;
 		} else {
 			$order->add_order_note( __(
-				'Arvato reservation could not be captured.',
+				'Arvato refund could not be processed.',
 				'woocommerce-gateway-arvato'
 			) );
+
+			return new WP_Error( 'arvato-refund', __( 'Refund failed.', 'woocommerce-gateway-arvato' ) );
 		}
 	}
 

@@ -37,7 +37,8 @@ function init_wc_gateway_arvato_invoice_class() {
 			$this->has_fields         = true;
 			$this->method_title       = __( 'Arvato Invoice', 'woocommerce-gateway-arvato' );
 			$this->method_description = __( 'Allows payments through Arvato Invoice.', 'woocommerce-gateway-arvato' );
-			$this->supports           = array(
+
+			$this->supports = array(
 				'products',
 				'refunds'
 			);
@@ -61,7 +62,7 @@ function init_wc_gateway_arvato_invoice_class() {
 				$this,
 				'process_admin_options'
 			) );
-			// add_action( 'wp_footer', array( $this, 'footer_debug' ) );
+			add_action( 'wp_footer', array( $this, 'footer_debug' ) );
 
 			// Filters
 		}
@@ -72,12 +73,14 @@ function init_wc_gateway_arvato_invoice_class() {
 		 * @param string $message
 		 */
 		public static function log( $message ) {
+			/*
 			if ( self::$log_enabled ) {
 				if ( empty( self::$log ) ) {
 					self::$log = new WC_Logger();
 				}
 				self::$log->add( 'arvato', $message );
 			}
+			*/
 		}
 
 		/**
@@ -88,6 +91,17 @@ function init_wc_gateway_arvato_invoice_class() {
 		}
 
 		function footer_debug() {
+			/*
+			$the_order = wc_get_order(169);
+			echo '<pre style="color:#fff">';
+			foreach( $the_order->get_items() as $item_id => $item ) {
+				echo $the_order->get_total_refunded_for_item($item_id);
+				echo '<br />';
+			}
+			echo '</pre>';
+			*/
+
+			/*
 			$soap_client_1 = new SoapClient( 'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl' );
 
 			// PreCheckCustomer
@@ -240,6 +254,7 @@ function init_wc_gateway_arvato_invoice_class() {
 			echo '<h1>Response: CaptureFull</h1>';
 			print_r( $response_4 );
 			echo '</pre>';
+			*/
 		}
 
 		/**
@@ -292,7 +307,7 @@ function init_wc_gateway_arvato_invoice_class() {
 
 			// error_log( 'RESPONSE PRE CHECK CUSTOMER: ' . var_export( $pre_check_customer_response, true ) );
 
-			add_post_meta( $order->id, '_arvato_customer_no', $pre_check_customer_response->Customer->CustomerNo );
+			update_post_meta( $order->id, '_arvato_customer_no', $pre_check_customer_response->Customer->CustomerNo );
 
 			// CompleteCheckout
 

@@ -90,10 +90,10 @@ define(
 	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'
 );
 define(
-	'ARVATO_ORDER_MANAGEMENT_LIVE',
+	'ARVATO_ORDER_MAINTENANCE_LIVE',
 	'https://api.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
 );
 define(
-	'ARVATO_ORDER_MANAGEMENT_TEST',
+	'ARVATO_ORDER_MAINTENANCE_TEST',
 	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
 );

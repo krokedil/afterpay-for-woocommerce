@@ -107,7 +107,7 @@ class WC_Arvato_Cancel_Reservation {
 
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			add_post_meta( $this->order_id, '_arvato_reservation_cancelled', current_time( 'mysql' ) );
+			update_post_meta( $this->order_id, '_arvato_reservation_cancelled', current_time( 'mysql' ) );
 
 			$order->add_order_note( __(
 				'Arvato reservation was successfully cancelled.',

@@ -113,7 +113,7 @@ class WC_Arvato_Complete_Checkout {
 		$complete_checkout_response = $soap_client->CompleteCheckout( $args_complete_checkout );
 
 		if ( $complete_checkout_response->IsSuccess ) {
-			add_post_meta( $order->id, '_arvato_reservation_id', $complete_checkout_response->ReservationID );
+			update_post_meta( $order->id, '_arvato_reservation_id', $complete_checkout_response->ReservationID );
 
 			return true;
 		} else {

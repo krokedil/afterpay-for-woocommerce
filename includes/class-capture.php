@@ -107,8 +107,8 @@ class WC_Arvato_Capture {
 
 		// Get settings for payment method used to create this order.
 		$payment_method_settings = $this->get_payment_method_settings();
-		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MANAGEMENT_TEST :
-			ARVATO_ORDER_MANAGEMENT_LIVE;
+		$order_maintenance_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MAINTENANCE_TEST :
+			ARVATO_ORDER_MAINTENANCE_LIVE;
 
 		$payment_method_id = $order->payment_method;
 		switch ( $payment_method_id ) {
@@ -126,7 +126,6 @@ class WC_Arvato_Capture {
 		// Prepare order lines for Arvato
 		$order_lines_processor = new WC_Arvato_Process_Order_Lines();
 		$order_lines = $order_lines_processor->get_order_lines( $order_id );
-		error_log( var_export( $order_lines, true ) );
 
 		// Check if logging is enabled
 		$this->log_enabled = $payment_method_settings['debug'];
@@ -151,19 +150,15 @@ class WC_Arvato_Capture {
 				'OrderLines'        => $order_lines,
 				'OrderNo'           => $this->order_id,
 			),
-			'YourRef'          => 'Britta Skoog',
-			'OurRef'           => 'Ann Holm',
-			'StatcodeNum'      => 12,
-			'StatcodeAlphaNum' => 'Blått'
 		);
 
-		$soap_client = new SoapClient( $checkout_endpoint );
+		$soap_client = new SoapClient( $order_maintenance_endpoint );
 		$response    = $soap_client->CaptureFull( $capture_full_args );
 
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			add_post_meta( $this->order_id, '_arvato_reservation_captured', current_time( 'mysql' ) );
-			add_post_meta( $this->order_id, '_arvato_invoice_number', $response->InvoiceNumber );
+			update_post_meta( $this->order_id, '_arvato_reservation_captured', current_time( 'mysql' ) );
+			update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );
 
 			$order->add_order_note(
 				sprintf( __( 'Arvato reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-arvato' ), $response->InvoiceNumber )

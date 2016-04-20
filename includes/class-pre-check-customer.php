@@ -25,10 +25,25 @@ class WC_Arvato_Pre_Check_Customer {
 		add_action( 'wp_ajax_arvato_pre_check_customer', array( $this, 'pre_check_customer' ) );
 		add_action( 'wp_ajax_nopriv_arvato_pre_check_customer', array( $this, 'pre_check_customer' ) );
 
-		add_action( 'woocommerce_before_checkout_form', array( $this, 'slbd' ) );
+		add_action( 'woocommerce_before_checkout_form', array( $this, 'display_pre_check_form' ) );
+
+		add_action( 'woocommerce_checkout_init', array( $this, 'test' ) );
 	}
 
-	function slbd() {
+	public function test() {
+		if ( is_user_logged_in() ) {
+			$user = wp_get_current_user();
+			echo '<p>Logged in ' . $user->exists() . '</p>';
+			echo '<pre>';
+			print_r( $user );
+			echo '</pre>';
+		} else {
+
+			echo '<p>Not logged in</p>';
+		}
+	}
+
+	public function display_pre_check_form() {
 		?>
 		<form id="arvato-pre-check-customer" class="arvato-pre-check-customer">
 			<p class="form-row form-row-wide validate-required">
@@ -39,6 +54,7 @@ class WC_Arvato_Pre_Check_Customer {
 				<input type="submit" for="arvato-pre-check-customer" value="Fetch customer information" />
 			</p>
 		</form>
+		<p>Not you? <a href="#">Click here</a> to enter your personal number.</p>
 		<?php
 	}
 
@@ -78,7 +94,7 @@ class WC_Arvato_Pre_Check_Customer {
 
 		// PreCheckCustomer
 		$soap_client = new SoapClient( $checkout_endpoint );
-		$args_pre_check_customer = array(
+		$args = array(
 			'User' => array(
 				'ClientID' => $payment_method_settings['client_id'],
 				'Username' => $payment_method_settings['username'],
@@ -89,7 +105,7 @@ class WC_Arvato_Pre_Check_Customer {
 					'CountryCode' => 'SE',
 				),
 				'CustomerCategory' => 'Person',
-				'Organization_PersonalNo' => $personal_number
+				'Organization_PersonalNo' => $personal_number,
 			),
 			'OrderDetails' => array(
 				'Amount' => WC()->cart->total,
@@ -99,7 +115,7 @@ class WC_Arvato_Pre_Check_Customer {
 				'OrderLines' => $order_lines
 			)
 		);
-		$pre_check_customer_response = $soap_client->PreCheckCustomer( $args_pre_check_customer );
+		$pre_check_customer_response = $soap_client->PreCheckCustomer( $args );
 		$data['response'] = $pre_check_customer_response;
 
 		if ( $pre_check_customer_response->IsSuccess ) {
@@ -116,6 +132,38 @@ class WC_Arvato_Pre_Check_Customer {
 		wp_die();
 	}
 
-}
+	public function pre_check_customer_request( $personal_number, $payment_method ) {
+		// Prepare order lines for Arvato
+		$order_lines_processor = new WC_Arvato_Process_Order_Lines();
+		$order_lines = $order_lines_processor->get_order_lines();
 
+		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+
+		// PreCheckCustomer
+		$soap_client = new SoapClient( $checkout_endpoint );
+		$args = array(
+			'User' => array(
+				'ClientID' => $payment_method_settings['client_id'],
+				'Username' => $payment_method_settings['username'],
+				'Password' => $payment_method_settings['password']
+			),
+			'Customer' => array(
+				'Address' => array(
+					'CountryCode' => 'SE',
+				),
+				'CustomerCategory' => 'Person',
+				'Organization_PersonalNo' => $personal_number,
+			),
+			'OrderDetails' => array(
+				'Amount' => WC()->cart->total,
+				'CurrencyCode' => 'SEK',
+				'OrderChannelType' => 'Internet',
+				'OrderDeliveryType' => 'Normal',
+				'OrderLines' => $order_lines
+			)
+		);
+		$pre_check_customer_response = $soap_client->PreCheckCustomer( $args );
+	}
+
+}
 $wc_arvato_pre_check_customer = new WC_Arvato_Pre_Check_Customer();
