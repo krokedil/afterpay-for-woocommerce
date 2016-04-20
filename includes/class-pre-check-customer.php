@@ -27,7 +27,7 @@ class WC_Arvato_Pre_Check_Customer {
 
 		add_action( 'woocommerce_before_checkout_form', array( $this, 'display_pre_check_form' ) );
 
-		add_action( 'woocommerce_checkout_init', array( $this, 'test' ) );
+		// add_action( 'woocommerce_checkout_init', array( $this, 'test' ) );
 	}
 
 	public function test() {
@@ -38,8 +38,7 @@ class WC_Arvato_Pre_Check_Customer {
 			print_r( $user );
 			echo '</pre>';
 		} else {
-
-			echo '<p>Not logged in</p>';
+			// echo '<p>Not logged in</p>';
 		}
 	}
 
@@ -54,7 +53,7 @@ class WC_Arvato_Pre_Check_Customer {
 				<input type="submit" for="arvato-pre-check-customer" value="Fetch customer information" />
 			</p>
 		</form>
-		<p>Not you? <a href="#">Click here</a> to enter your personal number.</p>
+		<?php /* <p>Not you? <a href="#">Click here</a> to enter your personal number.</p> */ ?>
 		<?php
 	}
 

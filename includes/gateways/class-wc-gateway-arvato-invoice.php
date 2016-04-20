@@ -91,6 +91,16 @@ function init_wc_gateway_arvato_invoice_class() {
 		}
 
 		function footer_debug() {
+			$order = wc_get_order( 193 );
+				echo '<pre style="color:#fff">';
+				print_r( $order->get_fees() );
+				echo '</pre>';
+
+			$processor = new WC_Arvato_Process_Order_Lines;
+			echo '<pre style="color:#fff">';
+			print_r( $processor->get_order_lines( 193 ) );
+			echo '</pre>';
+
 			/*
 			$the_order = wc_get_order(169);
 			echo '<pre style="color:#fff">';

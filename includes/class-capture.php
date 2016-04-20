@@ -130,7 +130,7 @@ class WC_Arvato_Capture {
 		// Check if logging is enabled
 		$this->log_enabled = $payment_method_settings['debug'];
 
-		$capture_full_args = array(
+		$args = array(
 			'User'       => array(
 				'ClientID' => $payment_method_settings['client_id'],
 				'Username' => $payment_method_settings['username'],
@@ -153,7 +153,10 @@ class WC_Arvato_Capture {
 		);
 
 		$soap_client = new SoapClient( $order_maintenance_endpoint );
-		$response    = $soap_client->CaptureFull( $capture_full_args );
+		$response    = $soap_client->CaptureFull( $args );
+
+		error_log( var_export( $args, true ) );
+		error_log( var_export( $response, true ) );
 
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
