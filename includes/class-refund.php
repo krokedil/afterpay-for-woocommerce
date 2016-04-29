@@ -4,28 +4,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Refund Arvato invoice
+ * Refund AfterPay invoice
  *
  * Check if refund is possible, then process it. Currently only supports RefundFull.
  *
- * @class WC_Arvato_Refund
+ * @class WC_AfterPay_Refund
  * @version 1.0.0
- * @package WC_Gateway_Arvato/Classes
+ * @package WC_Gateway_AfterPay/Classes
  * @category Class
  * @author Krokedil
  */
-class WC_Arvato_Refund {
+class WC_AfterPay_Refund {
 
 	/** @var int */
 	private $order_id = '';
 
 	/**
-	 * Grab Arvato reservation ID.
+	 * Grab AfterPay reservation ID.
 	 *
 	 * @return string
 	 */
 	public function get_reservation_id() {
-		return get_post_meta( $this->order_id, '_arvato_reservation_id', true );
+		return get_post_meta( $this->order_id, '_afterpay_reservation_id', true );
 	}
 
 	/**
@@ -42,15 +42,15 @@ class WC_Arvato_Refund {
 	}
 
 	/**
-	 * Check if order was created using one of Arvato's payment options.
+	 * Check if order was created using one of AfterPay's payment options.
 	 *
 	 * @return boolean
 	 */
-	public function check_if_arvato_order() {
+	public function check_if_afterpay_order() {
 		$order                = wc_get_order( $this->order_id );
 		$order_payment_method = $order->payment_method;
 
-		if ( strpos( $order_payment_method, 'arvato' ) !== false ) {
+		if ( strpos( $order_payment_method, 'afterpay' ) !== false ) {
 			return true;
 		}
 
@@ -67,8 +67,8 @@ class WC_Arvato_Refund {
 		$this->order_id = $order_id;
 		$order = wc_get_order( $this->order_id );
 
-		// If this order wasn't created using an Arvato payment method, bail.
-		if ( ! $this->check_if_arvato_order() ) {
+		// If this order wasn't created using an AfterPay payment method, bail.
+		if ( ! $this->check_if_afterpay_order() ) {
 			return;
 		}
 
@@ -105,25 +105,22 @@ class WC_Arvato_Refund {
 			$refund_args['OrderNo'] = $order_id;
 			$response = $soap_client->RefundFull( $refund_args );
 		}
-
-
-		error_log( var_export( $response, true ) );
-
+		
 		if ( $response->IsSuccess ) {
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			update_post_meta( $this->order_id, '_arvato_invoice_refunded', current_time( 'mysql' ) );
-			$order->add_order_note(	__( 'Arvato refund was successfully processed.', 'woocommerce-gateway-arvato' ) );
+			update_post_meta( $this->order_id, '_afterpay_invoice_refunded', current_time( 'mysql' ) );
+			$order->add_order_note(	__( 'AfterPay refund was successfully processed.', 'woocommerce-gateway-afterpay' ) );
 
 			return $response;
 		} else {
 			$order->add_order_note( __(
-				'Arvato refund could not be processed.',
-				'woocommerce-gateway-arvato'
+				'AfterPay refund could not be processed.',
+				'woocommerce-gateway-afterpay'
 			) );
 
-			return new WP_Error( 'arvato-refund', __( 'Refund failed.', 'woocommerce-gateway-arvato' ) );
+			return new WP_Error( 'afterpay-refund', __( 'Refund failed.', 'woocommerce-gateway-afterpay' ) );
 		}
 	}
 
 }
-$wc_arvato_refund = new WC_Arvato_Refund;
+$wc_afterpay_refund = new WC_AfterPay_Refund;

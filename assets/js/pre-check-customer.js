@@ -1,28 +1,31 @@
 jQuery( function( $ ) {
 
 	// Prevent the form from actually submitting
-	$(document).on('submit', '#arvato-pre-check-customer', function (event) {
+	$(document).on('click', '.afterpay-get-address-button', function (event) {
 		event.preventDefault();
 
-		var entered_personal_number = $('#arvato-pre-check-customer-pn').val();
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
+		var entered_personal_number = $(this).parent().parent().find('.afterpay-pre-check-customer-pn').val();
+		$('.afterpay-pre-check-customer-pn').val(entered_personal_number);
 
 		if ('' != entered_personal_number) { // Check if the field is empty
 			$.ajax(
-				WC_Arvato.ajaxurl,
+				WC_AfterPay.ajaxurl,
 				{
 					type: 'POST',
 					dataType: 'json',
 					data: {
-						action: 'arvato_pre_check_customer',
+						action: 'afterpay_pre_check_customer',
 						personal_number: entered_personal_number,
 						payment_method: selected_payment_method,
-						nonce: WC_Arvato.arvato_pre_check_customer_nonce
+						nonce: WC_AfterPay.afterpay_pre_check_customer_nonce
 					},
 					success: function (response) {
 						if (response.success) { // wp_send_json_success
 							console.log('SUCCESS');
 							console.log(response.data);
+
+							// $('body').trigger('update_checkout');
 
 							customer_data = response.data.response.Customer;
 

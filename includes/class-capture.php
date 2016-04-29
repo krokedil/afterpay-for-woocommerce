@@ -4,23 +4,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Capture Arvato reservation
+ * Capture AfterPay reservation
  *
- * Check if order was created using Arvato and if yes, capture Arvato reservation when WooCommerce order is marked
+ * Check if order was created using AfterPay and if yes, capture AfterPay reservation when WooCommerce order is marked
  * completed.
  *
- * @class WC_Arvato_Capture
+ * @class WC_AfterPay_Capture
  * @version 1.0.0
- * @package WC_Gateway_Arvato/Classes
+ * @package WC_Gateway_AfterPay/Classes
  * @category Class
  * @author Krokedil
  */
-class WC_Arvato_Capture {
+class WC_AfterPay_Capture {
 
 	/**
 	 * Mandatory fields
 	 * Member name
-	 * - CustomerNo (custom field _arvato_customer_no)
+	 * - CustomerNo (custom field _afterpay_customer_no)
 	 * - OrderNo (available in woocommerce_order_status_cancelled hook)
 	 *
 	 * User (pulled using get_option)
@@ -33,28 +33,28 @@ class WC_Arvato_Capture {
 	private $order_id = '';
 
 	/**
-	 * WC_Arvato_Cancel_Reservation constructor.
+	 * WC_AfterPay_Cancel_Reservation constructor.
 	 */
 	public function __construct() {
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_full' ) );
 	}
 
 	/**
-	 * Grab Arvato customer number.
+	 * Grab AfterPay customer number.
 	 *
 	 * @return string
 	 */
 	public function get_customer_no() {
-		return get_post_meta( $this->order_id, '_arvato_customer_no', true );
+		return get_post_meta( $this->order_id, '_afterpay_customer_no', true );
 	}
 
 	/**
-	 * Grab Arvato reservation ID.
+	 * Grab AfterPay reservation ID.
 	 *
 	 * @return string
 	 */
 	public function get_reservation_id() {
-		return get_post_meta( $this->order_id, '_arvato_reservation_id', true );
+		return get_post_meta( $this->order_id, '_afterpay_reservation_id', true );
 	}
 
 	/**
@@ -71,15 +71,15 @@ class WC_Arvato_Capture {
 	}
 
 	/**
-	 * Check if order was created using one of Arvato's payment options.
+	 * Check if order was created using one of AfterPay's payment options.
 	 *
 	 * @return boolean
 	 */
-	public function check_if_arvato_order() {
+	public function check_if_afterpay_order() {
 		$order                = wc_get_order( $this->order_id );
 		$order_payment_method = $order->payment_method;
 
-		if ( strpos( $order_payment_method, 'arvato' ) !== false ) {
+		if ( strpos( $order_payment_method, 'afterpay' ) !== false ) {
 			return true;
 		}
 
@@ -95,36 +95,42 @@ class WC_Arvato_Capture {
 		$this->order_id = $order_id;
 		$order = wc_get_order( $this->order_id );
 
-		// If this order wasn't created using an Arvato payment method, bail.
-		if ( ! $this->check_if_arvato_order() ) {
+		// If this order wasn't created using an AfterPay payment method, bail.
+		if ( ! $this->check_if_afterpay_order() ) {
 			return;
 		}
 
 		// If this reservation was already cancelled, do nothing.
-		if ( get_post_meta( $this->order_id, '_arvato_reservation_captured', true ) ) {
+		if ( get_post_meta( $this->order_id, '_afterpay_reservation_captured', true ) ) {
 			return;
 		}
 
 		// Get settings for payment method used to create this order.
 		$payment_method_settings = $this->get_payment_method_settings();
+
+		// If payment method is set to not capture orders automatically, bail.
+		if ( ! $payment_method_settings['order_management'] ) {
+			return;
+		}
+
 		$order_maintenance_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MAINTENANCE_TEST :
 			ARVATO_ORDER_MAINTENANCE_LIVE;
 
 		$payment_method_id = $order->payment_method;
 		switch ( $payment_method_id ) {
-			case 'arvato_invoice':
+			case 'afterpay_invoice':
 				$payment_method = 'Invoice';
 				break;
-			case 'arvato_account':
+			case 'afterpay_account':
 				$payment_method = 'Account';
 				break;
-			case 'arvato_part_payment':
+			case 'afterpay_part_payment':
 				$payment_method = 'Installment';
 				break;
 		}
 
-		// Prepare order lines for Arvato
-		$order_lines_processor = new WC_Arvato_Process_Order_Lines();
+		// Prepare order lines for AfterPay
+		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
 		$order_lines = $order_lines_processor->get_order_lines( $order_id );
 
 		// Check if logging is enabled
@@ -155,25 +161,24 @@ class WC_Arvato_Capture {
 		$soap_client = new SoapClient( $order_maintenance_endpoint );
 		$response    = $soap_client->CaptureFull( $args );
 
-		error_log( var_export( $args, true ) );
-		error_log( var_export( $response, true ) );
-
 		if ( $response->IsSuccess ) {
+			error_log( 'CAPTURE RESPONSE: ' . var_export( $response, true ) );
+
 			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			update_post_meta( $this->order_id, '_arvato_reservation_captured', current_time( 'mysql' ) );
+			update_post_meta( $this->order_id, '_afterpay_reservation_captured', current_time( 'mysql' ) );
 			update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );
 
 			$order->add_order_note(
-				sprintf( __( 'Arvato reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-arvato' ), $response->InvoiceNumber )
+				sprintf( __( 'AfterPay reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-afterpay' ), $response->InvoiceNumber )
 			);
 
 		} else {
 			$order->add_order_note( __(
-				'Arvato reservation could not be captured.',
-				'woocommerce-gateway-arvato'
+				'AfterPay reservation could not be captured.',
+				'woocommerce-gateway-afterpay'
 			) );
 		}
 	}
 
 }
-$wc_arvato_capture = new WC_Arvato_Capture;
+$wc_afterpay_capture = new WC_AfterPay_Capture;

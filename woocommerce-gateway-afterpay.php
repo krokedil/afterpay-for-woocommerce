@@ -1,21 +1,21 @@
 <?php
 /**
- * WooCommerce Arvato Gateway
+ * WooCommerce AfterPay Gateway
  *
  * @since 0.1
  *
- * @package WC_Gateway_Arvato
+ * @package WC_Gateway_AfterPay
  *
  * @wordpress-plugin
- * Plugin Name:     WooCommerce Arvato Gateway
+ * Plugin Name:     WooCommerce AfterPay Gateway
  * Plugin URI:      http://woothemes.com/woocommerce
- * Description:     Provides Arvato AfterPay payment gateway for WooCommerce.
+ * Description:     Provides AfterPay AfterPay payment gateway for WooCommerce.
  * Version:         0.1
  * Author:          Krokedil
  * Author URI:      http://krokedil.com/
  * Developer:       Krokedil
  * Developer URI:   http://krokedil.com/
- * Text Domain:     woocommerce-gateway-arvato
+ * Text Domain:     woocommerce-gateway-afterpay
  * Domain Path:     /languages
  * Copyright:       © 2016 Krokedil.
  * License:         GNU General Public License v3.0
@@ -29,24 +29,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Check if SOAP extension is loaded, prevent plugin activation if it isn't.
  */
-register_activation_hook( __FILE__, 'woocommerce_gateway_arvato_activation_check' );
-function woocommerce_gateway_arvato_activation_check() {
+register_activation_hook( __FILE__, 'woocommerce_gateway_afterpay_activation_check' );
+function woocommerce_gateway_afterpay_activation_check() {
 	if ( ! extension_loaded( 'soap' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die( __( 'WooCommerce Arvato Gateway requires PHP SOAP extension. Please get in touch with 
-	your hosting provider to see how you can enable it.', 'woocommerce-gateway-arvato' ) );
+		wp_die( __( 'WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in touch with 
+	your hosting provider to see how you can enable it.', 'woocommerce-gateway-afterpay' ) );
 	}
 }
 
 /**
  * If the plugin was activated in some other way, deactivate it if SOAP extension is not loaded.
  */
-add_action( 'admin_init', 'woocommerce_gateway_arvato_soap_check' );
-function woocommerce_gateway_arvato_soap_check() {
+add_action( 'admin_init', 'woocommerce_gateway_afterpay_soap_check' );
+function woocommerce_gateway_afterpay_soap_check() {
 	if ( ! extension_loaded( 'soap' ) ) {
 		if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
 			deactivate_plugins( plugin_basename( __FILE__ ) );
-			add_action( 'admin_notices', 'woocommerce_gateway_arvato_disabled_notice' );
+			add_action( 'admin_notices', 'woocommerce_gateway_afterpay_disabled_notice' );
 
 			if ( isset( $_GET['activate'] ) ) {
 				unset( $_GET['activate'] );
@@ -58,29 +58,31 @@ function woocommerce_gateway_arvato_soap_check() {
 /**
  * Print deactivation notice.
  */
-function woocommerce_gateway_arvato_disabled_notices() {
+function woocommerce_gateway_afterpay_disabled_notices() {
 	echo '<div class="notice notice-error">';
-	echo '<p><strong>' . esc_html__( 'WooCommerce Arvato Gateway requires PHP SOAP extension. Please get in touch with 
-	your hosting provider to see how you can enable it.', 'woocommerce-gateway-arvato' ) . '</strong></p>';
+	echo '<p><strong>' . esc_html__( 'WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in touch with 
+	your hosting provider to see how you can enable it.', 'woocommerce-gateway-afterpay' ) . '</strong></p>';
 	echo '</div>';
 }
 
-include_once( 'includes/gateways/class-wc-gateway-arvato-factory.php' );
-include_once( 'includes/gateways/class-wc-gateway-arvato-invoice.php' );
-include_once( 'includes/gateways/class-wc-gateway-arvato-part-payment.php' );
-include_once( 'includes/gateways/class-wc-gateway-arvato-account.php' );
+include_once( 'includes/gateways/class-wc-gateway-afterpay-factory.php' );
+include_once( 'includes/gateways/class-wc-gateway-afterpay-invoice.php' );
+include_once( 'includes/gateways/class-wc-gateway-afterpay-part-payment.php' );
+include_once( 'includes/gateways/class-wc-gateway-afterpay-account.php' );
 
 include_once( 'includes/class-pre-check-customer.php' );
 include_once( 'includes/class-cancel-reservation.php' );
+include_once( 'includes/class-create-contract.php' );
 include_once( 'includes/class-complete-checkout.php' );
 include_once( 'includes/class-capture.php' );
 
 include_once( 'includes/class-process-order-lines.php' );
 
+// Define plugin paths
+define( 'AFTERPAY_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
+define( 'AFTERPAY_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
 
-/**
- * Define server endpoints
- */
+// Define server endpoints
 define(
 	'ARVATO_CHECKOUT_LIVE',
 	'https://api.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'

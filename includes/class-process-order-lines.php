@@ -4,15 +4,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Process order lines for sending them to Arvato
+ * Process order lines for sending them to AfterPay
  *
- * @class    WC_Arvato_Process_Order_Lines
+ * @class    WC_AfterPay_Process_Order_Lines
  * @version  1.0.0
- * @package  WC_Gateway_Arvato/Classes
+ * @package  WC_Gateway_AfterPay/Classes
  * @category Class
  * @author   Krokedil
  */
-class WC_Arvato_Process_Order_Lines {
+class WC_AfterPay_Process_Order_Lines {
 
 	/**
 	 * Get order lines from order or cart
@@ -30,7 +30,7 @@ class WC_Arvato_Process_Order_Lines {
 	}
 
 	/**
-	 * Process WooCommerce order into Arvato order lines
+	 * Process WooCommerce order into AfterPay order lines
 	 *
 	 * @param $order_id
 	 *
@@ -95,7 +95,7 @@ class WC_Arvato_Process_Order_Lines {
 	}
 
 	/**
-	 * Process WooCommerce cart into Arvato order lines
+	 * Process WooCommerce cart into AfterPay order lines
 	 *
 	 * @return array
 	 */
@@ -153,9 +153,7 @@ class WC_Arvato_Process_Order_Lines {
 				);
 			}
 		}
-
-		error_log( 'CART ORDER LINES: ' . var_export( $order_lines, true ) );
-
+		
 		return $order_lines;
 	}
 

@@ -4,46 +4,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Complete Arvato checkout
+ * Complete AfterPay checkout
  *
- * @class    WC_Arvato_Complete_Checkout
+ * @class    WC_AfterPay_Complete_Checkout
  * @version  1.0.0
- * @package  WC_Gateway_Arvato/Classes
+ * @package  WC_Gateway_AfterPay/Classes
  * @category Class
  * @author   Krokedil
  */
-class WC_Arvato_Complete_Checkout {
-
-	/**
-	 * Mandatory fields
-	 *
-	 * Member name
-	 * - CheckoutID
-	 * - ContractID
-	 * - CustomerNo (custom field _arvato_customer_no)
-	 * - OrderNo (available in woocommerce_order_status_cancelled hook)
-	 * - CurrencyCode
-	 * - Amount (excluding VAT)
-	 * - TotalOrderValue (including VAT)
-	 * - OrderDate (yyyy-mm-dd)
-	 *
-	 * User (pulled using get_option)
-	 * - ClientID
-	 * - Password
-	 * - Username
-	 *
-	 * PaymentInfo
-	 * - PaymentMethod
-	 *
-	 * PaymentInfo.AccountInfo
-	 * - AccountProfileNo (mandatory by account)
-	 *
-	 * PaymentInfo.InstallmentInfo
-	 * AccountProfileNo (mandatory by installment)
-	 * Amount (mandatory by installment)
-	 * InstallmentProfileNo (mandatory by installment)
-	 * NumberOfInstallments (mandatory by installment)
-	 */
+class WC_AfterPay_Complete_Checkout {
 
 	/** @var int */
 	private $order_id = '';
@@ -55,7 +24,7 @@ class WC_Arvato_Complete_Checkout {
 	private $settings = array();
 
 	/**
-	 * WC_Arvato_Complete_Checkout constructor.
+	 * WC_AfterPay_Complete_Checkout constructor.
 	 *
 	 * @param $order_id          int    WooCommerce order ID
 	 * @param $payment_method_id string WooCommerce payment method id
@@ -67,13 +36,13 @@ class WC_Arvato_Complete_Checkout {
 	}
 
 	/**
-	 * Execute Arvato CompleteCheckout when WooCommerce checkout is processed.
+	 * Execute AfterPay CompleteCheckout when WooCommerce checkout is processed.
 	 */
 	public function complete_checkout() {
 		$order = wc_get_order( $this->order_id );
 
-		$customer_no = WC()->session->get( 'arvato_customer_no' );
-		$checkout_id = WC()->session->get( 'arvato_checkout_id' );
+		$customer_no = WC()->session->get( 'afterpay_customer_no' );
+		$checkout_id = WC()->session->get( 'afterpay_checkout_id' );
 
 		$payment_method_settings = $this->settings;
 
@@ -81,18 +50,18 @@ class WC_Arvato_Complete_Checkout {
 		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
 
 		switch ( $this->payment_method_id ) {
-			case 'arvato_invoice':
+			case 'afterpay_invoice':
 				$payment_method = 'Invoice';
 				break;
-			case 'arvato_account':
+			case 'afterpay_account':
 				$payment_method = 'Account';
 				break;
-			case 'arvato_part_payment':
+			case 'afterpay_part_payment':
 				$payment_method = 'Installment';
 				break;
 		}
 
-		$args_complete_checkout = array(
+		$args = array(
 			'User'            => array(
 				'ClientID' => $payment_method_settings['client_id'],
 				'Username' => $payment_method_settings['username'],
@@ -106,18 +75,39 @@ class WC_Arvato_Complete_Checkout {
 			'PaymentInfo'     => array(
 				'PaymentMethod' => $payment_method
 			),
-			'OrderDate'       => date( 'Y-m-d', $order->order_date )
+			'OrderDate'       => date( 'Y-m-d', strtotime( $order->order_date ) )
 		);
 
+		if ( 'afterpay_account' == $this->payment_method_id ) {
+			$args['PaymentInfo']['AccountInfo'] = array(
+				'AccountProfileNo' => 1
+			);
+		} elseif ( 'afterpay_part_payment' == $this->payment_method_id ) { // part_payment
+			if ( isset( $_POST['afterpay_installment_plan'] ) ) {
+				$args['PaymentInfo']['AccountInfo'] = array(
+					'AccountProfileNo' => wc_clean( $_POST['afterpay_installment_plan'] )
+				);
+			}
+		}
+
+		error_log( 'COMPLETE CHECKOUT ARGS: ' . var_export( $args, true ) );
+
 		$soap_client                = new SoapClient( $checkout_endpoint );
-		$complete_checkout_response = $soap_client->CompleteCheckout( $args_complete_checkout );
+		$complete_checkout_response = $soap_client->CompleteCheckout( $args );
 
 		if ( $complete_checkout_response->IsSuccess ) {
-			update_post_meta( $order->id, '_arvato_reservation_id', $complete_checkout_response->ReservationID );
+			error_log( 'COMPLETE CHECKOUT RESPONSE: ' . var_export( $complete_checkout_response, true ) );
+
+			update_post_meta( $order->id, '_afterpay_reservation_id', $complete_checkout_response->ReservationID );
+
+			// Unset AfterPay session values
+			WC()->session->__unset( 'afterpay_checkout_id' );
+			WC()->session->__unset( 'afterpay_customer_no' );
+			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 
 			return true;
 		} else {
-			return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-arvato' ) );
+			return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-afterpay' ) );
 		}
 	}
 
