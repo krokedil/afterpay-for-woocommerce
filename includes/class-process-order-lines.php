@@ -123,6 +123,12 @@ class WC_AfterPay_Process_Order_Lines {
 				foreach ( $shipping_package['rates'] as $shipping_rate_key => $shipping_rate_value ) {
 					$shipping_tax = array_sum( $shipping_rate_value->taxes );
 
+					if ( $shipping_rate_value->cost > 0 ) {
+						$vat_percent = round( $shipping_tax / $shipping_rate_value->cost, 4 ) * 100;
+					} else {
+						$vat_percent = 0;
+					}
+
 					$order_lines[] = array(
 						'GrossUnitPrice'  => $shipping_tax + $shipping_rate_value->cost,
 						'ItemDescription' => $shipping_rate_value->label,
@@ -130,7 +136,7 @@ class WC_AfterPay_Process_Order_Lines {
 						'LineNumber'      => $shipping_rate_key,
 						'NetUnitPrice'    => $shipping_rate_value->cost,
 						'Quantity'        => 1,
-						'VatPercent'      => round( $shipping_tax / $shipping_rate_value->cost, 4 ) * 100
+						'VatPercent'      => $vat_percent
 					);
 				}
 			}

@@ -69,17 +69,46 @@ function init_wc_gateway_afterpay_part_payment_class() {
 				foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
 					if ( $payment_option->PaymentMethod == 'Installment' ) {
 						if ( sizeof( $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan ) >= 1 ) {
-							echo '<select id="afterpay-installment-plans" name="afterpay_installment_plan">';
-							foreach( $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan as $installment_plan ) {
-								echo '<option value="' . $installment_plan->AccountProfileNumber . '">';
-								echo $installment_plan->NumberOfInstallments . ' * ' . $installment_plan->InstallmentAmount;
-								echo '</option>';
+							echo '<p>' . __( 'Please select a payment plan:', 'woocommerce-gateway-afterpay' ) . '</p><br />';
+
+							// Sort payment plans before displaying them
+							$payment_plans = $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan;
+							usort(
+								$payment_plans,
+								array( $this, 'sort_payment_plans' )
+							);
+
+							foreach( $payment_plans as $key => $installment_plan ) {
+								$label = sprintf(
+									'%1$sx %2$s %3$s per month',
+									$installment_plan->NumberOfInstallments,
+									$installment_plan->InstallmentAmount,
+									'kr'
+								);
+
+								echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '" value="' . $installment_plan->AccountProfileNumber . '" ' . checked( $key, 0, false ) . ' />';
+								echo '<label for="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '">' . $label . '</label>';
+								echo '<br />';
 							}
-							echo '</select>';
+
+							$example = __( 'Example: 10000 kr over 12 months, effective interest rate 16.82%. Total credit amount 1682SEK, total repayment amount 11682 SEK.', 'woocommerce-gateway-afterpay'	);
+							echo '<p style="margin: 1.5em 0 0; font-size: 0.8em;">' . $example . '</p>';
 						}
 					}
 				}
 			}
+		}
+
+		/**
+		 * Sort payment plans before displaying them, shortest to longest
+		 *
+		 * @param $plana
+		 * @param $planb
+		 *
+		 * @return int
+		 */
+		public function sort_payment_plans( $plana, $planb ) {
+			return $plana->NumberOfInstallments > $planb->NumberOfInstallments;
 		}
 	}
 

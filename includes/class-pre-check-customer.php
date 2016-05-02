@@ -25,6 +25,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		add_action( 'wp_ajax_afterpay_pre_check_customer', array( $this, 'pre_check_customer' ) );
 		add_action( 'wp_ajax_nopriv_afterpay_pre_check_customer', array( $this, 'pre_check_customer' ) );
 
+		add_action( 'woocommerce_before_checkout_billing_form', array( $this, 'display_pre_check_form' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'maybe_pre_check_customer' ) );
 	}
 
@@ -61,19 +62,27 @@ class WC_AfterPay_Pre_Check_Customer {
 
 	public static function display_pre_check_form() {
 		$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
-		$chosen_payment_method = WC()->session->chosen_payment_method;
 		?>
-		<p class="form-row form-row-wide validate-required">
-			<label for="afterpay-pre-check-customer-pn">
-				<?php _e( 'Personal number', 'woocommerce-gateway-afterpay' ); ?>
-				<abbr class="required" title="required">*</abbr>
-			</label>
-			<input type="text" name="afterpay-pre-check-customer-pn" class="afterpay-pre-check-customer-pn"
-			       placeholder="Personal number" value="<?php echo $personal_number; ?>" />
-		</p>
-		<p class="form-row form-row-wide validate-required" style="margin-bottom: 1em;">
-			<button type="button" style="margin-top:0.5em" class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-klarna' ); ?></button>
-		</p>
+		<div id="afterpay-pre-check-customer" style="display:none">
+			<p>
+				<input type="radio" class="input-radio" value="Person" name="afterpay_customer_category" id="afterpay-customer-category-person" checked />
+				<label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
+				<br />
+				<input type="radio" class="input-radio" value="Company" name="afterpay_customer_category" id="afterpay-customer-category-company" />
+				<label for="afterpay-customer-category-company"><?php _e( 'Company', 'woocommerce-gateway-afterpay' ); ?></label>
+			</p>
+			<p class="form-row form-row-wide validate-required">
+				<?php /*
+	            <label for="afterpay-pre-check-customer-pn">
+					<?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?>
+					<abbr class="required" title="required">*</abbr>
+				</label>
+	            */ ?>
+				<input type="text" name="afterpay-pre-check-customer-pn" id="afterpay-pre-check-customer-number" class="afterpay-pre-check-customer-number"
+				       placeholder="<?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?>" value="<?php echo $personal_number; ?>" />
+				<button type="button" style="margin-top:0.5em" class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-klarna' ); ?></button>
+			</p>
+		</div>
 		<?php
 	}
 
@@ -102,9 +111,15 @@ class WC_AfterPay_Pre_Check_Customer {
 
 		$personal_number = $_REQUEST['personal_number'];
 		$payment_method = $_REQUEST['payment_method'];
+		$customer_category = $_REQUEST['customer_category'];
 
-		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method );
+		if ( $customer_category != 'Company' ) {
+			$customer_category = 'Person';
+		}
+
+		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category );
 		$data['response'] = $pre_check_customer_response;
+		$data['message'] = __( 'Address found and added to checkout form.', 'woocommerce-gateway-afterpay' );
 
 		if ( $pre_check_customer_response->IsSuccess ) {
 			wp_send_json_success( $data );
@@ -117,7 +132,7 @@ class WC_AfterPay_Pre_Check_Customer {
 
 	// To be used when PreCheckCustomer is not an AJAX call (when customer is logged in and
 	// we have their personal number)
-	public function pre_check_customer_request( $personal_number, $payment_method ) {
+	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person' ) {
 		// Prepare order lines for AfterPay
 		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
 		$order_lines = $order_lines_processor->get_order_lines();
@@ -140,7 +155,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				'Address' => array(
 					'CountryCode' => 'SE',
 				),
-				'CustomerCategory' => 'Person',
+				'CustomerCategory' => $customer_category,
 				'Organization_PersonalNo' => $personal_number,
 			),
 			'OrderDetails' => array(
@@ -151,14 +166,16 @@ class WC_AfterPay_Pre_Check_Customer {
 				'OrderLines' => $order_lines
 			)
 		);
-		$pre_check_customer_response = $soap_client->PreCheckCustomer( $args );
+		$response = $soap_client->PreCheckCustomer( $args );
 
-		if ( $pre_check_customer_response->IsSuccess ) {
+		error_log( var_export( $response, true ) );
+
+		if ( $response->IsSuccess ) {
 			// Set session data
-			WC()->session->set( 'afterpay_checkout_id', $pre_check_customer_response->CheckoutID );
-			WC()->session->set( 'afterpay_customer_no', $pre_check_customer_response->Customer->CustomerNo );
+			WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
+			WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
 			WC()->session->set( 'afterpay_personal_no', $personal_number );
-			WC()->session->set( 'afterpay_allowed_payment_methods', $pre_check_customer_response->AllowedPaymentMethods->AllowedPaymentMethod );
+			WC()->session->set( 'afterpay_allowed_payment_methods', $response->AllowedPaymentMethods->AllowedPaymentMethod );
 
 			// Capture user's personal number as meta field, if logged in
 			if ( is_user_logged_in() ) {
@@ -167,7 +184,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			}
 
 			// Send success
-			return $pre_check_customer_response;
+			return $response;
 		} else {
 			return false;
 		}

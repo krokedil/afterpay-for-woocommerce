@@ -139,13 +139,6 @@ function init_wc_gateway_afterpay_factory_class() {
 
 		/**
 		 * Process the payment and return the result.
-		 */
-		public function payment_fields() {
-			WC_AfterPay_Pre_Check_Customer::display_pre_check_form();
-		}
-
-		/**
-		 * Process the payment and return the result.
 		 *
 		 * @param  int $order_id
 		 *
