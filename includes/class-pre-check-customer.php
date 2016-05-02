@@ -27,10 +27,26 @@ class WC_AfterPay_Pre_Check_Customer {
 
 		add_action( 'woocommerce_before_checkout_billing_form', array( $this, 'display_pre_check_form' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'maybe_pre_check_customer' ) );
+
+		// Filter checkout billing fields
+		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_address_1', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_address_2', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_postcode', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_billing_city', array( $this, 'filter_pre_checked_value' ) );
+
+		// Filter checkout shipping fields
+		add_filter( 'woocommerce_process_checkout_field_shipping_first_name', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_last_name', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_address_1', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_address_2', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_postcode', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_city', array( $this, 'filter_pre_checked_value' ) );
 	}
 
 	/**
-	 * Run PreCheckCustomer on checkout load if we have a personal number and an Arvato method is selected
+	 * Run PreCheckCustomer on checkout load if we have a personal number and an AfterPay method is selected
 	 */
 	public function maybe_pre_check_customer() {
 		$chosen_payment_method = WC()->session->chosen_payment_method;
@@ -130,8 +146,15 @@ class WC_AfterPay_Pre_Check_Customer {
 		wp_die();
 	}
 
-	// To be used when PreCheckCustomer is not an AJAX call (when customer is logged in and
-	// we have their personal number)
+	/**
+	 * AfterPay PreCheckCustomer request
+	 *
+	 * @param $personal_number
+	 * @param $payment_method
+	 * @param string $customer_category
+	 *
+	 * @return bool
+	 */
 	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person' ) {
 		// Prepare order lines for AfterPay
 		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
@@ -168,7 +191,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		);
 		$response = $soap_client->PreCheckCustomer( $args );
 
-		error_log( var_export( $response, true ) );
+		error_log( var_export( $args, true ) );
 
 		if ( $response->IsSuccess ) {
 			// Set session data
@@ -176,6 +199,17 @@ class WC_AfterPay_Pre_Check_Customer {
 			WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
 			WC()->session->set( 'afterpay_personal_no', $personal_number );
 			WC()->session->set( 'afterpay_allowed_payment_methods', $response->AllowedPaymentMethods->AllowedPaymentMethod );
+
+			// Customer information
+			$afterpay_customer_details = array(
+				'first_name' => $response->Customer->FirstName,
+				'last_name'  => $response->Customer->LastName,
+				'address_1'  => $response->Customer->AddressList->Address->Street,
+				'address_2'  => $response->Customer->AddressList->Address->StreetNumber,
+				'postcode'   => $response->Customer->AddressList->Address->PostalCode,
+				'city'       => $response->Customer->AddressList->Address->PostalPlace,
+			);
+			WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
 
 			// Capture user's personal number as meta field, if logged in
 			if ( is_user_logged_in() ) {
@@ -187,6 +221,24 @@ class WC_AfterPay_Pre_Check_Customer {
 			return $response;
 		} else {
 			return false;
+		}
+	}
+
+	public function filter_pre_checked_value( $value ) {
+		error_log( current_filter() );
+		$current_filter = current_filter();
+		$current_field = str_replace(
+			array( 'woocommerce_process_checkout_field_billing_', 'woocommerce_process_checkout_field_shipping_' ),
+			'',
+			$current_filter
+		);
+		error_log( $current_field );
+		$customer_details = WC()->session->get( 'afterpay_customer_details' );
+
+		if ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
+			return $customer_details[ $current_field ];
+		} else {
+			return $value;
 		}
 	}
 
