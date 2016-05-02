@@ -1,5 +1,22 @@
 jQuery( function( $ ) {
 
+	function mask_form_field(field) {
+		if (field != null) {
+			var field_split = field.split(' ');
+			var field_masked = new Array();
+
+			$.each(field_split, function(i, val) {
+				if (isNaN(val)) {
+					field_masked.push(val.charAt(0) + Array(val.length).join('*'));
+				} else {
+					field_masked.push('**' + field.substr(field.length - 3));
+				}
+			});
+
+			return field_masked.join(' ');
+		}
+	}
+
 	function maybe_show_pre_checkout_form() {
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		if (selected_payment_method.indexOf('afterpay') >= 0) {
@@ -27,6 +44,9 @@ jQuery( function( $ ) {
 	$(document).on('click', '.afterpay-get-address-button', function (event) {
 		event.preventDefault();
 
+		// Remove success note, in case it's already there
+		$('#afterpay-pre-check-customer-response').remove();
+
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		var selected_customer_category = $('input[name="afterpay_customer_category"]:checked').val();
 		var entered_personal_number = $(this).parent().parent().find('.afterpay-pre-check-customer-number').val();
@@ -47,26 +67,25 @@ jQuery( function( $ ) {
 					},
 					success: function (response) {
 						if (response.success) { // wp_send_json_success
-							console.log('SUCCESS');
 							console.log(response.data);
 
 							$('body').trigger('update_checkout');
 
 							customer_data = response.data.response.Customer;
 
-							$('#billing_first_name').val(customer_data.FirstName);
-							$('#billing_last_name').val(customer_data.LastName);
-							$('#billing_address_1').val(customer_data.AddressList.Address.Street);
-							$('#billing_address_2').val(customer_data.AddressList.Address.StreetNumber);
-							$('#billing_postcode').val(customer_data.AddressList.Address.PostalCode);
-							$('#billing_city').val(customer_data.AddressList.Address.PostalPlace);
+							$('#billing_first_name').val(mask_form_field(customer_data.FirstName)).prop('disabled', true);
+							$('#billing_last_name').val(mask_form_field(customer_data.LastName)).prop('disabled', true);
+							$('#billing_address_1').val(mask_form_field(customer_data.AddressList.Address.Street)).prop('disabled', true);
+							$('#billing_address_2').val(mask_form_field(customer_data.AddressList.Address.StreetNumber)).prop('disabled', true);
+							$('#billing_postcode').val(mask_form_field(customer_data.AddressList.Address.PostalCode)).prop('disabled', true);
+							$('#billing_city').val(mask_form_field(customer_data.AddressList.Address.PostalPlace)).prop('disabled', true);
 
-							$('#shipping_first_name').val(customer_data.FirstName);
-							$('#shipping_last_name').val(customer_data.LastName);
-							$('#shipping_address_1').val(customer_data.AddressList.Address.Street);
-							$('#shipping_address_2').val(customer_data.AddressList.Address.StreetNumber);
-							$('#shipping_postcode').val(customer_data.AddressList.Address.PostalCode);
-							$('#shipping_city').val(customer_data.AddressList.Address.PostalPlace);
+							$('#shipping_first_name').val(mask_form_field(customer_data.FirstName)).prop('disabled', true);
+							$('#shipping_last_name').val(mask_form_field(customer_data.LastName)).prop('disabled', true);
+							$('#shipping_address_1').val(mask_form_field(customer_data.AddressList.Address.Street)).prop('disabled', true);
+							$('#shipping_address_2').val(mask_form_field(customer_data.AddressList.Address.StreetNumber)).prop('disabled', true);
+							$('#shipping_postcode').val(mask_form_field(customer_data.AddressList.Address.PostalCode)).prop('disabled', true);
+							$('#shipping_city').val(mask_form_field(customer_data.AddressList.Address.PostalPlace)).prop('disabled', true);
 
 							$('#afterpay-pre-check-customer').append('<div id="afterpay-pre-check-customer-response" class="woocommerce-message">' + response.data.message + '</div>');
 						} else { // wp_send_json_error
