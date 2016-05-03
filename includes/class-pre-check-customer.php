@@ -71,7 +71,11 @@ class WC_AfterPay_Pre_Check_Customer {
 		}
 	}
 
+	/**
+	 * Check if customer has used PreCheckCustomer and received a positive response
+	 */
 	public function confirm_pre_check_customer() {
+		// Check if PreCheckCustomer was performed
 		if ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
 			wc_add_notice( __( 'Please use get address feature first.', 'woocommerce-gateway-afterpay' ), 'error' );
 		}

@@ -90,14 +90,10 @@ class WC_AfterPay_Complete_Checkout {
 			}
 		}
 
-		error_log( 'COMPLETE CHECKOUT ARGS: ' . var_export( $args, true ) );
-
 		$soap_client                = new SoapClient( $checkout_endpoint );
 		$complete_checkout_response = $soap_client->CompleteCheckout( $args );
 
 		if ( $complete_checkout_response->IsSuccess ) {
-			error_log( 'COMPLETE CHECKOUT RESPONSE: ' . var_export( $complete_checkout_response, true ) );
-
 			update_post_meta( $order->id, '_afterpay_reservation_id', $complete_checkout_response->ReservationID );
 
 			// Unset AfterPay session values
