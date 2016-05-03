@@ -23,7 +23,7 @@ function init_wc_gateway_afterpay_factory_class() {
 	 * @author      Krokedil
 	 */
 	class WC_Gateway_AfterPay_Factory extends WC_Payment_Gateway {
-		
+
 		/**
 		 * Check if payment method is available for current customer
 		 */

@@ -76,6 +76,9 @@ class WC_AfterPay_Pre_Check_Customer {
 		}
 	}
 
+	/**
+	 * Display AfterPay PreCheckCustomer fields
+	 */
 	public static function display_pre_check_form() {
 		$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
 		?>
@@ -224,22 +227,33 @@ class WC_AfterPay_Pre_Check_Customer {
 		}
 	}
 
+	/**
+	 * Filter checkout fields so they use data retrieved by PreCheckCustomer
+	 *
+	 * @param $value
+	 *
+	 * @return mixed
+	 */
 	public function filter_pre_checked_value( $value ) {
-		error_log( current_filter() );
-		$current_filter = current_filter();
-		$current_field = str_replace(
-			array( 'woocommerce_process_checkout_field_billing_', 'woocommerce_process_checkout_field_shipping_' ),
-			'',
-			$current_filter
-		);
-		error_log( $current_field );
-		$customer_details = WC()->session->get( 'afterpay_customer_details' );
+		// Only do this for AfterPay methods
+		$chosen_payment_method = WC()->session->get( 'chosen_payment_method' );
+		if ( strpos( $chosen_payment_method, 'afterpay' ) !== false ) {
+			$current_filter = current_filter();
+			$current_field  = str_replace( array(
+				'woocommerce_process_checkout_field_billing_',
+				'woocommerce_process_checkout_field_shipping_'
+			), '', $current_filter );
 
-		if ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
-			return $customer_details[ $current_field ];
-		} else {
-			return $value;
+			$customer_details = WC()->session->get( 'afterpay_customer_details' );
+
+			if ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
+				return $customer_details[ $current_field ];
+			} else {
+				return $value;
+			}
 		}
+
+		return $value;
 	}
 
 }
