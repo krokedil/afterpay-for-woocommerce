@@ -28,6 +28,9 @@ class WC_AfterPay_Pre_Check_Customer {
 		add_action( 'woocommerce_before_checkout_billing_form', array( $this, 'display_pre_check_form' ) );
 		add_action( 'woocommerce_checkout_init', array( $this, 'maybe_pre_check_customer' ) );
 
+		// Check if PreCheckCustomer was performed and successful
+		add_action( 'woocommerce_before_checkout_process', array( $this, 'confirm_pre_check_customer' ) );
+
 		// Filter checkout billing fields
 		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array( $this, 'filter_pre_checked_value' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array( $this, 'filter_pre_checked_value' ) );
@@ -64,15 +67,13 @@ class WC_AfterPay_Pre_Check_Customer {
 
 			if ( '' != $personal_no ) {
 				$pre_check_customer_response = $this->pre_check_customer_request( $personal_no, $chosen_payment_method );
-
-				if ( $pre_check_customer_response->IsSuccess ) {
-					// Set session data
-					WC()->session->set( 'afterpay_checkout_id', $pre_check_customer_response->CheckoutID );
-					WC()->session->set( 'afterpay_customer_no', $pre_check_customer_response->Customer->CustomerNo );
-					WC()->session->set( 'afterpay_personal_no', $personal_no );
-					WC()->session->set( 'afterpay_allowed_payment_methods', $pre_check_customer_response->AllowedPaymentMethods->AllowedPaymentMethod );
-				}
 			}
+		}
+	}
+
+	public function confirm_pre_check_customer() {
+		if ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+			wc_add_notice( __( 'Please use get address feature first.', 'woocommerce-gateway-afterpay' ), 'error' );
 		}
 	}
 
@@ -138,11 +139,12 @@ class WC_AfterPay_Pre_Check_Customer {
 
 		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category );
 		$data['response'] = $pre_check_customer_response;
-		$data['message'] = __( 'Address found and added to checkout form.', 'woocommerce-gateway-afterpay' );
 
 		if ( $pre_check_customer_response->IsSuccess ) {
+			$data['message'] = __( 'Address found and added to checkout form.', 'woocommerce-gateway-afterpay' );
 			wp_send_json_success( $data );
 		} else {
+			$data['message'] = __( 'No address was found. Please check your personal number or choose another payment method.', 'woocommerce-gateway-afterpay' );
 			wp_send_json_error( $data );
 		}
 
@@ -223,6 +225,11 @@ class WC_AfterPay_Pre_Check_Customer {
 			// Send success
 			return $response;
 		} else {
+			WC()->session->__unset( 'afterpay_checkout_id' );
+			WC()->session->__unset( 'afterpay_customer_no' );
+			WC()->session->__unset( 'afterpay_personal_no' );
+			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+			
 			return false;
 		}
 	}

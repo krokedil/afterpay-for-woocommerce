@@ -102,7 +102,6 @@ class WC_AfterPay_Complete_Checkout {
 
 			// Unset AfterPay session values
 			WC()->session->__unset( 'afterpay_checkout_id' );
-			WC()->session->__unset( 'afterpay_customer_no' );
 			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 
 			return true;

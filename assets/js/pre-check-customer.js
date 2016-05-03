@@ -151,6 +151,10 @@ jQuery(function ($) {
 						} else { // wp_send_json_error
 							console.log('ERROR:');
 							console.log(response.data);
+							
+							$('body').trigger('update_checkout');
+
+							$('#afterpay-pre-check-customer').append('<div id="afterpay-pre-check-customer-response" class="woocommerce-error">' + response.data.message + '</div>');
 						}
 					},
 					error: function (response) {
