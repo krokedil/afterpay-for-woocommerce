@@ -109,21 +109,24 @@ class WC_AfterPay_Cancel_Reservation {
 		);
 
 		$soap_client = new SoapClient( $checkout_endpoint );
-		$response    = $soap_client->CancelReservation( $cancel_reservation_args );
 
-		if ( $response->IsSuccess ) {
-			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			update_post_meta( $this->order_id, '_afterpay_reservation_cancelled', current_time( 'mysql' ) );
+		try {
+			$response = $soap_client->CancelReservation( $cancel_reservation_args );
 
-			$order->add_order_note( __(
-				'AfterPay reservation was successfully cancelled.',
-				'woocommerce-gateway-afterpay'
-			) );
-		} else {
-			$order->add_order_note( __(
-				'AfterPay reservation could not be cancelled.',
-				'woocommerce-gateway-afterpay'
-			) );
+			if ( $response->IsSuccess ) {
+				// Add time stamp, used to prevent duplicate cancellations for the same order.
+				update_post_meta( $this->order_id, '_afterpay_reservation_cancelled', current_time( 'mysql' ) );
+
+				$order->add_order_note( __( 'AfterPay reservation was successfully cancelled.', 'woocommerce-gateway-afterpay' ) );
+			} else {
+				$order->add_order_note( __( 'AfterPay reservation could not be cancelled.', 'woocommerce-gateway-afterpay' ) );
+			}
+		} catch ( Exception $e ) {
+			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
+
+			echo '<div class="woocommerce-error">';
+			echo $e->getMessage();
+			echo '</div>';
 		}
 	}
 

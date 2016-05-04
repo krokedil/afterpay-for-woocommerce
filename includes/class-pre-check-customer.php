@@ -66,7 +66,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			}
 
 			if ( '' != $personal_no ) {
-				$pre_check_customer_response = $this->pre_check_customer_request( $personal_no, $chosen_payment_method );
+				$this->pre_check_customer_request( $personal_no, $chosen_payment_method );
 			}
 		}
 	}
@@ -75,9 +75,16 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * Check if customer has used PreCheckCustomer and received a positive response
 	 */
 	public function confirm_pre_check_customer() {
+		error_log( var_export( $_POST, true ) );
+
+		// Check if personal/organization number field is empty
+		if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
+			wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
+		}
+
 		// Check if PreCheckCustomer was performed
-		if ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
-			wc_add_notice( __( 'Please use get address feature first.', 'woocommerce-gateway-afterpay' ), 'error' );
+		elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+			wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
 		}
 	}
 
@@ -102,7 +109,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					<abbr class="required" title="required">*</abbr>
 				</label>
 	            */ ?>
-				<input type="text" name="afterpay-pre-check-customer-pn" id="afterpay-pre-check-customer-number" class="afterpay-pre-check-customer-number"
+				<input type="text" name="afterpay-pre-check-customer-number" id="afterpay-pre-check-customer-number" class="afterpay-pre-check-customer-number"
 				       placeholder="<?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?>" value="<?php echo $personal_number; ?>" />
 				<button type="button" style="margin-top:0.5em" class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-klarna' ); ?></button>
 			</p>
@@ -198,43 +205,51 @@ class WC_AfterPay_Pre_Check_Customer {
 				'OrderLines' => $order_lines
 			)
 		);
-		$response = $soap_client->PreCheckCustomer( $args );
 
-		error_log( var_export( $args, true ) );
+		try {
+			$response = $soap_client->PreCheckCustomer( $args );
 
-		if ( $response->IsSuccess ) {
-			// Set session data
-			WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
-			WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
-			WC()->session->set( 'afterpay_personal_no', $personal_number );
-			WC()->session->set( 'afterpay_allowed_payment_methods', $response->AllowedPaymentMethods->AllowedPaymentMethod );
+			if ( $response->IsSuccess ) {
+				// Set session data
+				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
+				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
+				WC()->session->set( 'afterpay_personal_no', $personal_number );
+				WC()->session->set( 'afterpay_allowed_payment_methods', $response->AllowedPaymentMethods->AllowedPaymentMethod );
 
-			// Customer information
-			$afterpay_customer_details = array(
-				'first_name' => $response->Customer->FirstName,
-				'last_name'  => $response->Customer->LastName,
-				'address_1'  => $response->Customer->AddressList->Address->Street,
-				'address_2'  => $response->Customer->AddressList->Address->StreetNumber,
-				'postcode'   => $response->Customer->AddressList->Address->PostalCode,
-				'city'       => $response->Customer->AddressList->Address->PostalPlace,
-			);
-			WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
+				// Customer information
+				$afterpay_customer_details = array(
+					'first_name' => $response->Customer->FirstName,
+					'last_name'  => $response->Customer->LastName,
+					'address_1'  => $response->Customer->AddressList->Address->Street,
+					'address_2'  => $response->Customer->AddressList->Address->StreetNumber,
+					'postcode'   => $response->Customer->AddressList->Address->PostalCode,
+					'city'       => $response->Customer->AddressList->Address->PostalPlace,
+				);
+				WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
 
-			// Capture user's personal number as meta field, if logged in
-			if ( is_user_logged_in() ) {
-				$user = wp_get_current_user();
-				add_user_meta( $user->ID, '_arvato_personal_number', $personal_number );
+				// Capture user's personal number as meta field, if logged in
+				if ( is_user_logged_in() ) {
+					$user = wp_get_current_user();
+					add_user_meta( $user->ID, '_arvato_personal_number', $personal_number );
+				}
+
+				// Send success
+				return $response;
+			} else {
+				WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
+
+				WC()->session->__unset( 'afterpay_checkout_id' );
+				WC()->session->__unset( 'afterpay_customer_no' );
+				WC()->session->__unset( 'afterpay_personal_no' );
+				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+
+				return false;
 			}
-
-			// Send success
-			return $response;
-		} else {
-			WC()->session->__unset( 'afterpay_checkout_id' );
-			WC()->session->__unset( 'afterpay_customer_no' );
-			WC()->session->__unset( 'afterpay_personal_no' );
-			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
-			
-			return false;
+		} catch ( Exception $e ) {
+			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
+			echo '<div class="woocommerce-error">';
+			echo $e->getMessage();
+			echo '</div>';
 		}
 	}
 

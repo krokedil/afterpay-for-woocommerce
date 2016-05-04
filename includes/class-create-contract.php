@@ -75,20 +75,19 @@ class WC_AfterPay_Create_Contract {
 		);
 
 		$soap_client              = new SoapClient( $checkout_endpoint );
-		$create_contract_response = $soap_client->CreateContract( $args );
-		error_log( 'CREATE CONTRACT ARGS: ' . var_export( $args, true ) );
-		error_log( 'CREATE CONTRACT RESPONSE: ' . var_export( $create_contract_response, true ) );
+		$response = $soap_client->CreateContract( $args );
 
-		if ( $create_contract_response->IsSuccess ) {
-			update_post_meta( $order->id, '_afterpay_contract_id', $create_contract_response->ContractID );
+		if ( $response->IsSuccess ) {
+			update_post_meta( $order->id, '_afterpay_contract_id', $response->ContractID );
 			// Store reservation ID as order note
 			$order->add_order_note(
-				sprintf( __( 'AfterPay contract created, contract ID: %s.', 'woocommerce-gateway-afterpay' ), $create_contract_response->ContractID )
+				sprintf( __( 'AfterPay contract created, contract ID: %s.', 'woocommerce-gateway-afterpay' ), $response->ContractID )
 			);
 
 			return true;
 		} else {
-			return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-afterpay' ) );
+			WC_Gateway_AfterPay_Factory::log( 'CreateContract request failed.' );
+			return new WP_Error( 'failure', __( 'CreateContract request failed.', 'woocommerce-gateway-afterpay' ) );
 		}
 
 	}

@@ -90,19 +90,28 @@ class WC_AfterPay_Complete_Checkout {
 			}
 		}
 
-		$soap_client                = new SoapClient( $checkout_endpoint );
-		$complete_checkout_response = $soap_client->CompleteCheckout( $args );
+		$soap_client = new SoapClient( $checkout_endpoint );
 
-		if ( $complete_checkout_response->IsSuccess ) {
-			update_post_meta( $order->id, '_afterpay_reservation_id', $complete_checkout_response->ReservationID );
+		try {
+			$response = $soap_client->CompleteCheckout( $args );
 
-			// Unset AfterPay session values
-			WC()->session->__unset( 'afterpay_checkout_id' );
-			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+			if ( $response->IsSuccess ) {
+				update_post_meta( $order->id, '_afterpay_reservation_id', $response->ReservationID );
 
-			return true;
-		} else {
-			return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-afterpay' ) );
+				// Unset AfterPay session values
+				WC()->session->__unset( 'afterpay_checkout_id' );
+				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+
+				return true;
+			} else {
+				WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request failed.' );
+				return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-afterpay' ) );
+			}
+		} catch ( Exception $e ) {
+			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
+			echo '<div class="woocommerce-error">';
+			echo $e->getMessage();
+			echo '</div>';
 		}
 	}
 

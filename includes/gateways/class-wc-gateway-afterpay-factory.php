@@ -24,8 +24,28 @@ function init_wc_gateway_afterpay_factory_class() {
 	 */
 	class WC_Gateway_AfterPay_Factory extends WC_Payment_Gateway {
 
+		/** @var bool Whether or not logging is enabled */
+		public static $log_enabled = false;
+
+		/** @var WC_Logger Logger instance */
+		public static $log = false;
+
 		/**
-		 * Check if payment method is available for current customer
+		 * Logging method.
+		 *
+		 * @param string $message
+		 */
+		public static function log( $message ) {
+			// if ( self::$log_enabled ) {
+				if ( empty( self::$log ) ) {
+					self::$log = new WC_Logger();
+				}
+				self::$log->add( 'afterpay', $message );
+			// }
+		}
+
+		/**
+		 * Check if payment method is available for current customer.
 		 */
 		public function is_available() {
 			// Check if Sweden is selected
@@ -221,12 +241,14 @@ function init_wc_gateway_afterpay_factory_class() {
 		public function can_refund_order( $order, $amount ) {
 			// Check if there's a transaction ID (invoice number)
 			if ( ! $order->get_transaction_id() ) {
+				$this->log( 'Refund failed: No AfterPay invoice number ID.' );
 				return new WP_Error( 'error', __( 'Refund failed: No AfterPay invoice number ID.', 'woocommerce' ) );
 			}
 
 			// At the moment, only full refund is possible, because we can't send refunded order lines to AfterPay
 			if ( $amount != $order->get_total() ) {
-				return new WP_Error( 'error', __( 'Refund failed: Only full order amount can be refunded.',
+				$this->log( 'Refund failed: Only full order amount can be refunded via AfterPay.' );
+				return new WP_Error( 'error', __( 'Refund failed: Only full order amount can be refunded via AfterPay.',
 					'woocommerce' ) );
 			}
 

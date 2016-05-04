@@ -159,24 +159,28 @@ class WC_AfterPay_Capture {
 		);
 
 		$soap_client = new SoapClient( $order_maintenance_endpoint );
-		$response    = $soap_client->CaptureFull( $args );
 
-		if ( $response->IsSuccess ) {
-			error_log( 'CAPTURE RESPONSE: ' . var_export( $response, true ) );
+		try {
+			$response = $soap_client->CaptureFull( $args );
 
-			// Add time stamp, used to prevent duplicate cancellations for the same order.
-			update_post_meta( $this->order_id, '_afterpay_reservation_captured', current_time( 'mysql' ) );
-			update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );
+			if ( $response->IsSuccess ) {
+				error_log( 'CAPTURE RESPONSE: ' . var_export( $response, true ) );
 
-			$order->add_order_note(
-				sprintf( __( 'AfterPay reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-afterpay' ), $response->InvoiceNumber )
-			);
+				// Add time stamp, used to prevent duplicate cancellations for the same order.
+				update_post_meta( $this->order_id, '_afterpay_reservation_captured', current_time( 'mysql' ) );
+				update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );
 
-		} else {
-			$order->add_order_note( __(
-				'AfterPay reservation could not be captured.',
-				'woocommerce-gateway-afterpay'
-			) );
+				$order->add_order_note( sprintf( __( 'AfterPay reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-afterpay' ), $response->InvoiceNumber ) );
+
+			} else {
+				$order->add_order_note( __( 'AfterPay reservation could not be captured.', 'woocommerce-gateway-afterpay' ) );
+			}
+		} catch ( Exception $e ) {
+			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
+			
+			echo '<div class="woocommerce-error">';
+			echo $e->getMessage();
+			echo '</div>';
 		}
 	}
 
