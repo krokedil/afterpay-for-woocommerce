@@ -29,8 +29,8 @@ function init_wc_gateway_afterpay_invoice_class() {
 		 * Constructor for the gateway.
 		 */
 		public function __construct() {
-			$this->id                 = 'afterpay_invoice';
-			$this->method_title       = __( 'AfterPay Invoice', 'woocommerce-gateway-afterpay' );
+			$this->id           = 'afterpay_invoice';
+			$this->method_title = __( 'AfterPay Invoice', 'woocommerce-gateway-afterpay' );
 
 			$this->icon               = apply_filters( 'woocommerce_afterpay_invoice_icon', AFTERPAY_URL . '/assets/images/logo.png' );
 			$this->has_fields         = true;
@@ -43,7 +43,7 @@ function init_wc_gateway_afterpay_invoice_class() {
 			$this->username    = $this->get_option( 'username' );
 			$this->password    = $this->get_option( 'password' );
 			$this->debug       = $this->get_option( 'debug' );
-			
+
 			// Load the settings.
 			$this->init_form_fields();
 			$this->init_settings();
@@ -59,6 +59,7 @@ function init_wc_gateway_afterpay_invoice_class() {
 				'process_admin_options'
 			) );
 		}
+
 	}
 
 }

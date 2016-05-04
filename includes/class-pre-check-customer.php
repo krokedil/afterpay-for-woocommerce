@@ -232,7 +232,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					$user = wp_get_current_user();
 					add_user_meta( $user->ID, '_arvato_personal_number', $personal_number );
 				}
-
+				
 				// Send success
 				return $response;
 			} else {

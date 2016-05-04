@@ -24,9 +24,6 @@ function init_wc_gateway_afterpay_factory_class() {
 	 */
 	class WC_Gateway_AfterPay_Factory extends WC_Payment_Gateway {
 
-		/** @var bool Whether or not logging is enabled */
-		public static $log_enabled = false;
-
 		/** @var WC_Logger Logger instance */
 		public static $log = false;
 
@@ -36,12 +33,15 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * @param string $message
 		 */
 		public static function log( $message ) {
-			// if ( self::$log_enabled ) {
+			$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+			if ( $afterpay_settings['debug'] == 'yes' ) {
+				error_log( $message );
+
 				if ( empty( self::$log ) ) {
 					self::$log = new WC_Logger();
 				}
 				self::$log->add( 'afterpay', $message );
-			// }
+			}
 		}
 
 		/**
@@ -97,7 +97,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * Initialise Gateway Settings Form Fields.
 		 */
 		public function init_form_fields() {
-			$this->form_fields = array(
+			$form_fields = array(
 				'enabled' => array(
 					'title'   => __( 'Enable/Disable', 'woocommerce-gateway-afterpay' ),
 					'type'    => 'checkbox',
@@ -147,14 +147,20 @@ function init_wc_gateway_afterpay_factory_class() {
 					'label'       => __( 'Enable AfterPay testmode', 'woocommerce-gateway-afterpay' ),
 					'default'     => 'no',
 				),
-				'debug' => array(
+			);
+
+			// Logging toggle for all payment methods is in AfterPay Invoice settings
+			if ( 'afterpay_invoice' == $this->id ) {
+				$form_fields['debug'] = array(
 					'title'       => __( 'Debug Log', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'checkbox',
 					'label'       => __( 'Enable logging', 'woocommerce-gateway-afterpay' ),
 					'default'     => 'no',
 					'description' => sprintf( __( 'Log ' . $this->method_title . ' events in <code>%s</code>', 'woocommerce-gateway-afterpay' ), wc_get_log_file_path( 'afterpay-invoice' ) )
-				),
-			);
+				);
+			}
+
+			$this->form_fields = $form_fields;
 		}
 
 		/**
