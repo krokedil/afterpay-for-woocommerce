@@ -165,8 +165,6 @@ class WC_AfterPay_Capture {
 			$response = $soap_client->CaptureFull( $args );
 
 			if ( $response->IsSuccess ) {
-				error_log( 'CAPTURE RESPONSE: ' . var_export( $response, true ) );
-
 				// Add time stamp, used to prevent duplicate cancellations for the same order.
 				update_post_meta( $this->order_id, '_afterpay_reservation_captured', current_time( 'mysql' ) );
 				update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );

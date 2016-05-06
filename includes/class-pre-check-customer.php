@@ -81,8 +81,6 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * Check if customer has used PreCheckCustomer and received a positive response
 	 */
 	public function confirm_pre_check_customer() {
-		error_log( var_export( $_POST, true ) );
-
 		// Check if personal/organization number field is empty
 		if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
 			wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
@@ -216,11 +214,20 @@ class WC_AfterPay_Pre_Check_Customer {
 			$response = $soap_client->PreCheckCustomer( $args );
 
 			if ( $response->IsSuccess ) {
+				// If only invoice is returned, response is an object, not a one element array
+				if ( is_array( $response->AllowedPaymentMethods->AllowedPaymentMethod ) ) {
+					$allowed_payment_methods = $response->AllowedPaymentMethods->AllowedPaymentMethod;
+				} else {
+					$allowed_payment_methods = array();
+					$allowed_payment_methods[] = $response->AllowedPaymentMethods->AllowedPaymentMethod;
+				}
+				error_log( var_export( $allowed_payment_methods, true ) );
+
 				// Set session data
 				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
 				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
 				WC()->session->set( 'afterpay_personal_no', $personal_number );
-				WC()->session->set( 'afterpay_allowed_payment_methods', $response->AllowedPaymentMethods->AllowedPaymentMethod );
+				WC()->session->set( 'afterpay_allowed_payment_methods', $allowed_payment_methods );
 
 				// Customer information
 				$afterpay_customer_details = array(
@@ -244,10 +251,10 @@ class WC_AfterPay_Pre_Check_Customer {
 			} else {
 				WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
 
-				WC()->session->__unset( 'afterpay_checkout_id' );
-				WC()->session->__unset( 'afterpay_customer_no' );
-				WC()->session->__unset( 'afterpay_personal_no' );
-				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+				// WC()->session->__unset( 'afterpay_checkout_id' );
+				// WC()->session->__unset( 'afterpay_customer_no' );
+				// WC()->session->__unset( 'afterpay_personal_no' );
+				// WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 
 				return false;
 			}

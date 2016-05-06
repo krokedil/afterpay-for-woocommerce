@@ -35,8 +35,6 @@ function init_wc_gateway_afterpay_factory_class() {
 		public static function log( $message ) {
 			$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 			if ( $afterpay_settings['debug'] == 'yes' ) {
-				error_log( $message );
-
 				if ( empty( self::$log ) ) {
 					self::$log = new WC_Logger();
 				}
@@ -60,6 +58,9 @@ function init_wc_gateway_afterpay_factory_class() {
 				return false;
 			}
 
+			error_log( '1: ' . $payment_method );
+			error_log( 'a: ' . var_export( WC()->session, true ) );
+
 			// Check if PreCheckCustomer allows this payment method
 			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
 				switch ( $payment_method ) {
@@ -82,6 +83,8 @@ function init_wc_gateway_afterpay_factory_class() {
 						$success = true;
 					}
 				}
+
+				error_log( '2: ' . var_export( $success, true ) );
 
 				if ( $success ) {
 					return true;
