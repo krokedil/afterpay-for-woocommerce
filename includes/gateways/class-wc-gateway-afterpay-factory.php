@@ -135,22 +135,23 @@ function init_wc_gateway_afterpay_factory_class() {
 					'description' => __( 'Please enter your AfterPay client ID; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
-				'order_management' => array(
+			);
+
+			// Logging, test mode and order management toggles for all payment methods
+			// are in AfterPay Invoice settings
+			if ( 'afterpay_invoice' == $this->id ) {
+				$form_fields['order_management'] = array(
 					'title'   => __( 'Enable Order Management', 'woocommerce-gateway-afterpay' ),
 					'type'    => 'checkbox',
 					'label'   => __( 'Enable AfterPay order capture on WooCommerce order completion and AfterPay order cancellation on WooCommerce order cancellation', 'woocommerce-gateway-afterpay' ),
 					'default' => 'yes'
-				),
-				'testmode' => array(
+				);
+				$form_fields['testmode'] = array(
 					'title'       => __( 'AfterPay testmode', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'checkbox',
 					'label'       => __( 'Enable AfterPay testmode', 'woocommerce-gateway-afterpay' ),
 					'default'     => 'no',
-				),
-			);
-
-			// Logging toggle for all payment methods is in AfterPay Invoice settings
-			if ( 'afterpay_invoice' == $this->id ) {
+				);
 				$form_fields['debug'] = array(
 					'title'       => __( 'Debug Log', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'checkbox',

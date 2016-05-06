@@ -20,10 +20,20 @@ class WC_AfterPay_Cancel_Reservation {
 	/** @var int */
 	private $order_id = '';
 
+	/** @var bool */
+	private $order_management = false;
+
+	/** @var bool */
+	private $testmode = false;
+
 	/**
 	 * WC_AfterPay_Cancel_Reservation constructor.
 	 */
 	public function __construct() {
+		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+		$this->order_management = 'yes' == $afterpay_settings['order_management'] ? true : false;
+		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+		
 		add_action( 'woocommerce_order_status_cancelled', array( $this, 'cancel_reservation' ) );
 	}
 
@@ -81,6 +91,10 @@ class WC_AfterPay_Cancel_Reservation {
 
 		// If this reservation was already cancelled, do nothing.
 		if ( get_post_meta( $this->order_id, '_afterpay_reservation_cancelled', true ) ) {
+			$order->add_order_note(
+				__( 'Could not cancel AfterPay reservation, AfterPay reservation is already cancelled.', 'woocommerce-gateway-afterpay' )
+			);
+
 			return;
 		}
 
@@ -88,15 +102,11 @@ class WC_AfterPay_Cancel_Reservation {
 		$payment_method_settings = $this->get_payment_method_settings();
 
 		// If payment method is set to not cancel orders automatically, bail.
-		if ( ! $payment_method_settings['order_management'] ) {
+		if ( ! $this->order_management ) {
 			return;
 		}
 
-		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST :
-			ARVATO_CHECKOUT_LIVE;
-
-		// Check if logging is enabled
-		$this->log_enabled = $payment_method_settings['debug'];
+		$checkout_endpoint = $this->testmode ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
 
 		$cancel_reservation_args = array(
 			'User'       => array(
@@ -123,10 +133,7 @@ class WC_AfterPay_Cancel_Reservation {
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
-
-			echo '<div class="woocommerce-error">';
-			echo $e->getMessage();
-			echo '</div>';
+			$order->add_order_note( sprintf( __( 'AfterPay reservation could not be cancelled, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
 		}
 	}
 

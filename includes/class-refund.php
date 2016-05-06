@@ -19,6 +19,17 @@ class WC_AfterPay_Refund {
 	/** @var int */
 	private $order_id = '';
 
+	/** @var bool */
+	private $testmode = false;
+
+	/**
+	 * WC_AfterPay_Refund constructor.
+	 */
+	public function __construct() {
+		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+	}
+
 	/**
 	 * Grab AfterPay reservation ID.
 	 *
@@ -75,8 +86,7 @@ class WC_AfterPay_Refund {
 		// Get settings for payment method used to create this order.
 		$payment_method_settings = $this->get_payment_method_settings();
 
-		$order_maintenance_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MAINTENANCE_TEST :
-			ARVATO_ORDER_MAINTENANCE_LIVE;
+		$order_maintenance_endpoint = $this->testmode ? ARVATO_ORDER_MAINTENANCE_TEST : ARVATO_ORDER_MAINTENANCE_LIVE;
 
 		// Check if logging is enabled
 		$this->log_enabled = $payment_method_settings['debug'];

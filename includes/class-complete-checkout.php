@@ -23,6 +23,9 @@ class WC_AfterPay_Complete_Checkout {
 	/** @var array */
 	private $settings = array();
 
+	/** @var bool */
+	private $testmode = false;
+
 	/**
 	 * WC_AfterPay_Complete_Checkout constructor.
 	 *
@@ -33,6 +36,9 @@ class WC_AfterPay_Complete_Checkout {
 		$this->order_id          = $order_id;
 		$this->payment_method_id = $payment_method_id;
 		$this->settings          = get_option( 'woocommerce_' . $this->payment_method_id . '_settings' );
+
+		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
 	}
 
 	/**
@@ -47,7 +53,7 @@ class WC_AfterPay_Complete_Checkout {
 		$payment_method_settings = $this->settings;
 
 		// Live or test checkout endpoint, based on payment gateway settings
-		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
+		$checkout_endpoint = $this->testmode ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
 
 		switch ( $this->payment_method_id ) {
 			case 'afterpay_invoice':

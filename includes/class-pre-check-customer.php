@@ -14,10 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WC_AfterPay_Pre_Check_Customer {
 
+	/** @var bool */
+	private $testmode = false;
+
 	/**
 	 * WC_AfterPay_Pre_Check_Customer constructor.
 	 */
 	public function __construct() {
+		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+
 		// Enqueue JS file
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
@@ -179,7 +185,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
 
 		// Live or test checkout endpoint, based on payment gateway settings
-		$checkout_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_CHECKOUT_TEST :
+		$checkout_endpoint = $this->testmode ? ARVATO_CHECKOUT_TEST :
 			ARVATO_CHECKOUT_LIVE;
 
 		// PreCheckCustomer
@@ -232,7 +238,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					$user = wp_get_current_user();
 					add_user_meta( $user->ID, '_arvato_personal_number', $personal_number );
 				}
-				
+
 				// Send success
 				return $response;
 			} else {

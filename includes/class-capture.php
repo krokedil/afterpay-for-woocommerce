@@ -17,25 +17,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WC_AfterPay_Capture {
 
-	/**
-	 * Mandatory fields
-	 * Member name
-	 * - CustomerNo (custom field _afterpay_customer_no)
-	 * - OrderNo (available in woocommerce_order_status_cancelled hook)
-	 *
-	 * User (pulled using get_option)
-	 * - ClientID
-	 * - Password
-	 * - Username
-	 */
-
 	/** @var int */
 	private $order_id = '';
+
+	/** @var bool */
+	private $order_management = false;
+
+	/** @var bool */
+	private $testmode = false;
 
 	/**
 	 * WC_AfterPay_Cancel_Reservation constructor.
 	 */
 	public function __construct() {
+		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+		$this->order_management = 'yes' == $afterpay_settings['order_management'] ? true : false;
+		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_full' ) );
 	}
 
@@ -102,6 +100,10 @@ class WC_AfterPay_Capture {
 
 		// If this reservation was already cancelled, do nothing.
 		if ( get_post_meta( $this->order_id, '_afterpay_reservation_captured', true ) ) {
+			$order->add_order_note(
+				__( 'Could not capture AfterPar reservation, AfterPay reservation is already captured.', 'woocommerce-gateway-afterpay' )
+			);
+
 			return;
 		}
 
@@ -109,12 +111,11 @@ class WC_AfterPay_Capture {
 		$payment_method_settings = $this->get_payment_method_settings();
 
 		// If payment method is set to not capture orders automatically, bail.
-		if ( ! $payment_method_settings['order_management'] ) {
+		if ( ! $this->order_management ) {
 			return;
 		}
 
-		$order_maintenance_endpoint = 'yes' == $payment_method_settings['testmode'] ? ARVATO_ORDER_MAINTENANCE_TEST :
-			ARVATO_ORDER_MAINTENANCE_LIVE;
+		$order_maintenance_endpoint = $this->testmode ? ARVATO_ORDER_MAINTENANCE_TEST : ARVATO_ORDER_MAINTENANCE_LIVE;
 
 		$payment_method_id = $order->payment_method;
 		switch ( $payment_method_id ) {
@@ -177,10 +178,7 @@ class WC_AfterPay_Capture {
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
-			
-			echo '<div class="woocommerce-error">';
-			echo $e->getMessage();
-			echo '</div>';
+			$order->add_order_note( sprintf( __( 'AfterPay reservation could not be captured, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
 		}
 	}
 
