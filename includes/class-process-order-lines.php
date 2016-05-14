@@ -117,27 +117,31 @@ class WC_AfterPay_Process_Order_Lines {
 			}
 		}
 
+		$chosen_methods = WC()->session->get( 'chosen_shipping_methods' );
+
 		// Process shipping
 		if ( WC()->shipping->get_packages() ) {
 			foreach ( WC()->shipping->get_packages() as $shipping_package ) {
 				foreach ( $shipping_package['rates'] as $shipping_rate_key => $shipping_rate_value ) {
-					$shipping_tax = array_sum( $shipping_rate_value->taxes );
+					if ( in_array( $shipping_rate_value->id, $chosen_methods ) ) {
+						$shipping_tax = array_sum( $shipping_rate_value->taxes );
 
-					if ( $shipping_rate_value->cost > 0 ) {
-						$vat_percent = round( $shipping_tax / $shipping_rate_value->cost, 4 ) * 100;
-					} else {
-						$vat_percent = 0;
+						if ( $shipping_rate_value->cost > 0 ) {
+							$vat_percent = round( $shipping_tax / $shipping_rate_value->cost, 4 ) * 100;
+						} else {
+							$vat_percent = 0;
+						}
+
+						$order_lines[] = array(
+							'GrossUnitPrice'  => $shipping_tax + $shipping_rate_value->cost,
+							'ItemDescription' => $shipping_rate_value->label,
+							'ItemID'          => $shipping_rate_value->id,
+							'LineNumber'      => $shipping_rate_key,
+							'NetUnitPrice'    => $shipping_rate_value->cost,
+							'Quantity'        => 1,
+							'VatPercent'      => $vat_percent
+						);
 					}
-
-					$order_lines[] = array(
-						'GrossUnitPrice'  => $shipping_tax + $shipping_rate_value->cost,
-						'ItemDescription' => $shipping_rate_value->label,
-						'ItemID'          => $shipping_rate_value->id,
-						'LineNumber'      => $shipping_rate_key,
-						'NetUnitPrice'    => $shipping_rate_value->cost,
-						'Quantity'        => 1,
-						'VatPercent'      => $vat_percent
-					);
 				}
 			}
 

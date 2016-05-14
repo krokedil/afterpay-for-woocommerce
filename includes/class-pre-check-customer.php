@@ -209,7 +209,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				'OrderLines' => $order_lines
 			)
 		);
-
+		
 		try {
 			$response = $soap_client->PreCheckCustomer( $args );
 
@@ -221,7 +221,6 @@ class WC_AfterPay_Pre_Check_Customer {
 					$allowed_payment_methods = array();
 					$allowed_payment_methods[] = $response->AllowedPaymentMethods->AllowedPaymentMethod;
 				}
-				error_log( var_export( $allowed_payment_methods, true ) );
 
 				// Set session data
 				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
