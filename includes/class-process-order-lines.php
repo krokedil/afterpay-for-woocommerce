@@ -47,7 +47,7 @@ class WC_AfterPay_Process_Order_Lines {
 				$order_lines[] = array(
 					'GrossUnitPrice'  => $order->get_item_total( $item, true ),
 					'ItemDescription' => $item['name'],
-					'ItemID'          => $_product->id,
+					'ItemID'          => $this->get_item_reference( $_product ),
 					'ItemGroupId'     => $_product->id,
 					'LineNumber'      => $item_key,
 					'NetUnitPrice'    => $order->get_item_total( $item, false ),
@@ -65,8 +65,8 @@ class WC_AfterPay_Process_Order_Lines {
 				$order_lines[] = array(
 					'GrossUnitPrice'  => $shipping_method_tax + $shipping_method_value['cost'],
 					'ItemDescription' => $shipping_method_value['name'],
-					'ItemID'          => $shipping_method_key,
-					'ItemGroupId'     => $shipping_method_key,
+					'ItemID'          => $shipping_method_value['type'],
+					'ItemGroupId'     => $shipping_method_value['type'],
 					'LineNumber'      => $shipping_method_key,
 					'NetUnitPrice'    => $shipping_method_value['cost'],
 					'Quantity'        => 1,
@@ -81,8 +81,8 @@ class WC_AfterPay_Process_Order_Lines {
 				$order_lines[] = array(
 					'GrossUnitPrice'  => round( ( $order_fee_value['line_tax'] + $order_fee_value['line_total'] ), 2 ),
 					'ItemDescription' => $order_fee_value['name'],
-					'ItemID'          => $order_fee_key,
-					'ItemGroupId'     => $order_fee_key,
+					'ItemID'          => $order_fee_value['type'],
+					'ItemGroupId'     => $order_fee_value['type'],
 					'LineNumber'      => $order_fee_key,
 					'NetUnitPrice'    => $order_fee_value['line_total'],
 					'Quantity'        => 1,
@@ -105,10 +105,11 @@ class WC_AfterPay_Process_Order_Lines {
 		// Process order lines
 		if ( sizeof( WC()->cart->cart_contents ) > 0 ) {
 			foreach ( WC()->cart->cart_contents as $item_key => $item ) {
+				$_product      = wc_get_product( $item['product_id'] );;
 				$order_lines[] = array(
 					'GrossUnitPrice'  => ( $item['line_tax'] + $item['line_total'] ) / $item['quantity'],
 					'ItemDescription' => get_the_title( $item['product_id'] ),
-					'ItemID'          => $item['product_id'],
+					'ItemID'          => $this->get_item_reference( $_product ),
 					'LineNumber'      => $item_key,
 					'NetUnitPrice'    => $item['line_total'] / $item['quantity'],
 					'Quantity'        => $item['quantity'],
@@ -165,6 +166,25 @@ class WC_AfterPay_Process_Order_Lines {
 		}
 		
 		return $order_lines;
+	}
+
+	/**
+	 * Gets product SKU, variation ID or ID
+	 *
+	 * @param $_product object
+	 *
+	 * @return string
+	 */
+	public function get_item_reference( $_product ) {
+		if ( $_product->get_sku() ) {
+			$item_reference = $_product->get_sku();
+		} elseif ( $_product->variation_id ) {
+			$item_reference = $_product->variation_id;
+		} else {
+			$item_reference = $_product->id;
+		}
+
+		return strval( $item_reference );
 	}
 
 }
