@@ -106,14 +106,14 @@ class WC_AfterPay_Refund {
 		try {
 			if ( $amount != $order->get_total() ) {
 				$refund_args['OrderDetails']['Amount']            = $amount;
-				$refund_args['OrderDetails']['OrderNo']           = $order_id;
+				$refund_args['OrderDetails']['OrderNo']           = $order->get_order_number();
 				$refund_args['OrderDetails']['CurrencyCode']      = $order->get_order_currency();
 				$refund_args['OrderDetails']['OrderChannelType']  = 'Internet';
 				$refund_args['OrderDetails']['OrderDeliveryType'] = 'Normal';
 
 				$response = $soap_client->RefundPartial( $refund_args );
 			} else {
-				$refund_args['OrderNo'] = $order_id;
+				$refund_args['OrderNo'] = $order->get_order_number();
 				$response               = $soap_client->RefundFull( $refund_args );
 			}
 
