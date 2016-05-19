@@ -3,7 +3,7 @@
 require_once( '../woocommerce/woocommerce.php' );
 require_once( 'woocommerce-gateway-afterpay.php' );
 
-class WC_AfterPay_Pre_Check_Customer_Test extends WP_UnitTestCase {
+class WC_AfterPay_Cancel_Reservation_Test extends WP_UnitTestCase {
 
 	private $username = 'WooComTestSE';
 	private $password = 'm8K1Dfuj';
