@@ -155,7 +155,7 @@ class WC_AfterPay_Process_Order_Lines {
 
 				$order_lines[] = array(
 					'GrossUnitPrice'  => round( ( $cart_fee->amount + $cart_fee_tax ), 2 ),
-					'ItemDescription' => $cart_fee->label,
+					'ItemDescription' => $cart_fee->name,
 					'ItemID'          => $cart_fee->id,
 					'LineNumber'      => $cart_fee->id,
 					'NetUnitPrice'    => $cart_fee->amount,

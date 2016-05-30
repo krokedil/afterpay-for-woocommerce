@@ -79,6 +79,7 @@ include_once( AFTERPAY_PATH . '/includes/class-cancel-reservation.php' );
 include_once( AFTERPAY_PATH . '/includes/class-create-contract.php' );
 include_once( AFTERPAY_PATH . '/includes/class-complete-checkout.php' );
 include_once( AFTERPAY_PATH . '/includes/class-capture.php' );
+include_once( AFTERPAY_PATH . '/includes/class-update-reservation.php' );
 
 include_once( AFTERPAY_PATH . '/includes/class-process-order-lines.php' );
 
