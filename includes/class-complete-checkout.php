@@ -74,7 +74,7 @@ class WC_AfterPay_Complete_Checkout {
 				'Password' => $payment_method_settings['password']
 			),
 			'CheckoutID'      => $checkout_id,
-			'OrderNo'         => $this->order_id,
+			'OrderNo'         => $order->get_order_number(),
 			'CustomerNo'      => $customer_no,
 			'Amount'          => $order->get_total(),
 			'TotalOrderValue' => $order->get_total(),

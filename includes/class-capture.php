@@ -26,6 +26,9 @@ class WC_AfterPay_Capture {
 	/** @var bool */
 	private $testmode = false;
 
+	/** @var bool */
+	private $log_enabled = false;
+
 	/**
 	 * WC_AfterPay_Cancel_Reservation constructor.
 	 */
@@ -33,6 +36,7 @@ class WC_AfterPay_Capture {
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->order_management = 'yes' == $afterpay_settings['order_management'] ? true : false;
 		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+		$this->log_enabled = 'yes' == $afterpay_settings['debug'] ? true : false;
 
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_full' ) );
 	}
@@ -133,10 +137,7 @@ class WC_AfterPay_Capture {
 		// Prepare order lines for AfterPay
 		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
 		$order_lines = $order_lines_processor->get_order_lines( $order_id );
-
-		// Check if logging is enabled
-		$this->log_enabled = $payment_method_settings['debug'];
-
+		
 		$args = array(
 			'User'       => array(
 				'ClientID' => $payment_method_settings['client_id'],
@@ -155,7 +156,7 @@ class WC_AfterPay_Capture {
 				'OrderChannelType'  => 'Internet',
 				'OrderDeliveryType' => 'Normal',
 				'OrderLines'        => $order_lines,
-				'OrderNo'           => $this->order_id,
+				'OrderNo'           => $order->get_order_number()
 			),
 		);
 

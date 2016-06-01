@@ -65,22 +65,23 @@ function woocommerce_gateway_afterpay_disabled_notices() {
 	echo '</div>';
 }
 
-include_once( 'includes/gateways/class-wc-gateway-afterpay-factory.php' );
-include_once( 'includes/gateways/class-wc-gateway-afterpay-invoice.php' );
-include_once( 'includes/gateways/class-wc-gateway-afterpay-part-payment.php' );
-include_once( 'includes/gateways/class-wc-gateway-afterpay-account.php' );
-
-include_once( 'includes/class-pre-check-customer.php' );
-include_once( 'includes/class-cancel-reservation.php' );
-include_once( 'includes/class-create-contract.php' );
-include_once( 'includes/class-complete-checkout.php' );
-include_once( 'includes/class-capture.php' );
-
-include_once( 'includes/class-process-order-lines.php' );
-
 // Define plugin paths
 define( 'AFTERPAY_URL', untrailingslashit( plugins_url( '/', __FILE__ ) ) );
 define( 'AFTERPAY_PATH', untrailingslashit( plugin_dir_path( __FILE__ ) ) );
+
+include_once( AFTERPAY_PATH . '/includes/gateways/class-wc-gateway-afterpay-factory.php' );
+include_once( AFTERPAY_PATH . '/includes/gateways/class-wc-gateway-afterpay-invoice.php' );
+include_once( AFTERPAY_PATH . '/includes/gateways/class-wc-gateway-afterpay-part-payment.php' );
+include_once( AFTERPAY_PATH . '/includes/gateways/class-wc-gateway-afterpay-account.php' );
+
+include_once( AFTERPAY_PATH . '/includes/class-pre-check-customer.php' );
+include_once( AFTERPAY_PATH . '/includes/class-cancel-reservation.php' );
+include_once( AFTERPAY_PATH . '/includes/class-create-contract.php' );
+include_once( AFTERPAY_PATH . '/includes/class-complete-checkout.php' );
+include_once( AFTERPAY_PATH . '/includes/class-capture.php' );
+include_once( AFTERPAY_PATH . '/includes/class-update-reservation.php' );
+
+include_once( AFTERPAY_PATH . '/includes/class-process-order-lines.php' );
 
 // Define server endpoints
 define(

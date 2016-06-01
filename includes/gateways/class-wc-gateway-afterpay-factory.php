@@ -58,9 +58,6 @@ function init_wc_gateway_afterpay_factory_class() {
 				return false;
 			}
 
-			error_log( '1: ' . $payment_method );
-			error_log( 'a: ' . var_export( WC()->session, true ) );
-
 			// Check if PreCheckCustomer allows this payment method
 			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
 				switch ( $payment_method ) {
@@ -83,9 +80,7 @@ function init_wc_gateway_afterpay_factory_class() {
 						$success = true;
 					}
 				}
-
-				error_log( '2: ' . var_export( $success, true ) );
-
+				
 				if ( $success ) {
 					return true;
 				} else {
@@ -173,6 +168,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * @param  int $order_id
 		 *
 		 * @return array
+		 * @throws Exception
 		 */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
@@ -191,7 +187,7 @@ function init_wc_gateway_afterpay_factory_class() {
 			// CheckoutID and CustomerNo are required and returned from PreCheckCustomer
 			$wc_afterpay_complete_checkout = new WC_AfterPay_Complete_Checkout( $order_id, $this->id );
 
-			if ( $wc_afterpay_complete_checkout->complete_checkout() ) {
+			if ( ! is_wp_error( $wc_afterpay_complete_checkout->complete_checkout() ) ) {
 				// Mark payment complete on success
 				$order->payment_complete();
 
@@ -208,6 +204,9 @@ function init_wc_gateway_afterpay_factory_class() {
 					'result'   => 'success',
 					'redirect' => $this->get_return_url( $order )
 				);
+			} else {
+				$error_message = $wc_afterpay_complete_checkout->complete_checkout();
+				throw new Exception( $error_message->get_error_message() );
 			}
 		}
 

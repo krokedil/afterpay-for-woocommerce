@@ -104,18 +104,28 @@ jQuery(function ($) {
 		}
 	});
 
-	// Prevent the form from actually submitting
+	// Fire PreCheckCustomer when the button is clicked
 	$(document).on('click', '.afterpay-get-address-button', function (event) {
+		// Prevent the form from actually submitting
 		event.preventDefault();
 
+		trigger_ajax_pre_check_customer();
+	});
+
+	// Fire PreCheckCustomer on update_checkout
+	// $(document).on('update_checkout', function(event) {
+		// trigger_ajax_pre_check_customer();
+	// });
+
+	function trigger_ajax_pre_check_customer() {
 		// Remove success note, in case it's already there
 		$('#afterpay-pre-check-customer-response').remove();
 
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		var selected_customer_category = $('input[name="afterpay_customer_category"]:checked').val();
-		var entered_personal_number = $(this).parent().parent().find('.afterpay-pre-check-customer-number').val();
+		var entered_personal_number = $('#afterpay-pre-check-customer .afterpay-pre-check-customer-number').val();
 		$('.afterpay-pre-check-customer-number').val(entered_personal_number);
-		
+
 		if ('' != entered_personal_number) { // Check if the field is empty
 			$.ajax(
 				WC_AfterPay.ajaxurl,
@@ -151,7 +161,7 @@ jQuery(function ($) {
 						} else { // wp_send_json_error
 							console.log('ERROR:');
 							console.log(response.data);
-							
+
 							$('body').trigger('update_checkout');
 
 							$('#afterpay-pre-check-customer').append('<div id="afterpay-pre-check-customer-response" class="woocommerce-error">' + response.data.message + '</div>');
@@ -166,6 +176,6 @@ jQuery(function ($) {
 		} else { // If the field is empty show notification
 
 		}
-	});
+	}
 
 });
