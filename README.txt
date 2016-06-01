@@ -11,11 +11,11 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 By Krokedil - http://krokedil.com/
 
-== DESCRIPTION ==
+== Description ==
 
-AfterPay payment gateway for WooCommerce
+AfterPay for WooCommerce is a plugin that extends WooCommerce, allowing you to take payments via AfterPay. With this extension you get access to AfterPay's three payment methods - Invoice, Part Payment and Account.
 
-== INSTALLATION ==
+== Installation ==
 
 1. Download and unzip the latest release zip file.
 2. If you use the WordPress plugin uploader to install this plugin skip to step 4.
@@ -23,7 +23,7 @@ AfterPay payment gateway for WooCommerce
 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
 5. Go to --> WooCommerce --> Settings --> Checkout and configure your AfterPay settings.
 
-== CHANGELOG ==
+== Changelog ==
 
 = 1.0 =
 * Initial release
