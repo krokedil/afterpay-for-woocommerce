@@ -2,7 +2,8 @@
 Contributors: krokedil, niklashogefjord, slobodanmanic
 Tags: ecommerce, e-commerce, woocommerce, afterpay
 Requires at least: 4.2
-Tested up to: 4.4.2
+Tested up to: 4.5.2
+Stable tag: 1.0
 Requires WooCommerce at least: 2.4
 Tested WooCommerce up to: 2.5.5
 License: GPLv3
@@ -22,4 +23,7 @@ AfterPay payment gateway for WooCommerce
 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
 5. Go to --> WooCommerce --> Settings --> Checkout and configure your AfterPay settings.
 
-== CREDITS ==
+== CHANGELOG ==
+
+= 1.0 =
+* Initial release
