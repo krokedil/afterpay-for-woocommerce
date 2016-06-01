@@ -7,9 +7,9 @@
  * @package WC_Gateway_AfterPay
  *
  * @wordpress-plugin
- * Plugin Name:     WooCommerce AfterPay Gateway
- * Plugin URI:      http://woothemes.com/woocommerce
- * Description:     Provides AfterPay AfterPay payment gateway for WooCommerce.
+ * Plugin Name:     AfterPay for WooCommerce
+ * Plugin URI:      https://krokedil.se/produkt/afterpay/
+ * Description:     Provides AfterPay payment gateway for WooCommerce.
  * Version:         0.1
  * Author:          Krokedil
  * Author URI:      http://krokedil.com/

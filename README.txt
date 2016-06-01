@@ -1,4 +1,4 @@
-=== WooCommerce AfterPay Payment Gateway ===
+=== AfterPay for WooCommerce ===
 Contributors: krokedil, niklashogefjord, slobodanmanic
 Tags: ecommerce, e-commerce, woocommerce, afterpay
 Requires at least: 4.2
@@ -15,6 +15,9 @@ By Krokedil - http://krokedil.com/
 
 AfterPay for WooCommerce is a plugin that extends WooCommerce, allowing you to take payments via AfterPay. With this extension you get access to AfterPay's three payment methods - Invoice, Part Payment and Account.
 
+= Get started =
+More information on how to get started can be found in the [plugin documentation](http://wordpress.org/ “AfterPay for WooCommerce documentation”).
+
 == Installation ==
 
 1. Download and unzip the latest release zip file.
@@ -22,6 +25,10 @@ AfterPay for WooCommerce is a plugin that extends WooCommerce, allowing you to t
 3. Upload the entire plugin directory to your /wp-content/plugins/ directory.
 4. Activate the plugin through the 'Plugins' menu in WordPress Administration.
 5. Go to --> WooCommerce --> Settings --> Checkout and configure your AfterPay settings.
+
+== Frequently Asked Questions ==
+= Which countries does this payment gateway support? =
+Sweden is the only available country at the moment. Norway will be added in short.
 
 == Changelog ==
 
