@@ -96,10 +96,10 @@ class WC_AfterPay_Pre_Check_Customer {
 
 			if ( WC()->session->get( 'afterpay_personal_no' ) ) {
 				$personal_no = WC()->session->get( 'afterpay_personal_no' );
-			} else if ( ! is_user_logged_in() ) {
+			} else if ( is_user_logged_in() ) {
 				$user = wp_get_current_user();
-				if ( get_user_meta( $user->ID, '_arvato_personal_number', true ) ) {
-					$personal_no = get_user_meta( $user->ID, '_arvato_personal_number', true );
+				if ( get_user_meta( $user->ID, '_afterpay_personal_no', true ) ) {
+					$personal_no = get_user_meta( $user->ID, '_afterpay_personal_no', true );
 				}
 			}
 
@@ -126,7 +126,14 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * Display AfterPay PreCheckCustomer fields
 	 */
 	public static function display_pre_check_form() {
-		$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
+		if ( is_user_logged_in() ) {
+			$user = wp_get_current_user();
+			if ( get_user_meta( $user->ID, '_afterpay_personal_no', true ) ) {
+				$personal_number = get_user_meta( $user->ID, '_afterpay_personal_no', true );
+			}
+		} else {
+			$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
+		}
 		?>
 		<div id="afterpay-pre-check-customer" style="display:none">
 			<p>
@@ -280,7 +287,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				// Capture user's personal number as meta field, if logged in
 				if ( is_user_logged_in() ) {
 					$user = wp_get_current_user();
-					add_user_meta( $user->ID, '_arvato_personal_number', $personal_number );
+					add_user_meta( $user->ID, '_afterpay_personal_no', $personal_number, true );
 				}
 
 				// Send success
