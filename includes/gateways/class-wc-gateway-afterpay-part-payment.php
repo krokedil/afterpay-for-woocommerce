@@ -65,9 +65,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 		 */
 		public function payment_fields() {
 			parent::payment_fields();
-
-			echo get_user_meta( 1, '_arvato_personal_number', true );
-
+			
 			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
 				foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
 					if ( $payment_option->PaymentMethod == 'Installment' ) {

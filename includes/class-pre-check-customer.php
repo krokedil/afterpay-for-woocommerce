@@ -133,8 +133,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			}
 		} else {
 			$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
-		}
-		?>
+		} ?>
 		<div id="afterpay-pre-check-customer" style="display:none">
 			<p>
 				<input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
