@@ -76,7 +76,8 @@ class WC_AfterPay_Process_Order_Lines {
 		}
 
 		// Process fees
-		if ( ! empty( $order->get_fees() ) ) {
+		$order_fees = $order->get_fees();
+		if ( ! empty( $order_fees ) ) {
 			foreach ( $order->get_fees() as $order_fee_key => $order_fee_value ) {
 				$order_lines[] = array(
 					'GrossUnitPrice'  => round( ( $order_fee_value['line_tax'] + $order_fee_value['line_total'] ), 2 ),
