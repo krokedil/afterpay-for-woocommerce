@@ -16,7 +16,7 @@ By Krokedil - http://krokedil.com/
 AfterPay for WooCommerce is a plugin that extends WooCommerce, allowing you to take payments via AfterPay. With this extension you get access to AfterPay's three payment methods - Invoice, Part Payment and Account.
 
 = Get started =
-More information on how to get started can be found in the [plugin documentation](http://wordpress.org/ “AfterPay for WooCommerce documentation”).
+More information on how to get started can be found in the [plugin documentation](http://docs.krokedil.com/documentation/afterpay-for-woocommerce/).
 
 == Installation ==
 
@@ -29,6 +29,13 @@ More information on how to get started can be found in the [plugin documentation
 == Frequently Asked Questions ==
 = Which countries does this payment gateway support? =
 Sweden is the only available country at the moment. Norway will be added in short.
+
+= Where can I find AfterPay for WooCommerce documentation? =
+For help setting up and configuring AfterPay for WooCommerce please refer to our [documentation](http://docs.krokedil.com/documentation/afterpay-for-woocommerce/).
+
+= Where can I get support? =
+If you need help with installation and configuration we offer premium (paid) support. More information about our concierge service can be found on [the AfterPay for WooCommerce product page](https://krokedil.se/produkt/afterpay/).
+
 
 == Changelog ==
 
