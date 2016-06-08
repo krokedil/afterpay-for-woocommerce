@@ -10,7 +10,7 @@
  * Plugin Name:     AfterPay for WooCommerce
  * Plugin URI:      https://krokedil.se/produkt/afterpay/
  * Description:     Provides AfterPay payment gateway for WooCommerce.
- * Version:         1.0
+ * Version:         1.0.1
  * Author:          Krokedil
  * Author URI:      http://krokedil.com/
  * Developer:       Krokedil
