@@ -342,7 +342,6 @@ class WC_AfterPay_Pre_Check_Customer {
 
 		return $value;
 	}
-
 }
 
 $wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();

@@ -33,6 +33,14 @@ jQuery(function ($) {
 		} else {
 			$('#afterpay-pre-check-customer').slideUp(250);
 		}
+		
+		// Only display the Get Address button if Sweden is the selected country
+		var selected_customer_country = $("#billing_country").val();
+		if (selected_customer_country == 'SE') {
+			jQuery('.afterpay-get-address-button').fadeIn();
+		} else {
+			jQuery('.afterpay-get-address-button').fadeOut();
+		}
 	}
 
 	function populate_afterpay_fields() {
@@ -88,7 +96,10 @@ jQuery(function ($) {
 	$(document).on('init_checkout', function (event) {
 		maybe_show_pre_checkout_form();
 	});
-
+	$(document).on('updated_checkout', function (event) {
+		maybe_show_pre_checkout_form();
+	});
+	
 	$(document).on('change', 'input[name="payment_method"]', function (event) {
 		maybe_show_pre_checkout_form();
 
