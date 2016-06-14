@@ -47,7 +47,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function is_available() {
 			// Check if Sweden is selected
-			if ( WC()->customer->get_country() == true && 'SE' != WC()->customer->get_country() ) {
+			if ( WC()->customer->get_country() == true && ('SE' != WC()->customer->get_country() && 'NO' != WC()->customer->get_country() ) ) {
 				return false;
 			}
 
