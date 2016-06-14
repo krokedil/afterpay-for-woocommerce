@@ -110,15 +110,18 @@ class WC_AfterPay_Pre_Check_Customer {
 	}
 
 	/**
-	 * Check if customer has used PreCheckCustomer and received a positive response
+	 * Check if customer has used PreCheckCustomer and received a positive response (if AfterPay method is selected)
 	 */
 	public function confirm_pre_check_customer() {
-		// Check if personal/organization number field is empty
-		if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
-			wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
-		} // Check if PreCheckCustomer was performed
-		elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
-			wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
+		$chosen_payment_method = WC()->session->chosen_payment_method;
+		if ( strpos( $chosen_payment_method, 'afterpay' ) !== false ) {
+			// Check if personal/organization number field is empty
+			if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
+				wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
+			} // Check if PreCheckCustomer was performed
+			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+				wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
+			}
 		}
 	}
 
