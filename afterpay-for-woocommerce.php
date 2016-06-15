@@ -27,6 +27,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Localisation.
+ */
+load_plugin_textdomain( 'woocommerce-gateway-afterpay', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+
+/**
  * Check if SOAP extension is loaded, prevent plugin activation if it isn't.
  */
 register_activation_hook( __FILE__, 'woocommerce_gateway_afterpay_activation_check' );

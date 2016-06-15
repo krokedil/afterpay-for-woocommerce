@@ -1,0 +1,245 @@
+# Copyright (C) 2016 AfterPay for WooCommerce
+# This file is distributed under the same license as the AfterPay for WooCommerce package.
+msgid ""
+msgstr ""
+"Project-Id-Version: AfterPay for WooCommerce 1.0.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/afterpay-for-"
+"woocommerce\n"
+"POT-Creation-Date: 2016-06-14 12:36:29+00:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: afterpay-for-woocommerce.php:36 afterpay-for-woocommerce.php:63
+msgid ""
+"WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in "
+"touch with \n"
+"\tyour hosting provider to see how you can enable it."
+msgstr ""
+
+#: includes/class-cancel-reservation.php:95
+msgid ""
+"Could not cancel AfterPay reservation, AfterPay reservation is already "
+"cancelled."
+msgstr ""
+
+#: includes/class-cancel-reservation.php:130
+msgid "AfterPay reservation was successfully cancelled."
+msgstr ""
+
+#: includes/class-cancel-reservation.php:132
+msgid "AfterPay reservation could not be cancelled."
+msgstr ""
+
+#: includes/class-cancel-reservation.php:136
+msgid "AfterPay reservation could not be cancelled, reason: %s."
+msgstr ""
+
+#: includes/class-capture.php:108
+msgid ""
+"Could not capture AfterPar reservation, AfterPay reservation is already "
+"captured."
+msgstr ""
+
+#: includes/class-capture.php:173
+msgid "AfterPay reservation was successfully captured, invoice number: %s."
+msgstr ""
+
+#: includes/class-capture.php:176
+msgid "AfterPay reservation could not be captured."
+msgstr ""
+
+#: includes/class-capture.php:180
+msgid "AfterPay reservation could not be captured, reason: %s."
+msgstr ""
+
+#: includes/class-complete-checkout.php:114
+msgid "CompleteCheckout request failed."
+msgstr ""
+
+#: includes/class-create-contract.php:90
+msgid "AfterPay contract created, contract ID: %s."
+msgstr ""
+
+#: includes/class-create-contract.php:96
+msgid "CreateContract request failed."
+msgstr ""
+
+#: includes/class-pre-check-customer.php:118
+msgid "Personal/organization number is a required field."
+msgstr ""
+
+#: includes/class-pre-check-customer.php:121
+msgid ""
+"Please use get address feature first, before using one of AfterPay payment "
+"methods."
+msgstr ""
+
+#: includes/class-pre-check-customer.php:142
+msgid "Person"
+msgstr ""
+
+#: includes/class-pre-check-customer.php:147
+msgid "Company"
+msgstr ""
+
+#: includes/class-pre-check-customer.php:152
+msgid "Personal/organization number"
+msgstr ""
+
+#: includes/class-pre-check-customer.php:155
+msgid "Get address"
+msgstr ""
+
+#: includes/class-pre-check-customer.php:195
+msgid "Address found and added to checkout form."
+msgstr ""
+
+#: includes/class-pre-check-customer.php:201
+msgid ""
+"No address was found. Please check your personal number or choose another "
+"payment method."
+msgstr ""
+
+#: includes/class-refund.php:123
+msgid "AfterPay refund was successfully processed."
+msgstr ""
+
+#: includes/class-refund.php:127
+msgid "AfterPay refund could not be processed."
+msgstr ""
+
+#: includes/class-refund.php:129
+msgid "Refund failed."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-account.php:33
+msgid "AfterPay Account"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:100
+msgid "Enable/Disable"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:106
+msgid "Title"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:108
+msgid "This controls the title which the user sees during checkout."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:113
+msgid "Description"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:116
+msgid "This controls the description which the user sees during checkout."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:119
+msgid "AfterPay Username"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:121
+msgid ""
+"Please enter your AfterPay username; this is needed in order to take payment."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:125
+msgid "AfterPay Password"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:127
+msgid ""
+"Please enter your AfterPay password; this is needed in order to take payment."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:131
+msgid "AfterPay Client ID"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:133
+msgid ""
+"Please enter your AfterPay client ID; this is needed in order to take "
+"payment."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:142
+msgid "Enable Order Management"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:144
+msgid ""
+"Enable AfterPay order capture on WooCommerce order completion and AfterPay "
+"order cancellation on WooCommerce order cancellation"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:148
+msgid "AfterPay testmode"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:150
+msgid "Enable AfterPay testmode"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:154
+msgid "Debug Log"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:156
+msgid "Enable logging"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:196
+msgid "AfterPay reservation created, reservation ID: %s."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:254
+msgid "Refund failed: No AfterPay invoice number ID."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:260
+msgid "Refund failed: Only full order amount can be refunded via AfterPay."
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-invoice.php:33
+msgid "AfterPay Invoice"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:33
+msgid "AfterPay Part Payment"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:73
+msgid "Please select a payment plan:"
+msgstr ""
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:96
+msgid ""
+"Example: 10000 kr over 12 months, effective interest rate 16.82%. Total "
+"credit amount 1682SEK, total repayment amount 11682 SEK."
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "AfterPay for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+msgid "https://krokedil.se/produkt/afterpay/"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid "Provides AfterPay payment gateway for WooCommerce."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Krokedil"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "http://krokedil.com/"
+msgstr ""
