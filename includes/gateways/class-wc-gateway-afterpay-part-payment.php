@@ -37,12 +37,36 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			$this->method_description = __( 'Allows payments through ' . $this->method_title . '.', 'woocommerce-gateway-afterpay' );
 
 			// Define user set variables
-			$this->title       = $this->get_option( 'title' );
-			$this->description = $this->get_option( 'description' );
-			$this->client_id   = $this->get_option( 'client_id' );
-			$this->username    = $this->get_option( 'username' );
-			$this->password    = $this->get_option( 'password' );
-			$this->debug       = $this->get_option( 'debug' );
+			$this->title       		= $this->get_option( 'title' );
+			$this->description 		= $this->get_option( 'description' );
+			$this->client_id_se   	= $this->get_option( 'client_id_se' );
+			$this->username_se    	= $this->get_option( 'username_se' );
+			$this->password_se    	= $this->get_option( 'password_se' );
+			$this->client_id_no   	= $this->get_option( 'client_id_no' );
+			$this->username_no    	= $this->get_option( 'username_no' );
+			$this->password_no    	= $this->get_option( 'password_no' );
+			$this->debug       		= $this->get_option( 'debug' );
+			
+			// Set country and merchant credentials based on currency.
+			switch ( get_woocommerce_currency() ) {
+				case 'NOK' :
+					$this->afterpay_country 	= 'NO';
+					$this->client_id  			= $this->client_id_no;
+					$this->username     		= $this->username_no;
+					$this->password     		= $this->password_no;
+					break;
+				case 'SEK' :
+					$this->afterpay_country		= 'SE';
+					$this->client_id  			= $this->client_id_se;
+					$this->username     		= $this->username_se;
+					$this->password     		= $this->password_se;
+					break;
+				default:
+					$this->afterpay_country 	= '';
+					$this->client_id  			= '';
+					$this->username     		= '';
+					$this->password     		= '';
+			}
 			
 			// Load the settings.
 			$this->init_form_fields();
