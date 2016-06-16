@@ -119,7 +119,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
 				wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
 			} // Check if PreCheckCustomer was performed
-			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_country() ) {
 				wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
 			}
 		}
