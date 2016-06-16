@@ -38,17 +38,11 @@ class WC_AfterPay_Update_Reservation {
 		$orderid = $item_row->order_id;
 		error_log( 'add_item' );
 		$order = wc_get_order( $orderid );
-
-		error_log( 'order: ' . var_export( $order, true ) );
-		error_log( 'order_items: ' . var_export( $order->get_items(), true ) );
-		error_log( 'items: ' . var_export( $item, true ) );
 	}
 
 	function edit_item( $orderid, $items ) {
 		// if ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) {
 			$order = wc_get_order( $orderid );
-			error_log( 'order_items: ' . var_export( $order->get_items(), true ) );
-			error_log( 'items: ' . var_export( $items, true ) );
 		// }
 	}
 
