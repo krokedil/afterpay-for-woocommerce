@@ -32,10 +32,13 @@ class WC_AfterPay_Complete_Checkout {
 	 * @param $order_id          int    WooCommerce order ID
 	 * @param $payment_method_id string WooCommerce payment method id
 	 */
-	public function __construct( $order_id, $payment_method_id ) {
-		$this->order_id          = $order_id;
-		$this->payment_method_id = $payment_method_id;
-		$this->settings          = get_option( 'woocommerce_' . $this->payment_method_id . '_settings' );
+	public function __construct( $order_id, $payment_method_id, $client_id, $username, $password ) {
+		$this->order_id          	= $order_id;
+		$this->payment_method_id 	= $payment_method_id;
+		$this->client_id 			= $client_id;
+		$this->username 			= $username;
+		$this->password				= $password;
+		$this->settings          	= get_option( 'woocommerce_' . $this->payment_method_id . '_settings' );
 
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
