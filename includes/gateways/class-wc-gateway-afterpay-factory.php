@@ -46,8 +46,9 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * Check if payment method is available for current customer.
 		 */
 		public function is_available() {
-			// Check if Sweden is selected
-			if ( WC()->customer->get_country() == true && ('SE' != WC()->customer->get_country() && 'NO' != WC()->customer->get_country() ) ) {
+			
+			// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country)
+			if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
 				return false;
 			}
 
@@ -115,22 +116,40 @@ function init_wc_gateway_afterpay_factory_class() {
 					'desc_tip'    => true,
 					'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce-gateway-afterpay' ),
 				),
-				'username' => array(
-					'title'       => __( 'AfterPay Username', 'woocommerce-gateway-afterpay' ),
+				'username_se' => array(
+					'title'       => __( 'AfterPay Username - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay username; this is needed in order to take payment.',
+					'description' => __( 'Please enter your AfterPay username for Sweden; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
-				'password' => array(
-					'title'       => __( 'AfterPay Password', 'woocommerce-gateway-afterpay' ),
+				'password_se' => array(
+					'title'       => __( 'AfterPay Password - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay password; this is needed in order to take payment.',
+					'description' => __( 'Please enter your AfterPay password for Sweden; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
-				'client_id' => array(
-					'title'       => __( 'AfterPay Client ID', 'woocommerce-gateway-afterpay' ),
+				'client_id_se' => array(
+					'title'       => __( 'AfterPay Client ID - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay client ID; this is needed in order to take payment.',
+					'description' => __( 'Please enter your AfterPay client ID for Sweden; this is needed in order to take payment.',
+						'woocommerce-gateway-afterpay' ),
+				),
+				'username_no' => array(
+					'title'       => __( 'AfterPay Username - Norway', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'text',
+					'description' => __( 'Please enter your AfterPay username for Norway; this is needed in order to take payment.',
+						'woocommerce-gateway-afterpay' ),
+				),
+				'password_no' => array(
+					'title'       => __( 'AfterPay Password - Norway', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'text',
+					'description' => __( 'Please enter your AfterPay password for Norway; this is needed in order to take payment.',
+						'woocommerce-gateway-afterpay' ),
+				),
+				'client_id_no' => array(
+					'title'       => __( 'AfterPay Client ID - Norway', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'text',
+					'description' => __( 'Please enter your AfterPay client ID for Norway; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 			);
