@@ -19,6 +19,15 @@ class WC_AfterPay_Complete_Checkout {
 
 	/** @var string */
 	private $payment_method_id = '';
+	
+	/** @var string */
+	private $client_id = '';
+	
+	/** @var string */
+	private $username = '';
+	
+	/** @var string */
+	private $password = '';
 
 	/** @var array */
 	private $settings = array();
@@ -72,11 +81,11 @@ class WC_AfterPay_Complete_Checkout {
 
 		$args = array(
 			'User'            => array(
-				'ClientID' => $payment_method_settings['client_id'],
-				'Username' => $payment_method_settings['username'],
-				'Password' => $payment_method_settings['password']
+				'ClientID' => $this->client_id,
+				'Username' => $this->username,
+				'Password' => $this->password
 			),
-			'CheckoutID'      => $checkout_id,
+			
 			'OrderNo'         => $order->get_order_number(),
 			'CustomerNo'      => $customer_no,
 			'Amount'          => $order->get_total(),
@@ -86,7 +95,9 @@ class WC_AfterPay_Complete_Checkout {
 			),
 			'OrderDate'       => date( 'Y-m-d', strtotime( $order->order_date ) )
 		);
-
+		if( $checkout_id ) {
+			$args['CheckoutID'] = $checkout_id;
+		}
 		if ( 'afterpay_account' == $this->payment_method_id ) {
 			$args['PaymentInfo']['AccountInfo'] = array(
 				'AccountProfileNo' => 1
@@ -100,10 +111,10 @@ class WC_AfterPay_Complete_Checkout {
 		}
 
 		$soap_client = new SoapClient( $checkout_endpoint );
-
+		WC_Gateway_AfterPay_Factory::log( 'args: ' . var_export( $args, true) );
 		try {
 			$response = $soap_client->CompleteCheckout( $args );
-
+			WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request response: ' . var_export( $response, true) );
 			if ( $response->IsSuccess ) {
 				update_post_meta( $order->id, '_afterpay_reservation_id', $response->ReservationID );
 
