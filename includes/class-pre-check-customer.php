@@ -139,11 +139,11 @@ class WC_AfterPay_Pre_Check_Customer {
 		} ?>
 		<div id="afterpay-pre-check-customer" style="display:none">
 			<p>
+				<label for="klarna_invoice_pno"><?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
 				<input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
-				       id="afterpay-customer-category-person" checked/>
-				<label
-					for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
-				<br/>
+				       id="afterpay-customer-category-person" checked/> 
+				<label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
+				
 				<input type="radio" class="input-radio" value="Company" name="afterpay_customer_category"
 				       id="afterpay-customer-category-company"/>
 				<label
@@ -152,10 +152,10 @@ class WC_AfterPay_Pre_Check_Customer {
 			<p class="form-row form-row-wide validate-required">
 				<input type="text" name="afterpay-pre-check-customer-number" id="afterpay-pre-check-customer-number"
 				       class="afterpay-pre-check-customer-number"
-				       placeholder="<?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?>"
+				       placeholder="<?php _e( 'YYMMDDNNNN', 'woocommerce-gateway-afterpay' ); ?>"
 				       value="<?php echo $personal_number; ?>"/>
 				<button type="button" style="margin-top:0.5em"
-				        class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-klarna' ); ?></button>
+				        class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-afterpay' ); ?></button>
 			</p>
 		</div>
 		<?php
