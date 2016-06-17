@@ -87,10 +87,10 @@ function init_wc_gateway_afterpay_part_payment_class() {
 									'kr'
 								);
 
-								echo '<div>';
+								
 								echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '" value="' . $installment_plan->AccountProfileNumber . '" ' . checked( $key, 0, false ) . ' />';
-								echo '<label for="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '">' . $label . '</label>';
-								echo '</div>';
+								echo '<label for="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '"> ' . $label . '</label>';
+								echo '<br>';
 							}
 
 							$example = __( 'Example: 10000 kr over 12 months, effective interest rate 16.82%. Total credit amount 1682SEK, total repayment amount 11682 SEK.', 'woocommerce-gateway-afterpay'	);
