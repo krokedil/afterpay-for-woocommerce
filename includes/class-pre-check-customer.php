@@ -186,12 +186,13 @@ class WC_AfterPay_Pre_Check_Customer {
 		$personal_number   = $_REQUEST['personal_number'];
 		$payment_method    = $_REQUEST['payment_method'];
 		$customer_category = $_REQUEST['customer_category'];
+		$billing_country   = $_REQUEST['billing_country'];
 
 		if ( $customer_category != 'Company' ) {
 			$customer_category = 'Person';
 		}
 
-		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category );
+		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country );
 		$data['response']            = $pre_check_customer_response;
 
 		if ( $pre_check_customer_response->IsSuccess ) {
@@ -220,7 +221,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 *
 	 * @return bool
 	 */
-	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person' ) {
+	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person', $billing_country ) {
 		WC_Gateway_AfterPay_Factory::log( 'PreCheckCustomer request start' );
 
 		// Prepare order lines for AfterPay
@@ -228,6 +229,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		$order_lines           = $order_lines_processor->get_order_lines();
 
 		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+		
 
 		// Live or test checkout endpoint, based on payment gateway settings
 		$checkout_endpoint = $this->testmode ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
@@ -236,9 +238,9 @@ class WC_AfterPay_Pre_Check_Customer {
 		$soap_client = new SoapClient( $checkout_endpoint );
 		$args        = array(
 			'User'         => array(
-				'ClientID' => $payment_method_settings['client_id'],
-				'Username' => $payment_method_settings['username'],
-				'Password' => $payment_method_settings['password']
+				'ClientID' => $payment_method_settings['client_id_' . strtolower($billing_country)],
+				'Username' => $payment_method_settings['username_' . strtolower($billing_country)],
+				'Password' => $payment_method_settings['password_' . strtolower($billing_country)]
 			),
 			'Customer'     => array(
 				'Address'                 => array(

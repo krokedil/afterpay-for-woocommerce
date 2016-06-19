@@ -135,6 +135,7 @@ jQuery(function ($) {
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		var selected_customer_category = $('input[name="afterpay_customer_category"]:checked').val();
 		var entered_personal_number = $('#afterpay-pre-check-customer .afterpay-pre-check-customer-number').val();
+		var selected_billing_country = $("#billing_country").val();
 		$('.afterpay-pre-check-customer-number').val(entered_personal_number);
 
 		if ('' != entered_personal_number) { // Check if the field is empty
@@ -148,6 +149,7 @@ jQuery(function ($) {
 						personal_number: entered_personal_number,
 						payment_method: selected_payment_method,
 						customer_category: selected_customer_category,
+						billing_country: selected_billing_country,
 						nonce: WC_AfterPay.afterpay_pre_check_customer_nonce
 					},
 					success: function (response) {
