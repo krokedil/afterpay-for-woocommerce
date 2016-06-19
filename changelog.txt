@@ -1,4 +1,0 @@
-*** AfterPay for WooCommerce Changelog ***
-
-2016.06.01 	- version 1.0
-* - Initial release
