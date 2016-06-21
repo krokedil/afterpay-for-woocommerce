@@ -110,9 +110,9 @@ class WC_AfterPay_Cancel_Reservation {
 
 		$cancel_reservation_args = array(
 			'User'       => array(
-				'ClientID' => $payment_method_settings['client_id'],
-				'Username' => $payment_method_settings['username'],
-				'Password' => $payment_method_settings['password']
+				'ClientID' => $payment_method_settings['client_id_' . strtolower($order->billing_country)],
+				'Username' => $payment_method_settings['username_' . strtolower($order->billing_country)],
+				'Password' => $payment_method_settings['password_' . strtolower($order->billing_country)]
 			),
 			'CustomerNo' => $this->get_customer_no(),
 			'OrderNo'    => $this->order_id

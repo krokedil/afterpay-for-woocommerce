@@ -93,9 +93,9 @@ class WC_AfterPay_Refund {
 
 		$refund_args = array(
 			'User'       => array(
-				'ClientID' => $payment_method_settings['client_id'],
-				'Username' => $payment_method_settings['username'],
-				'Password' => $payment_method_settings['password']
+				'ClientID' => $payment_method_settings['client_id_' . strtolower($order->billing_country)],
+				'Username' => $payment_method_settings['username_' . strtolower($order->billing_country)],
+				'Password' => $payment_method_settings['password_' . strtolower($order->billing_country)]
 			),
 			'ReservationID' => $this->get_reservation_id(),
 			'InvoiceNumber' => $order->get_transaction_id(),

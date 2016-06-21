@@ -67,9 +67,9 @@ class WC_AfterPay_Create_Contract {
 
 		$args = array(
 			'User'        => array(
-				'ClientID' => $payment_method_settings['client_id'],
-				'Username' => $payment_method_settings['username'],
-				'Password' => $payment_method_settings['password']
+				'ClientID' => $payment_method_settings['client_id_' . strtolower($order->billing_country)],
+				'Username' => $payment_method_settings['username_' . strtolower($order->billing_country)],
+				'Password' => $payment_method_settings['password_' . strtolower($order->billing_country)]
 			),
 			'CheckoutID'  => $checkout_id,
 			'PaymentInfo' => array(
