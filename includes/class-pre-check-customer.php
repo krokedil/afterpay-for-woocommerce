@@ -317,8 +317,8 @@ class WC_AfterPay_Pre_Check_Customer {
 				// WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 				// WC()->session->__unset( 'afterpay_customer_details' );
 				// WC()->session->__unset( 'afterpay_cart_total' );
-
-				return false;
+				return new WP_Error( 'failure', __( $response->Messages->BusinessErrorMessages->ResponseBusinessErrorMessage->Message, 'woocommerce-gateway-afterpay' ) );
+				//return false;
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );

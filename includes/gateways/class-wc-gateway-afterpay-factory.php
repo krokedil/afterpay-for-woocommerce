@@ -197,9 +197,9 @@ function init_wc_gateway_afterpay_factory_class() {
 				$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
 				$response = $wc_afterpay_pre_check_customer->pre_check_customer_request( $_POST['afterpay-pre-check-customer-number'], $this->id, $_POST['afterpay_customer_category'], $order->billing_country, $order );
 				
-				if( false == $response->IsSuccess ) {
-					$error_msg = 'Error message: ' . $response->Messages->ResponseBusinessErrorMessage->Message;
-					throw new Exception( $error_msg );
+				if ( is_wp_error( $response ) ) {
+					throw new Exception( $response->get_error_message() );
+					return false;
 				}
 			}
 			
