@@ -104,7 +104,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			}
 
 			if ( '' != $personal_no ) {
-				$this->pre_check_customer_request( $personal_no, $chosen_payment_method );
+				$this->pre_check_customer_request( $personal_no, $chosen_payment_method, 'Person', WC()->customer->get_country() );
 			}
 		}
 	}
@@ -221,7 +221,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 *
 	 * @return bool
 	 */
-	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person', $billing_country, $order = false ) {
+	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country, $order = false ) {
 		WC_Gateway_AfterPay_Factory::log( 'PreCheckCustomer request start' );
 
 		// Prepare order lines for AfterPay
