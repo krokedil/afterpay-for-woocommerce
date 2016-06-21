@@ -191,7 +191,19 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-
+			
+			// If needed, run PreCheckCustomer
+			if( ! WC()->session->get( 'afterpay_checkout_id' ) ) {
+				$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
+				$response = $wc_afterpay_pre_check_customer->pre_check_customer_request( $_POST['afterpay-pre-check-customer-number'], $this->id, 'Person', 'NO', $order );
+				
+				if( false == $response->IsSuccess ) {
+					$error_msg = 'Error message: ' . $response->Messages->ResponseBusinessErrorMessage->Message;
+					throw new Exception( $error_msg );
+				}
+			}
+			
+			
 			// If needed, run CreateContract
 			if ( 'afterpay_account' == $this->id || 'afterpay_part_payment' == $this->id ) {
 				$wc_afterpay_create_contract = new WC_AfterPay_Create_Contract( $order_id, $this->id );
