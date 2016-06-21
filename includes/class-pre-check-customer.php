@@ -221,7 +221,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 *
 	 * @return bool
 	 */
-	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person', $billing_country ) {
+	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category = 'Person', $billing_country, $order = false ) {
 		WC_Gateway_AfterPay_Factory::log( 'PreCheckCustomer request start' );
 
 		// Prepare order lines for AfterPay
@@ -244,23 +244,34 @@ class WC_AfterPay_Pre_Check_Customer {
 			),
 			'Customer'     => array(
 				'Address'                 => array(
-					'CountryCode' => 'SE',
+					'CountryCode' 	=> $billing_country,
 				),
 				'CustomerCategory'        => $customer_category,
 				'Organization_PersonalNo' => $personal_number,
 			),
 			'OrderDetails' => array(
 				'Amount'            => WC()->cart->total,
-				'CurrencyCode'      => 'SEK',
+				'CurrencyCode'      => get_woocommerce_currency(),
 				'OrderChannelType'  => 'Internet',
 				'OrderDeliveryType' => 'Normal',
 				'OrderLines'        => $order_lines
 			)
 		);
+		
+		if( 'SE' !== $billing_country && $order ) {
+			$args['Customer']['Address']['Street'] = $order->billing_address_1;
+			$args['Customer']['Address']['PostalCode'] = $order->billing_postcode;
+			$args['Customer']['Address']['PostalPlace'] = $order->billing_city;
+			
+			$args['Customer']['Email'] = $order->billing_email;
+			$args['Customer']['FirstName'] = $order->billing_first_name;
+			$args['Customer']['LastName'] = $order->billing_last_name;
+			$args['Customer']['MobilePhone'] = $order->billing_phone;
+		}
 
 		try {
 			$response = $soap_client->PreCheckCustomer( $args );
-
+			WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
 			if ( $response->IsSuccess ) {
 				// If only invoice is returned, response is an object, not a one element array
 				if ( is_array( $response->AllowedPaymentMethods->AllowedPaymentMethod ) ) {
@@ -281,13 +292,14 @@ class WC_AfterPay_Pre_Check_Customer {
 				);
 
 				// Set session data
+				
 				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
 				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
 				WC()->session->set( 'afterpay_personal_no', $personal_number );
 				WC()->session->set( 'afterpay_allowed_payment_methods', $allowed_payment_methods );
 				WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
 				WC()->session->set( 'afterpay_cart_total', WC()->cart->total );
-
+				
 				// Capture user's personal number as meta field, if logged in
 				if ( is_user_logged_in() ) {
 					$user = wp_get_current_user();
