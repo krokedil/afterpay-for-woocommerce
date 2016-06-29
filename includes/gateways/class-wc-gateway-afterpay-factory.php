@@ -112,7 +112,7 @@ function init_wc_gateway_afterpay_factory_class() {
 				),
 				'description' => array(
 					'title'       => __( 'Description', 'woocommerce-gateway-afterpay' ),
-					'type'        => 'text',
+					'type'        => 'textarea',
 					'desc_tip'    => true,
 					'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce-gateway-afterpay' ),
 				),
