@@ -1,0 +1,356 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: AfterPay for WooCommerce\n"
+"POT-Creation-Date: 2016-06-17 13:42+0200\n"
+"PO-Revision-Date: 2016-06-17 13:43+0200\n"
+"Last-Translator: Niklas Högefjord <info@krokedil.se>\n"
+"Language-Team: Niklas Högefjord <info@krokedil.se>\n"
+"Language: sv_SE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.8\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-WPHeader: afterpay-for-woocommerce.php\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: afterpay-for-woocommerce.php:41 afterpay-for-woocommerce.php:68
+msgid ""
+"WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in "
+"touch with \n"
+"\tyour hosting provider to see how you can enable it."
+msgstr ""
+"WooCommerce AfterPay Gateway kräver PHP SOAP-tillägg. Vänligen ta kontakt "
+"med webbhotellet att se hur du kan aktivera den."
+
+#: includes/class-cancel-reservation.php:95
+msgid ""
+"Could not cancel AfterPay reservation, AfterPay reservation is already "
+"cancelled."
+msgstr ""
+"Kunde inte avbryta reservationen, AfterPay reservationen är redan avbruten."
+
+#: includes/class-cancel-reservation.php:130
+msgid "AfterPay reservation was successfully cancelled."
+msgstr "AfterPay reservationen avbröts framgångsrikt."
+
+#: includes/class-cancel-reservation.php:132
+msgid "AfterPay reservation could not be cancelled."
+msgstr "AfterPay reservationen kunde inte avbrytas."
+
+#: includes/class-cancel-reservation.php:136
+#, php-format
+msgid "AfterPay reservation could not be cancelled, reason: %s."
+msgstr "AfterPay reservationen kunde inte avbrytas, orsak: %s."
+
+#: includes/class-capture.php:108
+msgid ""
+"Could not capture AfterPar reservation, AfterPay reservation is already "
+"captured."
+msgstr ""
+"Kunde inte aktivera AfterPay reservationen, AfterPay reservationen redan "
+"aktiverad."
+
+#: includes/class-capture.php:173
+#, php-format
+msgid "AfterPay reservation was successfully captured, invoice number: %s."
+msgstr "AfterPay reservationen aktiverades framgångsrikt, fakturanummer: %s."
+
+#: includes/class-capture.php:176
+msgid "AfterPay reservation could not be captured."
+msgstr "AfterPay reservationen kunde inte aktiveras."
+
+#: includes/class-capture.php:180
+#, php-format
+msgid "AfterPay reservation could not be captured, reason: %s."
+msgstr "AfterPay reservation kunde inte aktiveras, orsak: %s."
+
+#: includes/class-complete-checkout.php:114
+msgid "CompleteCheckout request failed."
+msgstr "CompleteCheckout-anropet misslyckades."
+
+#: includes/class-create-contract.php:90
+#, php-format
+msgid "AfterPay contract created, contract ID: %s."
+msgstr "AfterPay-kontrakt skapat, kontrakt-ID: %s."
+
+#: includes/class-create-contract.php:96
+msgid "CreateContract request failed."
+msgstr "CreateContract-anrop misslyckades."
+
+#: includes/class-pre-check-customer.php:120
+msgid "Personal/organization number is a required field."
+msgstr "Person-/organisationsnummer är ett obligatoriskt fält."
+
+#: includes/class-pre-check-customer.php:123
+msgid ""
+"Please use get address feature first, before using one of AfterPay payment "
+"methods."
+msgstr ""
+"Vänligen använd hämta adress-funktionen först, innan du använder en av "
+"betalmetoderna från AfterPay."
+
+#: includes/class-pre-check-customer.php:142
+msgid "Personal/organization number"
+msgstr "Person-/organisationsnummer"
+
+#: includes/class-pre-check-customer.php:145
+msgid "Person"
+msgstr "Privatperson"
+
+#: includes/class-pre-check-customer.php:150
+msgid "Company"
+msgstr "Företag"
+
+#: includes/class-pre-check-customer.php:155
+msgid "YYMMDDNNNN"
+msgstr "ÅÅMMDDNNNN"
+
+#: includes/class-pre-check-customer.php:158
+msgid "Get address"
+msgstr "Hämta adress"
+
+#: includes/class-pre-check-customer.php:199
+msgid "Address found and added to checkout form."
+msgstr "Adress hittad och tillagd i kassaformuläret."
+
+#: includes/class-pre-check-customer.php:205
+msgid ""
+"No address was found. Please check your personal number or choose another "
+"payment method."
+msgstr ""
+"Ingen adress hittades. Kontrollera ditt personnummer eller välja en annan "
+"betalningsmetod."
+
+#: includes/class-refund.php:123
+msgid "AfterPay refund was successfully processed."
+msgstr "AfterPay återbetalning behandlades framgångsrikt."
+
+#: includes/class-refund.php:127
+msgid "AfterPay refund could not be processed."
+msgstr "AfterPay återbetalning kunde inte behandlas."
+
+#: includes/class-refund.php:129
+msgid "Refund failed."
+msgstr "Återbetalning misslyckades"
+
+#: includes/gateways/class-wc-gateway-afterpay-account.php:33
+msgid "AfterPay Account"
+msgstr "AfterPay konto"
+
+#: includes/gateways/class-wc-gateway-afterpay-account.php:37
+#: includes/gateways/class-wc-gateway-afterpay-invoice.php:37
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:37
+msgid "Allows payments through "
+msgstr "Tillåter betalningar genom"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:100
+msgid "Enable/Disable"
+msgstr "Aktivera/Inaktivera"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:102
+msgid "Enable "
+msgstr "Aktivera"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:106
+msgid "Title"
+msgstr "Titel"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:108
+msgid "This controls the title which the user sees during checkout."
+msgstr "Det här kontrollerar vilken titel kunden ser i kassan."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:113
+msgid "Description"
+msgstr "Beskrivning"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:116
+msgid "This controls the description which the user sees during checkout."
+msgstr "Det här kontrollerar den beskrivning kunden ser i kassan."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:119
+msgid "AfterPay Username"
+msgstr "AfterPay användarnamn"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:121
+msgid ""
+"Please enter your AfterPay username; this is needed in order to take payment."
+msgstr ""
+"Vänligen ange ditt användarnamn för AfterPay. Detta är nödvändigt för att ta "
+"betalning."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:125
+msgid "AfterPay Password"
+msgstr "AfterPay lösenord"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:127
+msgid ""
+"Please enter your AfterPay password; this is needed in order to take payment."
+msgstr ""
+"Skriv in lösenordet för AfterPay. Detta är nödvändigt för att ta betalning."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:131
+msgid "AfterPay Client ID"
+msgstr "AfterPay klient-ID"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:133
+msgid ""
+"Please enter your AfterPay client ID; this is needed in order to take "
+"payment."
+msgstr ""
+"Vänligen ange ditt klient-ID för AfterPay. Detta är nödvändigt för att ta "
+"betalning."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:142
+msgid "Enable Order Management"
+msgstr "Aktivera orderhantering"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:144
+msgid ""
+"Enable AfterPay order capture on WooCommerce order completion and AfterPay "
+"order cancellation on WooCommerce order cancellation"
+msgstr ""
+"Aktivera fakturor i AfterPay i samband med orderstatus i WooCommerce sätts "
+"till Genomförd och avbryt reservationer i AfterPay i samband med orderstatus "
+"i WooCommerce sätts till Avbruten."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:148
+msgid "AfterPay testmode"
+msgstr "AfterPay testmode"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:150
+msgid "Enable AfterPay testmode"
+msgstr "Aktivera AfterPay testmode"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:154
+msgid "Debug Log"
+msgstr "Debug Log"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:156
+msgid "Enable logging"
+msgstr "Aktivera loggning"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:158
+msgid "Log "
+msgstr "Logg"
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:196
+#, php-format
+msgid "AfterPay reservation created, reservation ID: %s."
+msgstr "AfterPay reservation skapad, reservations-ID: %s."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:254
+msgid "Refund failed: No AfterPay invoice number ID."
+msgstr "Återbetalning misslyckades: Inget AfterPay fakturanummer-ID."
+
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:260
+msgid "Refund failed: Only full order amount can be refunded via AfterPay."
+msgstr ""
+"Återbetalning misslyckades: endast hela orderbeloppet kan återbetalas via "
+"AfterPay."
+
+#: includes/gateways/class-wc-gateway-afterpay-invoice.php:33
+msgid "AfterPay Invoice"
+msgstr "AfterPay faktura"
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:33
+msgid "AfterPay Part Payment"
+msgstr "AfterPay delbetalning"
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:73
+msgid "Please select a payment plan:"
+msgstr "Välj en betalningsplan:"
+
+#: includes/gateways/class-wc-gateway-afterpay-part-payment.php:96
+msgid ""
+"Example: 10000 kr over 12 months, effective interest rate 16.82%. Total "
+"credit amount 1682SEK, total repayment amount 11682 SEK."
+msgstr ""
+"Exempel: 10000 kr på 12 månader, effektiv ränta 16.82%. Totalt kreditbelopp "
+"1682SEK, totalt återbetalningsbelopp 11682 kronor."
+
+#. Plugin Name of the plugin/theme
+msgid "AfterPay for WooCommerce"
+msgstr "AfterPay för WooCommerce"
+
+#. Plugin URI of the plugin/theme
+msgid "https://krokedil.se/produkt/afterpay/"
+msgstr "https://Krokedil.se/produkt/afterpay/"
+
+#. Description of the plugin/theme
+msgid "Provides AfterPay payment gateway for WooCommerce."
+msgstr "Tillhandahåller en AfterPay betalmodul för WooCommerce."
+
+#. Author of the plugin/theme
+msgid "Krokedil"
+msgstr "Krokedil"
+
+#. Author URI of the plugin/theme
+msgid "http://krokedil.com/"
+msgstr "http://krokedil.com/"
+
+#~ msgid "AfterPay Username - Sweden"
+#~ msgstr "AfterPay användarnamn - Sverige"
+
+#~ msgid ""
+#~ "Please enter your AfterPay username for Sweden; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Vänligen ange ditt användarnamn för AfterPay Sverige. Detta är nödvändigt "
+#~ "för att ta betalning."
+
+#~ msgid "AfterPay Password - Sweden"
+#~ msgstr "AfterPay lösenord - Sverige"
+
+#~ msgid ""
+#~ "Please enter your AfterPay password for Sweden; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Skriv in lösenordet för AfterPay Sverige. Detta är nödvändigt för att ta "
+#~ "betalning."
+
+#~ msgid "AfterPay Client ID - Sweden"
+#~ msgstr "AfterPay klient-ID - Sverige"
+
+#~ msgid ""
+#~ "Please enter your AfterPay client ID for Sweden; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Vänligen ange ditt klient-ID för AfterPay Sverige. Detta är nödvändigt "
+#~ "för att ta betalning."
+
+#~ msgid "AfterPay Username - Norway"
+#~ msgstr "AfterPay användarnamn - Norge"
+
+#~ msgid ""
+#~ "Please enter your AfterPay username for Norway; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Vänligen ange ditt användarnamn för AfterPay Norge. Detta är nödvändigt "
+#~ "för att ta betalning."
+
+#~ msgid "AfterPay Password - Norway"
+#~ msgstr "AfterPay lösenord - Norge"
+
+#~ msgid ""
+#~ "Please enter your AfterPay password for Norway; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Skriv in lösenordet för AfterPay Norge. Detta är nödvändigt för att ta "
+#~ "betalning."
+
+#~ msgid "AfterPay Client ID - Norway"
+#~ msgstr "AfterPay klient-ID - Norge"
+
+#~ msgid ""
+#~ "Please enter your AfterPay client ID for Norway; this is needed in order "
+#~ "to take payment."
+#~ msgstr ""
+#~ "Vänligen ange ditt klient-ID för AfterPay Norge. Detta är nödvändigt för "
+#~ "att ta betalning."
