@@ -258,6 +258,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			)
 		);
 		
+		// Send customer address for all countries except Sweden
 		if( 'SE' !== $billing_country && $order ) {
 			$args['Customer']['Address']['Street'] = $order->billing_address_1;
 			$args['Customer']['Address']['PostalCode'] = $order->billing_postcode;
@@ -268,7 +269,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			$args['Customer']['LastName'] = $order->billing_last_name;
 			$args['Customer']['MobilePhone'] = $order->billing_phone;
 		}
-
+		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer args: ' . var_export( $args, true ) );
 		try {
 			$response = $soap_client->PreCheckCustomer( $args );
 			WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
@@ -300,8 +301,8 @@ class WC_AfterPay_Pre_Check_Customer {
 				WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
 				WC()->session->set( 'afterpay_cart_total', WC()->cart->total );
 				
-				// Capture user's personal number as meta field, if logged in
-				if ( is_user_logged_in() ) {
+				// Capture user's personal number as meta field, if logged in and is from Sweden
+				if ( is_user_logged_in() && 'SE' == $billing_country ) {
 					$user = wp_get_current_user();
 					add_user_meta( $user->ID, '_afterpay_personal_no', $personal_number, true );
 				}
