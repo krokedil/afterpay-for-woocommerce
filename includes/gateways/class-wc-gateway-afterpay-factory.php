@@ -51,11 +51,18 @@ function init_wc_gateway_afterpay_factory_class() {
 			if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
 				return false;
 			}
+			
+			
 
 			// Check if payment method is configured
 			$payment_method = $this->id;
 			$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
 			if ( '' == $payment_method_settings['username'] || '' == $payment_method_settings['password'] || '' == $payment_method_settings['client_id'] ) {
+				return false;
+			}
+			
+			// Don't display part payment and Account for Norwegian customers
+			if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'afterpay_part_payment' == $this->id || 'afterpay_account' == $this->id ) ) {
 				return false;
 			}
 
