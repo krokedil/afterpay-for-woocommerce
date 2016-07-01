@@ -25,11 +25,14 @@ jQuery(function ($) {
 		}
 	}
 
-	function maybe_show_pre_checkout_form() {
+	function maybe_show_pre_checkout_form(do_focus) {
+		console.log(do_focus);
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		if (selected_payment_method.indexOf('afterpay') >= 0) {
 			$('#afterpay-pre-check-customer').slideDown(250);
-			$('#afterpay-pre-check-customer-number').focus();
+			if ('yes' == do_focus) {
+				$('#afterpay-pre-check-customer-number').focus();
+			}
 		} else {
 			$('#afterpay-pre-check-customer').slideUp(250);
 		}
@@ -94,14 +97,17 @@ jQuery(function ($) {
 	}
 
 	$(document).on('init_checkout', function (event) {
-		maybe_show_pre_checkout_form();
+		var do_focus = 'yes';
+		maybe_show_pre_checkout_form(do_focus);
 	});
 	$(document).on('updated_checkout', function (event) {
-		maybe_show_pre_checkout_form();
+		var do_focus = 'no';
+		maybe_show_pre_checkout_form(do_focus);
 	});
 	
 	$(document).on('change', 'input[name="payment_method"]', function (event) {
-		maybe_show_pre_checkout_form();
+		var do_focus = 'yes';
+		maybe_show_pre_checkout_form(do_focus);
 
 		var selected = $('input[name="payment_method"]:checked').val();
 		if (selected.indexOf('afterpay') < 0) {
