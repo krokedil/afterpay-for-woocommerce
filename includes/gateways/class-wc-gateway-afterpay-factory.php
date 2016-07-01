@@ -205,7 +205,8 @@ function init_wc_gateway_afterpay_factory_class() {
 				$response = $wc_afterpay_pre_check_customer->pre_check_customer_request( $_POST['afterpay-pre-check-customer-number'], $this->id, $_POST['afterpay_customer_category'], $order->billing_country, $order );
 				
 				if ( is_wp_error( $response ) ) {
-					throw new Exception( $response->get_error_message() );
+					//throw new Exception( $response->get_error_message() );
+					wc_add_notice( __( $response->get_error_message(), 'woocommerce-gateway-afterpay' ), 'error' );
 					return false;
 				}
 			}
@@ -246,6 +247,15 @@ function init_wc_gateway_afterpay_factory_class() {
 				$error_message = $wc_afterpay_complete_checkout->complete_checkout();
 				throw new Exception( $error_message->get_error_message() );
 			}
+		}
+		
+		public function clear_afterpay_sessions() {
+			WC()->session->__unset( 'afterpay_checkout_id' );
+			WC()->session->__unset( 'afterpay_customer_no' );
+			WC()->session->__unset( 'afterpay_personal_no' );
+			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+			WC()->session->__unset( 'afterpay_customer_details' );
+			WC()->session->__unset( 'afterpay_cart_total' );
 		}
 
 		/**

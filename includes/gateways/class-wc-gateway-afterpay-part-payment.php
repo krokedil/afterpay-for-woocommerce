@@ -82,6 +82,10 @@ function init_wc_gateway_afterpay_part_payment_class() {
 				$this,
 				'process_admin_options'
 			) );
+			add_action( 'woocommerce_thankyou', array( 
+				$this, 
+				'clear_afterpay_sessions' 
+			) );
 		}
 
 		/**
