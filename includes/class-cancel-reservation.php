@@ -115,7 +115,7 @@ class WC_AfterPay_Cancel_Reservation {
 				'Password' => $payment_method_settings['password_' . strtolower($order->billing_country)]
 			),
 			'CustomerNo' => $this->get_customer_no(),
-			'OrderNo'    => $this->order_id
+			'OrderNo'    => $order->get_order_number()
 		);
 
 		$soap_client = new SoapClient( $checkout_endpoint );
