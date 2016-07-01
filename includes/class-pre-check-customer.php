@@ -102,7 +102,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					$personal_no = get_user_meta( $user->ID, '_afterpay_personal_no', true );
 				}
 			}
-
+			
 			if ( '' != $personal_no ) {
 				$this->pre_check_customer_request( $personal_no, $chosen_payment_method, 'Person', WC()->customer->get_country() );
 			}
@@ -222,7 +222,6 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * @return bool
 	 */
 	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country, $order = false ) {
-		WC_Gateway_AfterPay_Factory::log( 'PreCheckCustomer request start' );
 
 		// Prepare order lines for AfterPay
 		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
@@ -269,7 +268,9 @@ class WC_AfterPay_Pre_Check_Customer {
 			$args['Customer']['LastName'] = $order->billing_last_name;
 			$args['Customer']['MobilePhone'] = $order->billing_phone;
 		}
-		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer args: ' . var_export( $args, true ) );
+		
+		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer request: ' . var_export( $args, true ) );
+		
 		try {
 			$response = $soap_client->PreCheckCustomer( $args );
 			WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
@@ -310,7 +311,6 @@ class WC_AfterPay_Pre_Check_Customer {
 				// Send success
 				return $response;
 			} else {
-				WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
 
 				// WC()->session->__unset( 'afterpay_checkout_id' );
 				// WC()->session->__unset( 'afterpay_customer_no' );
@@ -318,7 +318,13 @@ class WC_AfterPay_Pre_Check_Customer {
 				// WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 				// WC()->session->__unset( 'afterpay_customer_details' );
 				// WC()->session->__unset( 'afterpay_cart_total' );
-				return new WP_Error( 'failure', __( $response->Messages->BusinessErrorMessages->ResponseBusinessErrorMessage->Message, 'woocommerce-gateway-afterpay' ) );
+				//return new WP_Error( 'failure', __( $response->get_error_message(), 'woocommerce-gateway-afterpay' ) );
+				if( $response->Messages->BusinessErrorMessages->ResponseBusinessErrorMessage[0]->Message ) {
+					$error_message = $response->Messages->BusinessErrorMessages->ResponseBusinessErrorMessage[0]->Message;
+				} else {
+					$error_message = $response->Messages->AdditionalResponseInfo->ResultText;
+				}
+				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
 				//return false;
 			}
 		} catch ( Exception $e ) {
