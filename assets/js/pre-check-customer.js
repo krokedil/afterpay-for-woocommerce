@@ -101,13 +101,15 @@ jQuery(function ($) {
 		maybe_show_pre_checkout_form(do_focus);
 	});
 	$(document).on('updated_checkout', function (event) {
-		var do_focus = 'no';
+		var do_focus = 'yes';
 		maybe_show_pre_checkout_form(do_focus);
 	});
 	
 	$(document).on('change', 'input[name="payment_method"]', function (event) {
 		var do_focus = 'yes';
-		maybe_show_pre_checkout_form(do_focus);
+		//maybe_show_pre_checkout_form(do_focus);
+		
+		$('body').trigger('update_checkout');
 
 		var selected = $('input[name="payment_method"]:checked').val();
 		if (selected.indexOf('afterpay') < 0) {

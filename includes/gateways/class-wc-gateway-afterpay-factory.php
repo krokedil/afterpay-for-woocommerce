@@ -160,6 +160,15 @@ function init_wc_gateway_afterpay_factory_class() {
 						'woocommerce-gateway-afterpay' ),
 				),
 			);
+			
+			// Invoice fee for AfterPay Invoice
+			if ( 'afterpay_invoice' == $this->id ) {
+				$form_fields['invoice_fee_id'] = array(
+					'title'   => __( 'Invoice Fee', 'woocommerce-gateway-afterpay' ),
+					'type'    => 'text',
+					'description'   => __( 'Create a hidden (simple) product that acts as the invoice fee. Enter the ID number in this textfield. Leave blank to disable.', 'woocommerce-gateway-afterpay' ),
+				);
+			}
 
 			// Logging, test mode and order management toggles for all payment methods
 			// are in AfterPay Invoice settings
