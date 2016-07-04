@@ -23,7 +23,7 @@ class WC_AfterPay_Invoice_Fee {
 	public function __construct() {
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->testmode    = 'yes' == $afterpay_settings['testmode'] ? true : false;
-		$this->invoice_fee_id = $afterpay_settings['invoice_fee_id'];
+		$this->invoice_fee_id = ( isset( $afterpay_settings['invoice_fee_id'] ) ) ? $afterpay_settings['invoice_fee_id'] : '';
 		
 		// Invoice fee
 		if ( '' == $this->invoice_fee_id ) {
