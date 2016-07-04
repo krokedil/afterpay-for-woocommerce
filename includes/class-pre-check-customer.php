@@ -89,6 +89,11 @@ class WC_AfterPay_Pre_Check_Customer {
 		if ( WC()->session->get( 'afterpay_cart_total' ) == WC()->cart->total ) {
 			return;
 		}
+		
+		// Only perform PreCheckCustomer on checkout_init for Swedish customers
+		if( 'SE' != WC()->customer->get_country() ) {
+			return;
+		}
 
 		$chosen_payment_method = WC()->session->chosen_payment_method;
 		if ( strpos( $chosen_payment_method, 'afterpay' ) !== false ) {
