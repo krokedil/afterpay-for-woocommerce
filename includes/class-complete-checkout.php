@@ -61,7 +61,7 @@ class WC_AfterPay_Complete_Checkout {
 
 		$customer_no = WC()->session->get( 'afterpay_customer_no' );
 		$checkout_id = WC()->session->get( 'afterpay_checkout_id' );
-
+		
 		$payment_method_settings = $this->settings;
 
 		// Live or test checkout endpoint, based on payment gateway settings
@@ -111,7 +111,7 @@ class WC_AfterPay_Complete_Checkout {
 		}
 
 		$soap_client = new SoapClient( $checkout_endpoint );
-		WC_Gateway_AfterPay_Factory::log( 'args: ' . var_export( $args, true) );
+		WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request: ' . var_export( $args, true) );
 		try {
 			$response = $soap_client->CompleteCheckout( $args );
 			WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request response: ' . var_export( $response, true) );
@@ -120,11 +120,23 @@ class WC_AfterPay_Complete_Checkout {
 
 				// Unset AfterPay session values
 				WC()->session->__unset( 'afterpay_checkout_id' );
+				WC()->session->__unset( 'afterpay_customer_no' );
+				WC()->session->__unset( 'afterpay_personal_no' );
 				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+				WC()->session->__unset( 'afterpay_customer_details' );
+				WC()->session->__unset( 'afterpay_cart_total' );
 
 				return true;
 			} else {
 				WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request failed.' );
+				
+				WC()->session->__unset( 'afterpay_checkout_id' );
+				WC()->session->__unset( 'afterpay_customer_no' );
+				WC()->session->__unset( 'afterpay_personal_no' );
+				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+				WC()->session->__unset( 'afterpay_customer_details' );
+				WC()->session->__unset( 'afterpay_cart_total' );
+
 				$error_message = WC_AfterPay_Error_Notice::get_error_message( $response->ResultCode, 'complete_checkout' );
 				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
 				

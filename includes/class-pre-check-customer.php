@@ -85,6 +85,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * Run PreCheckCustomer on checkout load if we have a personal number and an AfterPay method is selected
 	 */
 	public function maybe_pre_check_customer() {
+		
 		WC()->cart->calculate_totals();
 		if ( WC()->session->get( 'afterpay_cart_total' ) == WC()->cart->total ) {
 			return;
@@ -316,7 +317,13 @@ class WC_AfterPay_Pre_Check_Customer {
 				// Send success
 				return $response;
 			} else {
-				
+				WC()->session->__unset( 'afterpay_checkout_id' );
+				WC()->session->__unset( 'afterpay_customer_no' );
+				WC()->session->__unset( 'afterpay_personal_no' );
+				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+				WC()->session->__unset( 'afterpay_customer_details' );
+				WC()->session->__unset( 'afterpay_cart_total' );
+			
 				$error_message = WC_AfterPay_Error_Notice::get_error_message( $response->ResultCode, 'pre_check_customer' );
 				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
 				
