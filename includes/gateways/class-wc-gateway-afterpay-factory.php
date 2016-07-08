@@ -320,6 +320,5 @@ function init_wc_gateway_afterpay_factory_class() {
 
 			return true;
 		}
-
 	}
 }

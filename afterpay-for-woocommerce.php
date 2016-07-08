@@ -88,6 +88,7 @@ include_once( AFTERPAY_PATH . '/includes/class-update-reservation.php' );
 
 include_once( AFTERPAY_PATH . '/includes/class-process-order-lines.php' );
 include_once( AFTERPAY_PATH . '/includes/class-invoice-fee.php' );
+include_once( AFTERPAY_PATH . '/includes/class-error-notice.php' );
 
 // Define server endpoints
 define(

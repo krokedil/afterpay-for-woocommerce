@@ -125,7 +125,9 @@ class WC_AfterPay_Complete_Checkout {
 				return true;
 			} else {
 				WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request failed.' );
-				return new WP_Error( 'failure', __( 'CompleteCheckout request failed.', 'woocommerce-gateway-afterpay' ) );
+				$error_message = WC_AfterPay_Error_Notice::get_error_message( $response->ResultCode, 'complete_checkout' );
+				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
+				
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
