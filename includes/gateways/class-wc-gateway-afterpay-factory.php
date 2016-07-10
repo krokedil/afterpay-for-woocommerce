@@ -51,13 +51,12 @@ function init_wc_gateway_afterpay_factory_class() {
 			if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
 				return false;
 			}
-			
-			
 
 			// Check if payment method is configured
 			$payment_method = $this->id;
+			$country = strtolower(WC()->customer->get_country());
 			$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
-			if ( '' == $payment_method_settings['username'] || '' == $payment_method_settings['password'] || '' == $payment_method_settings['client_id'] ) {
+			if ( '' == $payment_method_settings['username_' . $country] || '' == $payment_method_settings['password_' . $country] || '' == $payment_method_settings['client_id_' . $country] ) {
 				return false;
 			}
 			
@@ -218,6 +217,9 @@ function init_wc_gateway_afterpay_factory_class() {
 					wc_add_notice( __( $response->get_error_message(), 'woocommerce-gateway-afterpay' ), 'error' );
 					return false;
 				}
+				
+				// Update the address if needed
+				$this->check_used_address( WC()->session->get( 'afterpay_customer_details' ), $order );
 			}
 			
 			
@@ -259,12 +261,14 @@ function init_wc_gateway_afterpay_factory_class() {
 		}
 		
 		public function clear_afterpay_sessions() {
+			
 			WC()->session->__unset( 'afterpay_checkout_id' );
 			WC()->session->__unset( 'afterpay_customer_no' );
 			WC()->session->__unset( 'afterpay_personal_no' );
 			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
 			WC()->session->__unset( 'afterpay_customer_details' );
 			WC()->session->__unset( 'afterpay_cart_total' );
+			
 		}
 
 		/**
@@ -319,6 +323,66 @@ function init_wc_gateway_afterpay_factory_class() {
 			}
 
 			return true;
+		}
+		
+		/**
+		 * Check used address
+		 * Compare the address entered in the checkout with the registered address (returned from DIBS)
+		 **/
+		public function check_used_address( $posted, $order ) {
+			$changed_fields = array();
+	
+			// Shipping address
+			if ( $posted['address_1'] != $order->shipping_address_1 ) {
+				$changed_fields['shipping_&_billing_address_1'] = $posted['address_1'];
+				update_post_meta( $order->id, '_shipping_address_1', $posted['address_1'] );
+				update_post_meta( $order->id, '_billing_address_1', $posted['address_1'] );
+			}
+			
+			if ( $posted['address_2'] != $order->shipping_address_2 ) {
+				$changed_fields['shipping_&_billing_address_2'] = $posted['address_2'];
+				update_post_meta( $order->id, '_shipping_address_2', $posted['address_2'] );
+				update_post_meta( $order->id, '_billing_address_2', $posted['address_2'] );
+			}
+	
+	
+			// Post number
+			if ( $posted['postcode'] != $order->shipping_postcode ) {
+				$changed_fields['shipping_&_billing_postcode'] = $posted['postcode'];
+				update_post_meta( $order->id, '_shipping_postcode', $posted['postcode'] );
+				update_post_meta( $order->id, '_billing_postcode', $posted['postcode'] );
+			}
+	
+			// City
+			if ( $posted['city'] != $order->shipping_city ) {
+				$changed_fields['shipping_&_billing_city'] = $posted['city'];
+				update_post_meta( $order->id, '_shipping_city', $posted['city'] );
+				update_post_meta( $order->id, '_billing_city', $posted['city'] );
+			}
+	
+			// First name
+			if ( $posted['first_name'] != $order->shipping_first_name ) {
+				$changed_fields['shipping_&_billing_first_name'] = $posted['first_name'];
+				update_post_meta( $order->id, '_shipping_first_name', $posted['first_name'] );
+				update_post_meta( $order->id, '_billing_first_name', $posted['first_name'] );
+			}
+	
+			// Last name
+			if ( $posted['last_name'] != $order->shipping_last_name ) {
+				$changed_fields['shipping_&_billing_last_name'] = $posted['last_name'];
+				update_post_meta( $order->id, '_shipping_last_name', $posted['last_name'] );
+				update_post_meta( $order->id, '_billing_last_name', $posted['last_name'] );
+			}
+	
+			if ( ! empty( $changed_fields ) ) {
+				$changed_fields_in_string = '';
+				foreach ( $changed_fields as $key => $value ) {
+					$changed_fields_in_string .= $key . ': ' . $value . ', ';
+				}
+	
+				// Add order note about the changes
+				$order->add_order_note( sprintf( __( 'The registered address did not match the one specified in WooCommerce. The order has been updated. The following fields was changed: %s.', 'woocommerce' ), $changed_fields_in_string ) );
+			}
 		}
 	}
 }
