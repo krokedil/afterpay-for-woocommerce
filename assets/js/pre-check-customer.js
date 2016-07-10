@@ -26,15 +26,22 @@ jQuery(function ($) {
 	}
 
 	function maybe_show_pre_checkout_form(do_focus) {
-		console.log(do_focus);
+		//console.log(do_focus);
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		if (selected_payment_method.indexOf('afterpay') >= 0) {
+			// Do not allow separate shipping address for AfterPay
+			$( 'div.shipping_address' ).hide();
+			$( '#ship-to-different-address' ).hide();
+			// Show pno
 			$('#afterpay-pre-check-customer').slideDown(250);
 			if ('yes' == do_focus) {
 				$('#afterpay-pre-check-customer-number').focus();
 			}
 		} else {
+			// Hide pno
 			$('#afterpay-pre-check-customer').slideUp(250);
+			// Show ship to different address checkbox
+			$( '#ship-to-different-address' ).show();
 		}
 		
 		// Only display the Get Address button if Sweden is the selected country
