@@ -235,9 +235,10 @@ function init_wc_gateway_afterpay_factory_class() {
 			// Use WC_AfterPay_Complete_Checkout class to process the payment
 			// Must previously perform PreCheckCustomer
 			// CheckoutID and CustomerNo are required and returned from PreCheckCustomer
+			$response = '';
 			$wc_afterpay_complete_checkout = new WC_AfterPay_Complete_Checkout( $order_id, $this->id, $this->client_id, $this->username, $this->password );
-
-			if ( ! is_wp_error( $wc_afterpay_complete_checkout->complete_checkout() ) ) {
+			$response = $wc_afterpay_complete_checkout->complete_checkout();
+			if ( ! is_wp_error( $response ) ) {
 				// Mark payment complete on success
 				$order->payment_complete();
 
@@ -255,8 +256,8 @@ function init_wc_gateway_afterpay_factory_class() {
 					'redirect' => $this->get_return_url( $order )
 				);
 			} else {
-				$error_message = $wc_afterpay_complete_checkout->complete_checkout();
-				throw new Exception( $error_message->get_error_message() );
+				wc_add_notice( __( $response->get_error_message(), 'woocommerce-gateway-afterpay' ), 'error' );
+				return false;
 			}
 		}
 		
