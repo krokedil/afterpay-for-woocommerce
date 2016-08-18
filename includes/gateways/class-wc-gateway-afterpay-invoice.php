@@ -92,6 +92,11 @@ function init_wc_gateway_afterpay_invoice_class() {
 				$this, 
 				'clear_afterpay_sessions' 
 			) );
+			add_action( 'woocommerce_checkout_process', array( 
+				$this, 
+				'process_checkout_fields' 
+			) );
+			
 		}
 		
 		/**
