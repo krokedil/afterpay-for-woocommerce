@@ -110,54 +110,6 @@ function init_wc_gateway_afterpay_invoice_class() {
 			}
 		}
 		
-		/**
-		 * Helper function for displaying the AfterPay Invoice terms
-		 */
-		public function get_afterpay_info() {
-
-			switch ( get_woocommerce_currency() ) {
-				case 'NOK':
-					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_title 			= 'AfterPay Faktura';
-					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det ikke påløpe gebyr.</p>';
-					} else {
-					 	$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
-					}
-					$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
-					$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
-					$short_readmore 		= 'Les mer her';
-					break;
-				case 'SEK' :
-					$terms_url   			= 'http://www.afterpay.se/sv/terms-and-conditions';
-					$terms_title 			= 'AfterPay Faktura';
-					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		= '<p>Vi erbjuder betalning med faktura i samarbete med AfterPay. Betalningsvillkor är 14 dagar. Ingen fakturaavgift tillkommer.</p>';
-					} else {
-					 	$terms_content 		.= '<p>Vi erbjuder betalning med faktura i samarbete med AfterPay. Betalningsvillkor är 14 dagar och en fakturaavgift om ' . $this->get_invoice_fee_price() . ' kr tillkommer.</p>';
-					}
-					$terms_content 			.= '<p>För att kunna beställa mot faktura måste Du ha fyllt 18 år och vara folkbokförd i Sverige samt godkännas i den kreditprövning som genomförs vid köpet. Fakturan skickas via e-post. Vid försenad betalning skickar AfterPay en betalningspåminnelse varvid lagstadgad påminnelseavgift. Ni debiteras även dröjsmålsränta med 2% per månad från fakturans förfallodag. Vid utebliven betalning lämnas ärendet till inkasso varvid lagstadgad inkassoavgift tillkommer.</p>';
-					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
-					$short_readmore 		= 'Läs mer här';
-					break;
-				default:
-					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_title 			= 'AfterPay Faktura';
-					$terms_content 			= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på ' . get_woocommerce_currency() . ' 0.</p>';
-					$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
-					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
-					$short_readmore 		= 'Läs mer här';
-			}
-		
-			add_thickbox();
-			$afterpay_info = '<div id="afterpay-terms-content" style="display:none;">';
-			$afterpay_info .= '<h3>' . $terms_title . '</h3>';
-			$afterpay_info .= $terms_content;
-			$afterpay_info .= '<p>' . $terms_readmore . '</p>';
-			$afterpay_info .='</div>';
-			$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
-			return $afterpay_info;
-		}
 		
 		// Helper function - get Invoice fee price
 		public function get_invoice_fee_price() {
