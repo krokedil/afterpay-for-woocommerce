@@ -332,7 +332,8 @@ function init_wc_gateway_afterpay_factory_class() {
 		 **/
 		public function process_checkout_fields() {	
 			if ( $_POST['payment_method'] == 'afterpay_invoice' || $_POST['payment_method'] == 'afterpay_account' || $_POST['payment_method'] == 'afterpay_part_payment' ) {
-				if( !is_numeric() == $_POST['afterpay-pre-check-customer-number'] ) {
+				
+				if( !is_numeric( $_POST['afterpay-pre-check-customer-number'] ) ) {
 					$format = __( 'YYMMDDNNNN', 'woocommerce-gateway-afterpay' );
 					wc_add_notice( sprintf( __( '<strong>Personal/organization number</strong> needs to be numeric and in the following format: %s.', 'woocommerce-gateway-afterpay' ), $format), 'error' );
 				}
