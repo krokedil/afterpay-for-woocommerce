@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: AfterPay for WooCommerce\n"
-"POT-Creation-Date: 2016-08-18 15:49+0200\n"
-"PO-Revision-Date: 2016-08-18 15:49+0200\n"
+"POT-Creation-Date: 2016-09-12 14:58+0200\n"
+"PO-Revision-Date: 2016-09-12 15:01+0200\n"
 "Last-Translator: Niklas Högefjord <info@krokedil.se>\n"
 "Language-Team: Niklas Högefjord <info@krokedil.se>\n"
 "Language: sv_SE\n"
@@ -80,109 +80,37 @@ msgstr "AfterPay-kontrakt skapat, kontrakt-ID: %s."
 msgid "CreateContract request failed."
 msgstr "CreateContract-anrop misslyckades."
 
-#: includes/class-error-notice.php:26 includes/class-error-notice.php:90
-msgid "Not set."
-msgstr ""
+#: includes/class-error-notice.php:26 includes/class-error-notice.php:29
+#: includes/class-error-notice.php:81 includes/class-error-notice.php:90
+#: includes/class-error-notice.php:93
+msgid "Please try again"
+msgstr "Vänligen försök igen"
 
-#: includes/class-error-notice.php:29 includes/class-error-notice.php:93
-msgid "Ok."
+#: includes/class-error-notice.php:32
+msgid "Please verify "
 msgstr ""
+"Vänligen kontrollera att du har angivit korrekta upplysningar och försök igen"
 
-#: includes/class-error-notice.php:32 includes/class-error-notice.php:99
-msgid "Illegal values."
-msgstr ""
+#: includes/class-error-notice.php:35 includes/class-error-notice.php:53
+#: includes/class-error-notice.php:56 includes/class-error-notice.php:59
+#: includes/class-error-notice.php:62 includes/class-error-notice.php:65
+#: includes/class-error-notice.php:68 includes/class-error-notice.php:71
+#: includes/class-error-notice.php:74 includes/class-error-notice.php:77
+#: includes/class-error-notice.php:96 includes/class-error-notice.php:102
+#: includes/class-error-notice.php:105 includes/class-error-notice.php:108
+#: includes/class-error-notice.php:111 includes/class-error-notice.php:114
+#: includes/class-error-notice.php:117 includes/class-error-notice.php:120
+msgid "Please select a different payment method"
+msgstr "Vänligen välj en annan betalmetod"
 
-#: includes/class-error-notice.php:35
-msgid "Limit exceeded."
+#: includes/class-error-notice.php:38 includes/class-error-notice.php:41
+#: includes/class-error-notice.php:44 includes/class-error-notice.php:47
+#: includes/class-error-notice.php:50 includes/class-error-notice.php:99
+#: includes/class-error-notice.php:123 includes/class-error-notice.php:126
+#: includes/class-error-notice.php:129 includes/class-error-notice.php:133
+msgid "Please verify your information and try again "
 msgstr ""
-
-#: includes/class-error-notice.php:38 includes/class-error-notice.php:96
-msgid "Order already exists."
-msgstr ""
-
-#: includes/class-error-notice.php:41
-msgid "Amount does not match PreCheck."
-msgstr ""
-
-#: includes/class-error-notice.php:44
-msgid "Invalid Checkout ID."
-msgstr ""
-
-#: includes/class-error-notice.php:47 includes/class-error-notice.php:123
-msgid "System error."
-msgstr ""
-
-#: includes/class-error-notice.php:50
-msgid "Invalid Contract ID."
-msgstr ""
-
-#: includes/class-error-notice.php:53 includes/class-error-notice.php:126
-msgid "Invalid Client ID."
-msgstr ""
-
-#: includes/class-error-notice.php:56 includes/class-error-notice.php:102
-msgid "Customer related risk."
-msgstr ""
-
-#: includes/class-error-notice.php:59 includes/class-error-notice.php:120
-msgid "Other risk. Please select another payment method."
-msgstr ""
-
-#: includes/class-error-notice.php:62
-msgid "Invalid payment method."
-msgstr ""
-
-#: includes/class-error-notice.php:65
-msgid "Invalid Order No."
-msgstr ""
-
-#: includes/class-error-notice.php:68
-msgid "Invalid Customer No."
-msgstr ""
-
-#: includes/class-error-notice.php:71
-msgid "Invalid currency code."
-msgstr ""
-
-#: includes/class-error-notice.php:74
-msgid "Contract duration not allowed."
-msgstr ""
-
-#: includes/class-error-notice.php:77
-msgid "Monthly installment below minimum amount."
-msgstr ""
-
-#: includes/class-error-notice.php:81
-msgid "Unknown response code."
-msgstr ""
-
-#: includes/class-error-notice.php:105
-msgid "Delivery related risk."
-msgstr ""
-
-#: includes/class-error-notice.php:108
-msgid "Address related risk."
-msgstr ""
-
-#: includes/class-error-notice.php:111
-msgid "Order related risk."
-msgstr ""
-
-#: includes/class-error-notice.php:114
-msgid "Profile related risk."
-msgstr ""
-
-#: includes/class-error-notice.php:117
-msgid "Limit exceed risk."
-msgstr ""
-
-#: includes/class-error-notice.php:129
-msgid "Validation error – wrong/missing input data."
-msgstr ""
-
-#: includes/class-error-notice.php:133
-msgid "Unknown response code"
-msgstr ""
+"Vänligen kontrollera att du angivit korrekta upplysningar och försök igen"
 
 #: includes/class-pre-check-customer.php:126
 msgid "Personal/organization number is a required field."
@@ -209,7 +137,7 @@ msgid "Company"
 msgstr "Företag"
 
 #: includes/class-pre-check-customer.php:161
-#: includes/gateways/class-wc-gateway-afterpay-factory.php:336
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:337
 msgid "YYMMDDNNNN"
 msgstr "ÅÅMMDDNNNN"
 
@@ -405,14 +333,14 @@ msgstr ""
 "Återbetalning misslyckades: endast hela orderbeloppet kan återbetalas via "
 "AfterPay."
 
-#: includes/gateways/class-wc-gateway-afterpay-factory.php:337
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:338
 #, php-format
 msgid ""
 "<strong>Personal/organization number</strong> needs to be numeric and in the "
 "following format: %s."
 msgstr ""
 
-#: includes/gateways/class-wc-gateway-afterpay-factory.php:398
+#: includes/gateways/class-wc-gateway-afterpay-factory.php:399
 #, php-format
 msgid ""
 "The registered address did not match the one specified in WooCommerce. The "
