@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AfterPay for WooCommerce\n"
 "POT-Creation-Date: 2016-09-12 14:53+0200\n"
-"PO-Revision-Date: 2016-09-12 14:58+0200\n"
+"PO-Revision-Date: 2016-10-27 13:34+0200\n"
 "Last-Translator: Niklas Högefjord <info@krokedil.se>\n"
 "Language-Team: Niklas Högefjord <info@krokedil.se>\n"
 "Language: nb_NO\n"
@@ -132,7 +132,7 @@ msgstr "Selskap"
 #: includes/class-pre-check-customer.php:161
 #: includes/gateways/class-wc-gateway-afterpay-factory.php:337
 msgid "YYMMDDNNNN"
-msgstr "YYMMDDNNNNN"
+msgstr "DDMMYYNNNNN"
 
 #: includes/class-pre-check-customer.php:164
 msgid "Get address"
