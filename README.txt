@@ -13,7 +13,7 @@ AfterPay for WooCommerce is a plugin that extends WooCommerce, allowing you to t
 
 == Description ==
 
-With this extension you get access to [AfterPay's](http://www.afterpay.se/en/) three payment methods - Invoice, Part Payment and Account - in Sweden.
+With this extension you get access to [AfterPay's](http://www.afterpay.se/en/) three payment methods - Invoice, Part Payment and Account - in Sweden & Norway.
 
 = Get started =
 More information on how to get started can be found in the [plugin documentation](http://docs.krokedil.com/documentation/afterpay-for-woocommerce/).
