@@ -3,7 +3,7 @@ Contributors: krokedil, niklashogefjord, slobodanmanic
 Tags: ecommerce, e-commerce, woocommerce, afterpay
 Requires at least: 4.2
 Tested up to: 4.5.2
-Stable tag: 1.0.2
+Stable tag: 1.1
 Requires WooCommerce at least: 2.4
 Tested WooCommerce up to: 2.5.5
 License: GPLv3
@@ -41,15 +41,20 @@ If you need help with installation and configuration Krokedil offer premium (pai
 
 == Changelog ==
 
-= 1.0.2 - 2016.06.17 =
-* Tweak - Defined path to translation files (load_plugin_textdomain).
-* Tweak - Added Swedish translation.
-* Tweak	- Updated display of Personal/organization number in checkout.
-* Fix	- Only check for entered personal number in checkout when AfterPay is selected payment method.
-* Fix	- Updated html markup for radio buttons when displaying installment plans in checkout for part payment.
+= 1.1 		- 2016.11.01 =
+* Feature	- Added support for Norway.
+* Feature	- Added invoice fee feature.
+* Tweak		- Added terms text for Sweden & Norway.
+
+= 1.0.2 	- 2016.06.17 =
+* Tweak 	- Defined path to translation files (load_plugin_textdomain).
+* Tweak 	- Added Swedish translation.
+* Tweak		- Updated display of Personal/organization number in checkout.
+* Fix		- Only check for entered personal number in checkout when AfterPay is selected payment method.
+* Fix		- Updated html markup for radio buttons when displaying installment plans in checkout for part payment.
 
 = 1.0.1 =
-* Tweak - Readme update.
+* Tweak 	- Readme update.
 
 = 1.0 =
 * Initial release
