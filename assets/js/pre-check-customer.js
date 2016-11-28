@@ -108,7 +108,7 @@ jQuery(function ($) {
 		maybe_show_pre_checkout_form(do_focus);
 	});
 	$(document).on('updated_checkout', function (event) {
-		var do_focus = 'yes';
+		var do_focus = 'no';
 		maybe_show_pre_checkout_form(do_focus);
 	});
 	
