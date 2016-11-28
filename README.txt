@@ -3,7 +3,7 @@ Contributors: krokedil, niklashogefjord, slobodanmanic
 Tags: ecommerce, e-commerce, woocommerce, afterpay
 Requires at least: 4.2
 Tested up to: 4.5.2
-Stable tag: 1.1
+Stable tag: 1.1.1
 Requires WooCommerce at least: 2.4
 Tested WooCommerce up to: 2.5.5
 License: GPLv3
@@ -40,6 +40,9 @@ If you need help with installation and configuration Krokedil offer premium (pai
 
 
 == Changelog ==
+
+= 1.1.1		- 2016.11.28 =
+* Fix		- Don't set .focus() on AfterPay personal number input field on js-event updated_checkout(). updated_checkout() might be triggered during entering info in Postal number & City fields.
 
 = 1.1 		- 2016.11.01 =
 * Feature	- Added support for Norway.
