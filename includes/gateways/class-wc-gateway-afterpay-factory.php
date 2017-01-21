@@ -261,6 +261,19 @@ function init_wc_gateway_afterpay_factory_class() {
 			}
 		}
 		
+		/**
+		 * Display payment fields for all three payment methods
+		 */
+		function payment_fields() {
+			if ( $this->description ) {
+				echo wpautop( wptexturize( $this->description ) );
+			}
+			echo $this->get_afterpay_info();
+		}
+		
+		/**
+		 * Clear sessions on finalized purchase
+		 */
 		public function clear_afterpay_sessions() {
 			
 			WC()->session->__unset( 'afterpay_checkout_id' );

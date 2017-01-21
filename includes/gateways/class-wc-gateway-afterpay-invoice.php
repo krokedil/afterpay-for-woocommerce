@@ -99,18 +99,6 @@ function init_wc_gateway_afterpay_invoice_class() {
 			
 		}
 		
-		/**
-		 * Display payment fields for Part Payment
-		 */
-		function payment_fields() {
-			if ( $this->description ) {
-				echo wpautop( wptexturize( $this->description ) );
-				
-				echo $this->get_afterpay_info();
-			}
-		}
-		
-		
 		// Helper function - get Invoice fee price
 		public function get_invoice_fee_price() {
 			if ( $this->invoice_fee_id > 0 ) {
