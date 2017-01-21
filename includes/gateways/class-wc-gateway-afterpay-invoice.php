@@ -98,20 +98,6 @@ function init_wc_gateway_afterpay_invoice_class() {
 			) );
 			
 		}
-		
-		// Helper function - get Invoice fee price
-		public function get_invoice_fee_price() {
-			if ( $this->invoice_fee_id > 0 ) {
-				$product = wc_get_product( $this->invoice_fee_id );
-				if ( $product ) {
-					return $product->get_price();
-				} else {
-					return 0;
-				}
-			} else {
-				return 0;
-			}
-		}
 
 	}
 

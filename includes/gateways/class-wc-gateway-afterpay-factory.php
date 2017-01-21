@@ -421,9 +421,10 @@ function init_wc_gateway_afterpay_factory_class() {
 			switch ( get_woocommerce_currency() ) {
 				case 'NOK':
 					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_title 			= 'AfterPay Faktura';
+					$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
+					$terms_content 			= '<h3>AfterPay Faktura</h3>';
 					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det ikke påløpe gebyr.</p>';
+						$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det ikke påløpe gebyr.</p>';
 					} else {
 					 	$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
 					}
@@ -432,43 +433,47 @@ function init_wc_gateway_afterpay_factory_class() {
 					$terms_content			.= '<p>Med AfterPay får du tilbud om å dele opp betalingen når du mottar fakturaen. Det er to alternative måter å dele opp betalingen på; konto eller delbetaling.</p>';
 					$terms_content			.= '<p><strong>AfterPay Konto</strong> er en fleksibel måte å betale din faktura på og du velger selv hvor mye du ønsker å betale hver måned. Minste beløp å betale vil til enhver tid være basert på utestående balanse og er presisert på den månedlige fakturaen. Priseksempel: 5000 kr o/ 9 mnd., effektiv rente 45,09 %. Samlet kredittkostnad: 820 kr.</p>';
 					$terms_content			.= '<p>Med <strong>AfterPay Delbetaling</strong> velger du hvor mange måneder du ønsker å dele opp betalingen i. Du kan velge mellom 3, 6, 12, 24 eller 36 måneder. På den måten vil du alltid ha kontroll på hva du skal betale per måned. Priseksempel: 5000 kr o/ 12 mnd, effektiv rente 43,58 %. Samlet kredittkostnad: 1009 kr.</p>';
-					$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
+					$terms_content 			.= '<p>' . $terms_readmore . '</p>';
 					$short_readmore 		= 'Les mer her';
 					break;
-				case 'SEK' :
-					$terms_url   			= 'http://www.afterpay.se/sv/terms-and-conditions';
-					$terms_title 			= 'AfterPay Faktura';
-					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		= '<p>Vi erbjuder betalning med faktura i samarbete med AfterPay. Betalningsvillkor är 14 dagar. Ingen fakturaavgift tillkommer.</p>';
-					} else {
-					 	$terms_content 		.= '<p>Vi erbjuder betalning med faktura i samarbete med AfterPay. Betalningsvillkor är 14 dagar och en fakturaavgift om ' . $this->get_invoice_fee_price() . ' kr tillkommer.</p>';
-					}
-					$terms_content 			.= '<p>För att kunna beställa mot faktura måste Du ha fyllt 18 år och vara folkbokförd i Sverige samt godkännas i den kreditprövning som genomförs vid köpet. Fakturan skickas via e-post. Vid försenad betalning skickar AfterPay en betalningspåminnelse varvid lagstadgad påminnelseavgift. Ni debiteras även dröjsmålsränta med 2% per månad från fakturans förfallodag. Vid utebliven betalning lämnas ärendet till inkasso varvid lagstadgad inkassoavgift tillkommer.</p>';
-					$terms_content			.= '<h3>AfterPay Konto/Delbetalning</h3>';
-					$terms_content			.= '<p>Genom AfterPay ges du möjlighet att dela upp din betalning. Vid ett köp om minst 200 SEK kommer du att bli erbjuden att ansöka om att dela upp betalningen på www.myafterpay.se.</p>';
-					$terms_content			.= '<p>Det finns två alternativ för att dela upp betalningen.</p>';
-					$terms_content			.= '<p>Ett alternativ är att starta ett AfterPay konto där du själv bestämmer varje månad hur mycket du vill betala. Det finns ett minimumbelopp som baseras på det totala kvarstående beloppet på kontot. Det beloppet framgår av kontoavin och på myafterpay.se. För att dela upp din betalning behöver ansöka om kredit samt godkänna villkoren. Detta gör du efter köpet på www.myafterpay.se. För information om nekande till kredit eller om du anser att du blivit felaktigt nekad, kontakta AfterPay.</p>';
-					$terms_content			.= sprintf('<p>Det andra alternativet är att starta en delbetalningsplan. Då bestämmer du i förhand hur många månader du vill dela upp betalningen på. Du kan välja mellan att betala på 3, 6, 12, 24 eller 36 månader (med reservation att varje delbetalningsbelopp inte understiger 50 kr). Det totala beloppet delas upp på de antal månader du väljer och blir därmed detsamma varje månad. För att dela upp din betalning behöver du ansöka om kredit samt godkänna villkoren. Detta gör du efter köpet på %s.</p>', '<a href="http://www.myafterpay.se">www.myafterpay.se</a>');
+				case 'SEK':
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
 					break;
 				default:
-					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_title 			= 'AfterPay Faktura';
-					$terms_content 			= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på ' . get_woocommerce_currency() . ' 0.</p>';
-					$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
+					break;
 			}
-		
+			
 			add_thickbox();
 			$afterpay_info = '<div id="afterpay-terms-content" style="display:none;">';
-			$afterpay_info .= '<h3>' . $terms_title . '</h3>';
 			$afterpay_info .= $terms_content;
-			$afterpay_info .= '<p>' . $terms_readmore . '</p>';
 			$afterpay_info .='</div>';
 			$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
+			
 			return $afterpay_info;
+		}
+		
+		
+		/**
+		 * Helper function - get Invoice fee price
+		 */
+		public function get_invoice_fee_price() {
+			$invoice_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+			$this->invoice_fee_id = $invoice_settings['invoice_fee_id'];
+			if ( $this->invoice_fee_id > 0 ) {
+				$product = wc_get_product( $this->invoice_fee_id );
+				if ( $product ) {
+					return $product->get_price();
+				} else {
+					return 0;
+				}
+			} else {
+				return 0;
+			}
 		}
 	}
 }
