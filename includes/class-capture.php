@@ -105,7 +105,7 @@ class WC_AfterPay_Capture {
 		// If this reservation was already cancelled, do nothing.
 		if ( get_post_meta( $this->order_id, '_afterpay_reservation_captured', true ) ) {
 			$order->add_order_note(
-				__( 'Could not capture AfterPar reservation, AfterPay reservation is already captured.', 'woocommerce-gateway-afterpay' )
+				__( 'Could not capture Arvato reservation, Arvato reservation is already captured.', 'woocommerce-gateway-afterpay' )
 			);
 
 			return;
@@ -170,14 +170,14 @@ class WC_AfterPay_Capture {
 				update_post_meta( $this->order_id, '_afterpay_reservation_captured', current_time( 'mysql' ) );
 				update_post_meta( $this->order_id, '_transaction_id', $response->InvoiceNumber );
 
-				$order->add_order_note( sprintf( __( 'AfterPay reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-afterpay' ), $response->InvoiceNumber ) );
+				$order->add_order_note( sprintf( __( 'Arvato reservation was successfully captured, invoice number: %s.', 'woocommerce-gateway-afterpay' ), $response->InvoiceNumber ) );
 
 			} else {
-				$order->add_order_note( __( 'AfterPay reservation could not be captured.', 'woocommerce-gateway-afterpay' ) );
+				$order->add_order_note( __( 'Arvato reservation could not be captured.', 'woocommerce-gateway-afterpay' ) );
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
-			$order->add_order_note( sprintf( __( 'AfterPay reservation could not be captured, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
+			$order->add_order_note( sprintf( __( 'Arvato reservation could not be captured, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
 		}
 	}
 

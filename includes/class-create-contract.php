@@ -87,7 +87,7 @@ class WC_AfterPay_Create_Contract {
 			update_post_meta( $order->id, '_afterpay_contract_id', $response->ContractID );
 			// Store reservation ID as order note
 			$order->add_order_note(
-				sprintf( __( 'AfterPay contract created, contract ID: %s.', 'woocommerce-gateway-afterpay' ), $response->ContractID )
+				sprintf( __( 'Arvato contract created, contract ID: %s.', 'woocommerce-gateway-afterpay' ), $response->ContractID )
 			);
 
 			return true;

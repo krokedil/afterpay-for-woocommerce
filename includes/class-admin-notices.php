@@ -44,7 +44,7 @@ class WC_AfterPay_Admin_Notices {
 		// Terms page
 		if( $this->username && !$this->username_se ) {
 			echo '<div class="notice notice-error">';
-			echo '<p>' . __( 'We have updated the settings for AfterPay. You need to enter your AfterPay merchant credentials again and resave the settings top be able to take payments via AfterPay.', 'woocommerce-gateway-afterpay' ) . '</p>';
+			echo '<p>' . __( 'We have updated the settings for Arvato. You need to enter your Arvato merchant credentials again and resave the settings top be able to take payments via Arvato.', 'woocommerce-gateway-afterpay' ) . '</p>';
 			echo '</div>';
 		}
 	}

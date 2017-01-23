@@ -29,8 +29,8 @@ function init_wc_gateway_afterpay_account_class() {
 		 * Constructor for the gateway.
 		 */
 		public function __construct() {
-			$this->id                 = 'afterpay_account';
-			$this->method_title       = __( 'AfterPay Account', 'woocommerce-gateway-afterpay' );
+			$this->id                 = 'arvato_account';
+			$this->method_title       = __( 'Arvato Account', 'woocommerce-gateway-afterpay' );
 
 			$this->icon               = apply_filters( 'woocommerce_afterpay_account_icon', AFTERPAY_URL . '/assets/images/logo.png' );
 			$this->has_fields         = true;

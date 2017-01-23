@@ -123,39 +123,39 @@ function init_wc_gateway_afterpay_factory_class() {
 					'description' => __( 'This controls the description which the user sees during checkout.', 'woocommerce-gateway-afterpay' ),
 				),
 				'username_se' => array(
-					'title'       => __( 'AfterPay Username - Sweden', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Username - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay username for Sweden; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato username for Sweden; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 				'password_se' => array(
-					'title'       => __( 'AfterPay Password - Sweden', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Password - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay password for Sweden; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato password for Sweden; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 				'client_id_se' => array(
-					'title'       => __( 'AfterPay Client ID - Sweden', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Client ID - Sweden', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay client ID for Sweden; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato client ID for Sweden; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 				'username_no' => array(
-					'title'       => __( 'AfterPay Username - Norway', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Username - Norway', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay username for Norway; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato username for Norway; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 				'password_no' => array(
-					'title'       => __( 'AfterPay Password - Norway', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Password - Norway', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay password for Norway; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato password for Norway; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 				'client_id_no' => array(
-					'title'       => __( 'AfterPay Client ID - Norway', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato Client ID - Norway', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
-					'description' => __( 'Please enter your AfterPay client ID for Norway; this is needed in order to take payment.',
+					'description' => __( 'Please enter your Arvato client ID for Norway; this is needed in order to take payment.',
 						'woocommerce-gateway-afterpay' ),
 				),
 			);
@@ -175,13 +175,13 @@ function init_wc_gateway_afterpay_factory_class() {
 				$form_fields['order_management'] = array(
 					'title'   => __( 'Enable Order Management', 'woocommerce-gateway-afterpay' ),
 					'type'    => 'checkbox',
-					'label'   => __( 'Enable AfterPay order capture on WooCommerce order completion and AfterPay order cancellation on WooCommerce order cancellation', 'woocommerce-gateway-afterpay' ),
+					'label'   => __( 'Enable Arvato order capture on WooCommerce order completion and Arvato order cancellation on WooCommerce order cancellation', 'woocommerce-gateway-afterpay' ),
 					'default' => 'yes'
 				);
 				$form_fields['testmode'] = array(
-					'title'       => __( 'AfterPay testmode', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Arvato testmode', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'checkbox',
-					'label'       => __( 'Enable AfterPay testmode', 'woocommerce-gateway-afterpay' ),
+					'label'       => __( 'Enable Arvato testmode', 'woocommerce-gateway-afterpay' ),
 					'default'     => 'no',
 				);
 				$form_fields['debug'] = array(
@@ -244,7 +244,7 @@ function init_wc_gateway_afterpay_factory_class() {
 
 				// Store reservation ID as order note
 				$order->add_order_note(
-					sprintf( __( 'AfterPay reservation created, reservation ID: %s.', 'woocommerce-gateway-afterpay' ), get_post_meta( $order_id, '_afterpay_reservation_id', true ) )
+					sprintf( __( 'Arvato reservation created, reservation ID: %s.', 'woocommerce-gateway-afterpay' ), get_post_meta( $order_id, '_afterpay_reservation_id', true ) )
 				);
 
 				// Remove cart
@@ -325,14 +325,14 @@ function init_wc_gateway_afterpay_factory_class() {
 		public function can_refund_order( $order, $amount ) {
 			// Check if there's a transaction ID (invoice number)
 			if ( ! $order->get_transaction_id() ) {
-				$this->log( 'Refund failed: No AfterPay invoice number ID.' );
-				return new WP_Error( 'error', __( 'Refund failed: No AfterPay invoice number ID.', 'woocommerce' ) );
+				$this->log( 'Refund failed: No Arvato invoice number ID.' );
+				return new WP_Error( 'error', __( 'Refund failed: No Arvato invoice number ID.', 'woocommerce' ) );
 			}
 
 			// At the moment, only full refund is possible, because we can't send refunded order lines to AfterPay
 			if ( $amount != $order->get_total() ) {
-				$this->log( 'Refund failed: Only full order amount can be refunded via AfterPay.' );
-				return new WP_Error( 'error', __( 'Refund failed: Only full order amount can be refunded via AfterPay.',
+				$this->log( 'Refund failed: Only full order amount can be refunded via Arvato.' );
+				return new WP_Error( 'error', __( 'Refund failed: Only full order amount can be refunded via Arvato.',
 					'woocommerce' ) );
 			}
 
@@ -421,29 +421,29 @@ function init_wc_gateway_afterpay_factory_class() {
 			switch ( get_woocommerce_currency() ) {
 				case 'NOK':
 					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
-					$terms_content 			= '<h3>AfterPay Faktura</h3>';
+					$terms_readmore 		= 'Les mer om Arvato <a href="' . $terms_url . '" target="_blank">her</a>.';
+					$terms_content 			= '<h3>Arvato Faktura</h3>';
 					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det ikke påløpe gebyr.</p>';
+						$terms_content 		.= '<p>Vi tilbyr Arvato Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med Arvato faktura vil det ikke påløpe gebyr.</p>';
 					} else {
-					 	$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
+					 	$terms_content 		.= '<p>Vi tilbyr Arvato Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med Arvato faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
 					}
 					$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
-					$terms_content			.= '<h3>AfterPay Konto/Delbetalning</h3>';
-					$terms_content			.= '<p>Med AfterPay får du tilbud om å dele opp betalingen når du mottar fakturaen. Det er to alternative måter å dele opp betalingen på; konto eller delbetaling.</p>';
-					$terms_content			.= '<p><strong>AfterPay Konto</strong> er en fleksibel måte å betale din faktura på og du velger selv hvor mye du ønsker å betale hver måned. Minste beløp å betale vil til enhver tid være basert på utestående balanse og er presisert på den månedlige fakturaen. Priseksempel: 5000 kr o/ 9 mnd., effektiv rente 45,09 %. Samlet kredittkostnad: 820 kr.</p>';
-					$terms_content			.= '<p>Med <strong>AfterPay Delbetaling</strong> velger du hvor mange måneder du ønsker å dele opp betalingen i. Du kan velge mellom 3, 6, 12, 24 eller 36 måneder. På den måten vil du alltid ha kontroll på hva du skal betale per måned. Priseksempel: 5000 kr o/ 12 mnd, effektiv rente 43,58 %. Samlet kredittkostnad: 1009 kr.</p>';
+					$terms_content			.= '<h3>Arvato Konto/Delbetalning</h3>';
+					$terms_content			.= '<p>Med Arvato får du tilbud om å dele opp betalingen når du mottar fakturaen. Det er to alternative måter å dele opp betalingen på; konto eller delbetaling.</p>';
+					$terms_content			.= '<p><strong>Arvato Konto</strong> er en fleksibel måte å betale din faktura på og du velger selv hvor mye du ønsker å betale hver måned. Minste beløp å betale vil til enhver tid være basert på utestående balanse og er presisert på den månedlige fakturaen. Priseksempel: 5000 kr o/ 9 mnd., effektiv rente 45,09 %. Samlet kredittkostnad: 820 kr.</p>';
+					$terms_content			.= '<p>Med <strong>Arvato Delbetaling</strong> velger du hvor mange måneder du ønsker å dele opp betalingen i. Du kan velge mellom 3, 6, 12, 24 eller 36 måneder. På den måten vil du alltid ha kontroll på hva du skal betale per måned. Priseksempel: 5000 kr o/ 12 mnd, effektiv rente 43,58 %. Samlet kredittkostnad: 1009 kr.</p>';
 					$terms_content 			.= '<p>' . $terms_readmore . '</p>';
 					$short_readmore 		= 'Les mer her';
 					break;
 				case 'SEK':
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
-					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
 					break;
 				default:
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
-					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
 					break;
 			}

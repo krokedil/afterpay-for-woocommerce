@@ -7,9 +7,9 @@
  * @package WC_Gateway_AfterPay
  *
  * @wordpress-plugin
- * Plugin Name:     AfterPay for WooCommerce
+ * Plugin Name:     Arvato for WooCommerce
  * Plugin URI:      https://krokedil.se/produkt/afterpay/
- * Description:     Provides AfterPay payment gateway for WooCommerce.
+ * Description:     Provides Arvato payment gateway for WooCommerce.
  * Version:         1.1.2
  * Author:          Krokedil
  * Author URI:      http://krokedil.com/
@@ -38,7 +38,7 @@ register_activation_hook( __FILE__, 'woocommerce_gateway_afterpay_activation_che
 function woocommerce_gateway_afterpay_activation_check() {
 	if ( ! extension_loaded( 'soap' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
-		wp_die( __( 'WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in touch with 
+		wp_die( __( 'WooCommerce Arvato Gateway requires PHP SOAP extension. Please get in touch with 
 	your hosting provider to see how you can enable it.', 'woocommerce-gateway-afterpay' ) );
 	}
 }
@@ -65,7 +65,7 @@ function woocommerce_gateway_afterpay_soap_check() {
  */
 function woocommerce_gateway_afterpay_disabled_notices() {
 	echo '<div class="notice notice-error">';
-	echo '<p><strong>' . esc_html__( 'WooCommerce AfterPay Gateway requires PHP SOAP extension. Please get in touch with 
+	echo '<p><strong>' . esc_html__( 'WooCommerce Arvato Gateway requires PHP SOAP extension. Please get in touch with 
 	your hosting provider to see how you can enable it.', 'woocommerce-gateway-afterpay' ) . '</strong></p>';
 	echo '</div>';
 }

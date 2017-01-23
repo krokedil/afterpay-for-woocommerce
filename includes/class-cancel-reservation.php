@@ -92,7 +92,7 @@ class WC_AfterPay_Cancel_Reservation {
 		// If this reservation was already cancelled, do nothing.
 		if ( get_post_meta( $this->order_id, '_afterpay_reservation_cancelled', true ) ) {
 			$order->add_order_note(
-				__( 'Could not cancel AfterPay reservation, AfterPay reservation is already cancelled.', 'woocommerce-gateway-afterpay' )
+				__( 'Could not cancel Arvato reservation, Arvato reservation is already cancelled.', 'woocommerce-gateway-afterpay' )
 			);
 
 			return;
@@ -127,13 +127,13 @@ class WC_AfterPay_Cancel_Reservation {
 				// Add time stamp, used to prevent duplicate cancellations for the same order.
 				update_post_meta( $this->order_id, '_afterpay_reservation_cancelled', current_time( 'mysql' ) );
 
-				$order->add_order_note( __( 'AfterPay reservation was successfully cancelled.', 'woocommerce-gateway-afterpay' ) );
+				$order->add_order_note( __( 'Arvato reservation was successfully cancelled.', 'woocommerce-gateway-afterpay' ) );
 			} else {
-				$order->add_order_note( __( 'AfterPay reservation could not be cancelled.', 'woocommerce-gateway-afterpay' ) );
+				$order->add_order_note( __( 'Arvato reservation could not be cancelled.', 'woocommerce-gateway-afterpay' ) );
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
-			$order->add_order_note( sprintf( __( 'AfterPay reservation could not be cancelled, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
+			$order->add_order_note( sprintf( __( 'Arvato reservation could not be cancelled, reason: %s.', 'woocommerce-gateway-afterpay' ), $e->getMessage() ) );
 		}
 	}
 

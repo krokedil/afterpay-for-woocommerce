@@ -126,7 +126,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
 			} // Check if PreCheckCustomer was performed
 			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_country() ) {
-				wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
+				wc_add_notice( __( 'Please use get address feature first, before using one of Arvato payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
 			}
 		}
 	}
@@ -275,11 +275,11 @@ class WC_AfterPay_Pre_Check_Customer {
 			$args['Customer']['MobilePhone'] = $order->billing_phone;
 		}
 		
-		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer request: ' . var_export( $args, true ) );
+		WC_Gateway_AfterPay_Factory::log( 'Arvato PreCheckCustomer request: ' . var_export( $args, true ) );
 		
 		try {
 			$response = $soap_client->PreCheckCustomer( $args );
-			WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
+			WC_Gateway_AfterPay_Factory::log( 'Arvato PreCheckCustomer response: ' . var_export( $response, true ) );
 			if ( $response->IsSuccess ) {
 				// If only invoice is returned, response is an object, not a one element array
 				if ( is_array( $response->AllowedPaymentMethods->AllowedPaymentMethod ) ) {

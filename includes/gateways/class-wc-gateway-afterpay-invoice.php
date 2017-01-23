@@ -29,8 +29,8 @@ function init_wc_gateway_afterpay_invoice_class() {
 		 * Constructor for the gateway.
 		 */
 		public function __construct() {
-			$this->id           = 'afterpay_invoice';
-			$this->method_title = __( 'AfterPay Invoice', 'woocommerce-gateway-afterpay' );
+			$this->id           = 'arvato_invoice';
+			$this->method_title = __( 'Arvato Invoice', 'woocommerce-gateway-afterpay' );
 
 			$this->icon               = apply_filters( 'woocommerce_afterpay_invoice_icon', AFTERPAY_URL . '/assets/images/logo.png' );
 			$this->has_fields         = true;
