@@ -29,7 +29,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 		 * Constructor for the gateway.
 		 */
 		public function __construct() {
-			$this->id                 = 'arvato_part_payment';
+			$this->id                 = 'afterpay_part_payment';
 			$this->method_title       = __( 'Arvato Part Payment', 'woocommerce-gateway-afterpay' );
 
 			$this->icon               = apply_filters( 'woocommerce_afterpay_part_payment_icon', AFTERPAY_URL . '/assets/images/arvato-logo.jpg' );
