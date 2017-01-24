@@ -33,7 +33,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * @param string $message
 		 */
 		public static function log( $message ) {
-			$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+			$afterpay_settings = get_option( 'woocommerce_arvato_invoice_settings' );
 			if ( $afterpay_settings['debug'] == 'yes' ) {
 				if ( empty( self::$log ) ) {
 					self::$log = new WC_Logger();
@@ -61,20 +61,20 @@ function init_wc_gateway_afterpay_factory_class() {
 			}
 			
 			// Don't display part payment and Account for Norwegian customers
-			if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'afterpay_part_payment' == $this->id || 'afterpay_account' == $this->id ) ) {
+			if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'arvato_part_payment' == $this->id || 'arvato_account' == $this->id ) ) {
 				return false;
 			}
 
 			// Check if PreCheckCustomer allows this payment method
 			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
 				switch ( $payment_method ) {
-					case 'afterpay_invoice':
+					case 'arvato_invoice':
 						$payment_method_name = 'Invoice';
 						break;
-					case 'afterpay_account':
+					case 'arvato_account':
 						$payment_method_name = 'Account';
 						break;
-					case 'afterpay_part_payment':
+					case 'arvato_part_payment':
 						$payment_method_name = 'Installment';
 						break;
 				}
@@ -161,7 +161,7 @@ function init_wc_gateway_afterpay_factory_class() {
 			);
 			
 			// Invoice fee for AfterPay Invoice
-			if ( 'afterpay_invoice' == $this->id ) {
+			if ( 'arvato_invoice' == $this->id ) {
 				$form_fields['invoice_fee_id'] = array(
 					'title'   => __( 'Invoice Fee', 'woocommerce-gateway-afterpay' ),
 					'type'    => 'text',
@@ -171,7 +171,7 @@ function init_wc_gateway_afterpay_factory_class() {
 
 			// Logging, test mode and order management toggles for all payment methods
 			// are in AfterPay Invoice settings
-			if ( 'afterpay_invoice' == $this->id ) {
+			if ( 'arvato_invoice' == $this->id ) {
 				$form_fields['order_management'] = array(
 					'title'   => __( 'Enable Order Management', 'woocommerce-gateway-afterpay' ),
 					'type'    => 'checkbox',
@@ -224,7 +224,7 @@ function init_wc_gateway_afterpay_factory_class() {
 			
 			
 			// If needed, run CreateContract
-			if ( 'afterpay_account' == $this->id || 'afterpay_part_payment' == $this->id ) {
+			if ( 'arvato_account' == $this->id || 'arvato_part_payment' == $this->id ) {
 				$wc_afterpay_create_contract = new WC_AfterPay_Create_Contract( $order_id, $this->id );
 				if ( is_wp_error( $wc_afterpay_create_contract->create_contract() ) ) {
 					return false;
@@ -344,7 +344,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * 
 		 **/
 		public function process_checkout_fields() {	
-			if ( $_POST['payment_method'] == 'afterpay_invoice' || $_POST['payment_method'] == 'afterpay_account' || $_POST['payment_method'] == 'afterpay_part_payment' ) {
+			if ( $_POST['payment_method'] == 'arvato_invoice' || $_POST['payment_method'] == 'arvato_account' || $_POST['payment_method'] == 'arvato_part_payment' ) {
 				
 				if( !is_numeric( $_POST['afterpay-pre-check-customer-number'] ) ) {
 					$format = __( 'YYMMDDNNNN', 'woocommerce-gateway-afterpay' );
@@ -462,7 +462,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * Helper function - get Invoice fee price
 		 */
 		public function get_invoice_fee_price() {
-			$invoice_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+			$invoice_settings = get_option( 'woocommerce_arvato_invoice_settings' );
 			$this->invoice_fee_id = $invoice_settings['invoice_fee_id'];
 			if ( $this->invoice_fee_id > 0 ) {
 				$product = wc_get_product( $this->invoice_fee_id );
