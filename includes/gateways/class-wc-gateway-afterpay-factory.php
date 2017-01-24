@@ -344,7 +344,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * 
 		 **/
 		public function process_checkout_fields() {	
-			if ( $_POST['payment_method'] == 'afterpay_invoice' || $_POST['payment_method'] == 'arvato_account' || $_POST['payment_method'] == 'arvato_part_payment' ) {
+			if ( $_POST['payment_method'] == 'afterpay_invoice' || $_POST['payment_method'] == 'afterpay_account' || $_POST['payment_method'] == 'afterpay_part_payment' ) {
 				
 				if( !is_numeric( $_POST['afterpay-pre-check-customer-number'] ) ) {
 					$format = __( 'YYMMDDNNNN', 'woocommerce-gateway-afterpay' );
@@ -437,12 +437,12 @@ function init_wc_gateway_afterpay_factory_class() {
 					$short_readmore 		= 'Les mer her';
 					break;
 				case 'SEK':
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( AFTERPAY_URL . '/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
 					break;
 				default:
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugin_dir_url( __FILE__ ) . 'templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
 					break;
