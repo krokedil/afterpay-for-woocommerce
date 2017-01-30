@@ -32,7 +32,7 @@ function init_wc_gateway_afterpay_account_class() {
 			$this->id                 = 'afterpay_account';
 			$this->method_title       = __( 'Arvato Account', 'woocommerce-gateway-afterpay' );
 
-			$this->icon               = apply_filters( 'woocommerce_afterpay_account_icon', AFTERPAY_URL . '/assets/images/arvato-logo.jpg' );
+			$this->icon               = apply_filters( 'woocommerce_arvato_account_icon', AFTERPAY_URL . '/assets/images/arvato-logo.png' );
 			$this->has_fields         = true;
 			$this->method_description = __( 'Allows payments through ' . $this->method_title . '.', 'woocommerce-gateway-afterpay' );
 
