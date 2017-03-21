@@ -57,6 +57,10 @@ function init_wc_gateway_afterpay_factory_class() {
 				$payment_method          = $this->id;
 				$country                 = strtolower( WC()->customer->get_country() );
 				$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+				
+				if ( 'yes' !== $payment_method_settings['enabled'] ) {
+					return false;
+				}
 				/*
 				if ( '' === $payment_method_settings[ 'username_' . $country ] || '' === $payment_method_settings[ 'password_' . $country ] || '' === $payment_method_settings[ 'client_id_' . $country ] ) {
 					return false;
