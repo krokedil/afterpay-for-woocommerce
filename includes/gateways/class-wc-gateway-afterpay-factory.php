@@ -47,51 +47,59 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function is_available() {
 			
-			// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country)
-			if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
-				return false;
-			}
-
-			// Check if payment method is configured
-			$payment_method = $this->id;
-			$country = strtolower(WC()->customer->get_country());
-			$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
-			if ( '' == $payment_method_settings['username_' . $country] || '' == $payment_method_settings['password_' . $country] || '' == $payment_method_settings['client_id_' . $country] ) {
-				return false;
+			if( WC()->customer ) {
+				// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country).
+				if ( WC()->customer->get_country() === true && WC()->customer->get_country() !== $this->afterpay_country ) {
+					return false;
+				}
+	
+				// Check if payment method is configured.
+				$payment_method          = $this->id;
+				$country                 = strtolower( WC()->customer->get_country() );
+				$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
+				/*
+				if ( '' === $payment_method_settings[ 'username_' . $country ] || '' === $payment_method_settings[ 'password_' . $country ] || '' === $payment_method_settings[ 'client_id_' . $country ] ) {
+					return false;
+				}
+				*/
+	
+				// Don't display part payment and Account for Norwegian customers.
+				if ( WC()->customer->get_country() === true && 'NO' === WC()->customer->get_country() && ( 'afterpay_part_payment' === $this->id || 'afterpay_account' === $this->id ) ) {
+					return false;
+				}
 			}
 			
-			// Don't display part payment and Account for Norwegian customers
-			if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'afterpay_part_payment' == $this->id || 'afterpay_account' == $this->id ) ) {
-				return false;
-			}
-
-			// Check if PreCheckCustomer allows this payment method
-			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
-				switch ( $payment_method ) {
-					case 'afterpay_invoice':
-						$payment_method_name = 'Invoice';
-						break;
-					case 'afterpay_account':
-						$payment_method_name = 'Account';
-						break;
-					case 'afterpay_part_payment':
-						$payment_method_name = 'Installment';
-						break;
-				}
-
-				$success = false;
-
-				// Check PreCheckCustomer response for available payment methods
-				foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
-					if ( $payment_option->PaymentMethod == $payment_method_name ) {
-						$success = true;
+			if( WC()->session ) {
+				// Check if PreCheckCustomer allows this payment method.
+				if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+					switch ( $payment_method ) {
+						case 'afterpay_invoice':
+							$payment_method_name = 'Invoice';
+							break;
+						case 'afterpay_account':
+							$payment_method_name = 'Account';
+							break;
+						case 'afterpay_part_payment':
+							//$payment_method_name = 'Installment';
+							$payment_method_name = 'Account';
+							break;
+						default:
+							$payment_method_name = '';
 					}
-				}
-				
-				if ( $success ) {
-					return true;
-				} else {
-					return false;
+					// @TODO - change $success to false after we have gotten an answer about installemnt
+					$success = false;
+					// Check PreCheckCustomer response for available payment methods.
+					foreach ( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
+						if ( $payment_option->type === $payment_method_name ) {
+							$success = true;
+						}
+					}
+	
+					if ( $success ) {
+						return true;
+					} else {
+						return false;
+					}
 				}
 			}
 
