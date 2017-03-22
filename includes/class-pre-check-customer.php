@@ -144,6 +144,11 @@ class WC_AfterPay_Pre_Check_Customer {
 			$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
 		} ?>
 		<div id="afterpay-pre-check-customer" style="display:none">
+            <?php
+                $afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+                $customer_type = $afterpay_settings['customer_type'];
+                if ($customer_type === 'both') {
+            ?>
 			<p>
 				<label for="klarna_invoice_pno"><?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
 				<input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
@@ -163,6 +168,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				<button type="button" style="margin-top:0.5em"
 				        class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-afterpay' ); ?></button>
 			</p>
+            <?php }?>
 		</div>
 		<?php
 	}
