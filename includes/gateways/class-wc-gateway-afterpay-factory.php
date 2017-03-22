@@ -90,7 +90,7 @@ function init_wc_gateway_afterpay_factory_class() {
 					$success = false;
 					// Check PreCheckCustomer response for available payment methods.
 					foreach ( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
-						if ( $payment_option->type === $payment_method_name ) {
+						if ( $payment_option->PaymentMethod === $payment_method_name ) {
 							$success = true;
 						}
 					}
