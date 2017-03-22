@@ -198,13 +198,13 @@ function init_wc_gateway_afterpay_factory_class() {
 					'description' => sprintf( __( 'Log ' . $this->method_title . ' events in <code>%s</code>', 'woocommerce-gateway-afterpay' ), wc_get_log_file_path( 'afterpay-invoice' ) )
 				);
 				$form_fields['customer_type'] = array(
-					'title'       => __( 'Select customer type', 'woocommerce-gateway-afterpay' ),
+					'title'       => __( 'Customer type', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'select',
-					'label'       => __( 'Select customer type', 'woocommerce-gateway-afterpay' ),
+					'description'       => __( 'Select the type of customer that can make purchases through AfterPay', 'woocommerce-gateway-afterpay' ),
 					'options' => array(
-						'both' => __( 'Both', 'cmb2' ),
-						'private'   => __( 'Private person', 'cmb2' ),
-						'company'     => __( 'Company', 'cmb2' ),
+						'both'      => __( 'Both', 'woocommerce-gateway-afterpay' ),
+						'private'   => __( 'Private person', 'woocommerce-gateway-afterpay' ),
+						'company'   => __( 'Company', 'woocommerce-gateway-afterpay' ),
 					),
 					'default'     => 'both',
 				);
