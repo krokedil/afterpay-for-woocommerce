@@ -13,10 +13,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @author Krokedil
  */
 
-// Radera sen
-// wp_get_current_user(); - få användar id för användaren som redigeras.
-// get_user_meta( $user->ID, '_afterpay_personal_no'); - Få personal_no för användaren
-
 class WC_AfterPay_User_Profile {
 	public function __construct() {
 		// View User profile fields
