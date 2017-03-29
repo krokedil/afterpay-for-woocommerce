@@ -208,6 +208,12 @@ function init_wc_gateway_afterpay_factory_class() {
 					),
 					'default'     => 'both',
 				);
+				$form_fields['separate_shipping_companies'] = array(
+					'title'       => __( 'Separate shipping address', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'checkbox',
+					'label'       => __( 'Enable separate shipping address for companies', 'woocommerce-gateway-afterpay' ),
+					'default'     => 'no',
+				);
 			}
 
 			$this->form_fields = $form_fields;
@@ -223,7 +229,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-			
+
 			// If needed, run PreCheckCustomer
 			if( ! WC()->session->get( 'afterpay_checkout_id' ) ) {
 				$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
@@ -372,7 +378,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		
 		/**
 		 * Check used address
-		 * Compare the address entered in the checkout with the registered address (returned from DIBS)
+		 * Compare the address entered in the checkout with the registered address (returned from AfterPay)
 		 **/
 		public function check_used_address( $posted, $order ) {
 			$changed_fields = array();

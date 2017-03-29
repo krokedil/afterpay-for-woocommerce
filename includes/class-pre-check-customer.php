@@ -56,7 +56,10 @@ class WC_AfterPay_Pre_Check_Customer {
 		) );
 		add_filter( 'woocommerce_process_checkout_field_billing_postcode', array( $this, 'filter_pre_checked_value' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_city', array( $this, 'filter_pre_checked_value' ) );
-
+		add_filter( 'woocommerce_process_checkout_field_billing_company', array(
+			$this,
+			'filter_pre_checked_value'
+		) );
 		// Filter checkout shipping fields
 		add_filter( 'woocommerce_process_checkout_field_shipping_first_name', array(
 			$this,
@@ -78,7 +81,14 @@ class WC_AfterPay_Pre_Check_Customer {
 			$this,
 			'filter_pre_checked_value'
 		) );
-		add_filter( 'woocommerce_process_checkout_field_shipping_city', array( $this, 'filter_pre_checked_value' ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_city', array(
+            $this,
+            'filter_pre_checked_value'
+        ) );
+		add_filter( 'woocommerce_process_checkout_field_shipping_company', array(
+			$this,
+			'filter_pre_checked_value'
+		) );
 	}
 
 	/**
@@ -148,6 +158,7 @@ class WC_AfterPay_Pre_Check_Customer {
                 // Check settings for what customer type is wanted, and print the form according to that.
                 $afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
                 $customer_type = $afterpay_settings['customer_type'];
+                $separate_shipping_companies = $afterpay_settings['separate_shipping_companies'];
                 if ( $customer_type === 'both' ) {
             ?>
                     <p>
@@ -155,7 +166,7 @@ class WC_AfterPay_Pre_Check_Customer {
                         <input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
                                id="afterpay-customer-category-person" checked/>
                         <label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
-
+                        <input type="hidden" id="separate_shipping_companies" value="<?php echo $separate_shipping_companies ?>">
                         <input type="radio" class="input-radio" value="Company" name="afterpay_customer_category"
                                id="afterpay-customer-category-company"/>
                         <label
@@ -173,6 +184,7 @@ class WC_AfterPay_Pre_Check_Customer {
                         <label for="klarna_invoice_pno"><?php _e( 'Organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
                         <input type="radio" value="Company" name="afterpay_customer_category"
                                id="afterpay-customer-category-company" checked style="display:none;"/>
+                        <input type="hidden" id="separate_shipping_companies" value="<?php echo $separate_shipping_companies ?>">
                     </p>
                 <?php } ?>
 			<p class="form-row form-row-wide validate-required">
@@ -372,15 +384,19 @@ class WC_AfterPay_Pre_Check_Customer {
 				'woocommerce_process_checkout_field_shipping_'
 			), '', $current_filter );
 
-			$customer_details = WC()->session->get( 'afterpay_customer_details' );
-
-			if ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
-				return $customer_details[ $current_field ];
-			} else {
-				return $value;
-			}
+			if ( strpos($value, '**') !== false ) {
+                $customer_details = WC()->session->get( 'afterpay_customer_details' );
+                if ($current_field === 'company'){
+	                return $customer_details[ 'last_name' ];
+				} elseif ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
+                    return $customer_details[ $current_field ];
+                } else {
+                    return $value;
+                }
+            } else {
+                return $value;
+            }
 		}
-
 		return $value;
 	}
 }
