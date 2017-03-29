@@ -144,17 +144,37 @@ class WC_AfterPay_Pre_Check_Customer {
 			$personal_number = WC()->session->get( 'afterpay_personal_no' ) ? WC()->session->get( 'afterpay_personal_no' ) : '';
 		} ?>
 		<div id="afterpay-pre-check-customer" style="display:none">
-			<p>
-				<label for="klarna_invoice_pno"><?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
-				<input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
-				       id="afterpay-customer-category-person" checked/> 
-				<label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
-				
-				<input type="radio" class="input-radio" value="Company" name="afterpay_customer_category"
-				       id="afterpay-customer-category-company"/>
-				<label
-					for="afterpay-customer-category-company"><?php _e( 'Company', 'woocommerce-gateway-afterpay' ); ?></label>
-			</p>
+            <?php
+                // Check settings for what customer type is wanted, and print the form according to that.
+                $afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+                $customer_type = $afterpay_settings['customer_type'];
+                if ( $customer_type === 'both' ) {
+            ?>
+                    <p>
+                        <label for="klarna_invoice_pno"><?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
+                        <input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
+                               id="afterpay-customer-category-person" checked/>
+                        <label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
+
+                        <input type="radio" class="input-radio" value="Company" name="afterpay_customer_category"
+                               id="afterpay-customer-category-company"/>
+                        <label
+                            for="afterpay-customer-category-company"><?php _e( 'Company', 'woocommerce-gateway-afterpay' ); ?></label>
+                    </p>
+                <?php } else if ( $customer_type === 'private' ) {?>
+                    <p>
+                        <label for="klarna_invoice_pno"><?php _e( 'Personal number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
+                        <input type="radio" value="Person" name="afterpay_customer_category"
+                               id="afterpay-customer-category-person" checked style="display:none;"/>
+                    </p>
+                    <style> #billing_company_field{ display:none; } </style>
+                <?php } else if ( $customer_type === 'company' ) { ?>
+                    <p>
+                        <label for="klarna_invoice_pno"><?php _e( 'Organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
+                        <input type="radio" value="Company" name="afterpay_customer_category"
+                               id="afterpay-customer-category-company" checked style="display:none;"/>
+                    </p>
+                <?php } ?>
 			<p class="form-row form-row-wide validate-required">
 				<input type="text" name="afterpay-pre-check-customer-number" id="afterpay-pre-check-customer-number"
 				       class="afterpay-pre-check-customer-number"

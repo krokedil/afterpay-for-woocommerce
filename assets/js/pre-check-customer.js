@@ -154,6 +154,9 @@ jQuery(function ($) {
 		$('.afterpay-pre-check-customer-number').val(entered_personal_number);
 
 		if ('' != entered_personal_number) { // Check if the field is empty
+
+			$('.afterpay-get-address-button').addClass('disabled');
+
 			$.ajax(
 				WC_AfterPay.ajaxurl,
 				{
@@ -185,7 +188,9 @@ jQuery(function ($) {
 
 							populate_afterpay_fields();
 
+                            $('.afterpay-get-address-button').removeClass('disabled');
 							$('#afterpay-pre-check-customer').append('<div id="afterpay-pre-check-customer-response" class="woocommerce-message">' + response.data.message + '</div>');
+
 						} else { // wp_send_json_error
 							console.log('ERROR:');
 							console.log(response.data);
