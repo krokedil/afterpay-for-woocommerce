@@ -251,6 +251,37 @@ class WC_AfterPay_Pre_Check_Customer {
 	}
 
 	/**
+	 * Check billing fields against shipping fields for differences
+	 *
+	 * @param $order
+	 *
+	 * @return bool
+	 */
+	public function check_against_fields($order){
+		$return = false;
+	    if($order->shipping_address_1 != '' || $order->shipping_postcode != '' || $order->shipping_city != '' || $order->shipping_first_name != '' || $order->shipping_last_name != '' ){
+	        if($order->billing_address_1 != $order->shipping_address_1){
+	            $return = true;
+            }
+		    if($order->billing_postcode != $order->shipping_postcode){
+			    $return = true;
+		    }
+		    if($order->billing_city != $order->shipping_city){
+			    $return = true;
+		    }
+		    if($order->billing_first_name != $order->shipping_first_name){
+			    $return = true;
+		    }
+		    if($order->billing_last_name != $order->shipping_last_name){
+			    $return = true;
+		    }
+		    return $return;
+        }else {
+	        return $return;
+        }
+    }
+
+	/**
 	 * AfterPay PreCheckCustomer request
 	 *
 	 * @param $personal_number
@@ -306,7 +337,17 @@ class WC_AfterPay_Pre_Check_Customer {
 			$args['Customer']['LastName'] = $order->billing_last_name;
 			$args['Customer']['MobilePhone'] = $order->billing_phone;
 		}
-		
+		// Send delivery address if the option is selected and fields are different
+		if( $order && $this->check_against_fields($order) ) {
+			$args['DeliveryCustomer']['Address']['Street'] = $order->shipping_address_1;
+			$args['DeliveryCustomer']['Address']['PostalCode'] = $order->shipping_postcode;
+			$args['DeliveryCustomer']['Address']['PostalPlace'] = $order->shipping_city;
+			$args['DeliveryCustomer']['Address']['CountryCode'] = $order->shipping_country;
+
+			$args['DeliveryCustomer']['FirstName'] = $order->shipping_first_name;
+			$args['DeliveryCustomer']['LastName'] = $order->shipping_last_name;
+		}
+		error_log(var_export($args, true));
 		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer request: ' . var_export( $args, true ) );
 		
 		try {
@@ -330,7 +371,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					'postcode'   => $response->Customer->AddressList->Address->PostalCode,
 					'city'       => $response->Customer->AddressList->Address->PostalPlace,
 				);
-				
+				error_log(var_export($response, true));
 				// Set session data
 				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
 				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
@@ -375,7 +416,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * @return mixed
 	 */
 	public function filter_pre_checked_value( $value ) {
-		// Only do this for AfterPay methods
+	    // Only do this for AfterPay methods
 		$chosen_payment_method = WC()->session->get( 'chosen_payment_method' );
 		if ( strpos( $chosen_payment_method, 'afterpay' ) !== false ) {
 			$current_filter = current_filter();
