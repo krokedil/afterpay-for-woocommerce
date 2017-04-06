@@ -229,10 +229,9 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-
 			// If needed, run PreCheckCustomer
-			if( ! WC()->session->get( 'afterpay_checkout_id' ) ) {
-				$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
+			$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
+			if( ! WC()->session->get( 'afterpay_checkout_id' ) || $wc_afterpay_pre_check_customer->check_against_fields($order) ) {
 				$response = $wc_afterpay_pre_check_customer->pre_check_customer_request( $_POST['afterpay-pre-check-customer-number'], $this->id, $_POST['afterpay_customer_category'], $order->billing_country, $order );
 				
 				if ( is_wp_error( $response ) ) {
@@ -242,7 +241,11 @@ function init_wc_gateway_afterpay_factory_class() {
 				}
 				
 				// Update the address if needed
-				$this->check_used_address( WC()->session->get( 'afterpay_customer_details' ), $order );
+				$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+				$customer_type = $afterpay_settings['customer_type'];
+				if($customer_type === 'private') {
+					$this->check_used_address( WC()->session->get( 'afterpay_customer_details' ), $order );
+				}
 			}
 			
 			
@@ -442,6 +445,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		public function get_afterpay_info() {
 
 			switch ( get_woocommerce_currency() ) {
+
 				case 'NOK':
 					//$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
 					//$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
@@ -461,6 +465,7 @@ function init_wc_gateway_afterpay_factory_class() {
 					$afterpay_info ='<a target="_blank" href="https://www.afterpay.no/nb/vilkar">' . $short_readmore . '</a>';
 					break;
 				case 'SEK':
+					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
 					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
@@ -470,6 +475,7 @@ function init_wc_gateway_afterpay_factory_class() {
 					$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
 					break;
 				default:
+					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
 					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
 					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
