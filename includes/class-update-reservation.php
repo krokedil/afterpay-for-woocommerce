@@ -36,7 +36,6 @@ class WC_AfterPay_Update_Reservation {
 		", $itemid ) );
 
 		$orderid = $item_row->order_id;
-		error_log( 'add_item' );
 		$order = wc_get_order( $orderid );
 	}
 

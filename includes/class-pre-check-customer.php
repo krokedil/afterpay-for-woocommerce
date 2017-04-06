@@ -347,7 +347,7 @@ class WC_AfterPay_Pre_Check_Customer {
 			$args['DeliveryCustomer']['FirstName'] = $order->shipping_first_name;
 			$args['DeliveryCustomer']['LastName'] = $order->shipping_last_name;
 		}
-		error_log(var_export($args, true));
+
 		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer request: ' . var_export( $args, true ) );
 		
 		try {
