@@ -2,10 +2,10 @@
 Contributors: krokedil, niklashogefjord, slobodanmanic
 Tags: ecommerce, e-commerce, woocommerce, afterpay
 Requires at least: 4.2
-Tested up to: 4.5.2
-Stable tag: 1.1.2
+Tested up to: 4.7.3
+Stable tag: 1.2
 Requires WooCommerce at least: 2.4
-Tested WooCommerce up to: 2.5.5
+Tested WooCommerce up to: 2.6.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -40,6 +40,16 @@ If you need help with installation and configuration Krokedil offer premium (pai
 
 
 == Changelog ==
+
+= 1.2		- 2017.04.06 =
+* Feature	- Added setting to be able to sell only to companies or individuals.
+* Feature	- Added setting to enable separate shipping address for companies if wanted. This feature requires a separate agreement with Arvato.
+* Tweak		- AfterPay terms link now redirects to external site for Norwegian customers.
+* Tweak		- Disable get address button when request is being performed (to avoid multiple concurrent calls).
+* Tweak		- Possible to add/change personal ID number in user settings page.
+* Fix		- Don’t show payment method in checkout if not enabled in settings.
+* Fix		- Avoid errors in is_available() if check is performed in backend.
+* Fix		- Updated Swedish translation.
 
 = 1.1.2		- 2017.01.21 =
 * Tweak		- Updated terms text for Sweden.
