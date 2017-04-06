@@ -27,23 +27,8 @@ jQuery(function ($) {
 
 	function maybe_show_pre_checkout_form(do_focus) {
 		//console.log(do_focus);
-		var selected_payment_method = $('input[name="payment_method"]:checked').val();
-		if (selected_payment_method.indexOf('afterpay') >= 0) {
-			// Do not allow separate shipping address for AfterPay
-			$( 'div.shipping_address' ).hide();
-			$( '#ship-to-different-address' ).hide();
-			// Show pno
-			$('#afterpay-pre-check-customer').slideDown(250);
-			if ('yes' == do_focus) {
-				$('#afterpay-pre-check-customer-number').focus();
-			}
-		} else {
-			// Hide pno
-			$('#afterpay-pre-check-customer').slideUp(250);
-			// Show ship to different address checkbox
-			$( '#ship-to-different-address' ).show();
-		}
-		
+        check_separate_shipping_address(do_focus);
+
 		// Only display the Get Address button if Sweden is the selected country
 		var selected_customer_country = $("#billing_country").val();
 		if (selected_customer_country == 'SE') {
@@ -51,6 +36,38 @@ jQuery(function ($) {
 		} else {
 			jQuery('.afterpay-get-address-button').fadeOut();
 		}
+	}
+
+	function check_separate_shipping_address(do_focus){
+        var selected_payment_method = $('input[name="payment_method"]:checked').val();
+        if (selected_payment_method.indexOf('afterpay') >= 0) {
+            // Check customer type
+            if ( $( '#afterpay-customer-category-company' ).is(":checked") ) {
+                // Check if option is checked in admin for separate shipping address for companies
+                if ( $('#separate_shipping_companies').val() === 'yes' ){
+                    // Show separate shipping address for AfterPay if customer is company
+                    $('#ship-to-different-address').show();
+                } else{
+                    // Do not allow separate shipping address for AfterPay if the option is not checked
+                    $('div.shipping_address').hide();
+                    $('#ship-to-different-address').hide();
+                }
+            } else {
+                // Do not allow separate shipping address for AfterPay if customer is not company
+                $('div.shipping_address').hide();
+                $('#ship-to-different-address').hide();
+            }
+            // Show pno
+            $('#afterpay-pre-check-customer').slideDown(250);
+            if ('yes' == do_focus) {
+                $('#afterpay-pre-check-customer-number').focus();
+            }
+        } else {
+            // Hide pno
+            $('#afterpay-pre-check-customer').slideUp(250);
+            // Show ship to different address checkbox
+            $( '#ship-to-different-address' ).show();
+        }
 	}
 
 	function populate_afterpay_fields() {
@@ -77,12 +94,12 @@ jQuery(function ($) {
 		} else {
 			$('#shipping_first_name').val('').prop('readonly', false);
 			$('#shipping_last_name').val('').prop('readonly', false);
-			$('#shipping_company').val(mask_form_field(customer_last_name)).prop('readonly', true);
+			$('#shipping_company').val(mask_form_field(customer_last_name));
 		}
-		$('#shipping_address_1').val(mask_form_field(customer_address_1)).prop('readonly', true);
-		$('#shipping_address_2').val(mask_form_field(customer_address_2)).prop('readonly', true);
-		$('#shipping_postcode').val(mask_form_field(customer_postcode)).prop('readonly', true);
-		$('#shipping_city').val(mask_form_field(customer_city)).prop('readonly', true);
+		$('#shipping_address_1').val(mask_form_field(customer_address_1));
+		$('#shipping_address_2').val(mask_form_field(customer_address_2));
+		$('#shipping_postcode').val(mask_form_field(customer_postcode));
+		$('#shipping_city').val(mask_form_field(customer_city));
 	}
 
 	function wipe_afterpay_fields() {
@@ -138,6 +155,11 @@ jQuery(function ($) {
 		trigger_ajax_pre_check_customer();
 	});
 
+	// Fire check_separate_shipping_address on radio button press
+    $(document).on('click', '#afterpay-pre-check-customer', function () {
+		check_separate_shipping_address('no');
+    });
+
 	// Fire PreCheckCustomer on update_checkout
 	// $(document).on('update_checkout', function(event) {
 		// trigger_ajax_pre_check_customer();
@@ -154,6 +176,9 @@ jQuery(function ($) {
 		$('.afterpay-pre-check-customer-number').val(entered_personal_number);
 
 		if ('' != entered_personal_number) { // Check if the field is empty
+
+			$('.afterpay-get-address-button').addClass('disabled');
+
 			$.ajax(
 				WC_AfterPay.ajaxurl,
 				{
@@ -185,7 +210,9 @@ jQuery(function ($) {
 
 							populate_afterpay_fields();
 
+                            $('.afterpay-get-address-button').removeClass('disabled');
 							$('#afterpay-pre-check-customer').append('<div id="afterpay-pre-check-customer-response" class="woocommerce-message">' + response.data.message + '</div>');
+
 						} else { // wp_send_json_error
 							console.log('ERROR:');
 							console.log(response.data);

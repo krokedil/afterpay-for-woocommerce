@@ -47,54 +47,60 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function is_available() {
 			
-			// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country)
-			if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
-				return false;
-			}
-
-			// Check if payment method is configured
-			$payment_method = $this->id;
-			$country = strtolower(WC()->customer->get_country());
-			$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
-			if ( '' == $payment_method_settings['username_' . $country] || '' == $payment_method_settings['password_' . $country] || '' == $payment_method_settings['client_id_' . $country] ) {
-				return false;
-			}
-			
-			// Don't display part payment and Account for Norwegian customers
-			if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'arvato_part_payment' == $this->id || 'arvato_account' == $this->id ) ) {
-				return false;
-			}
-
-			// Check if PreCheckCustomer allows this payment method
-			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
-				switch ( $payment_method ) {
-					case 'afterpay_invoice':
-						$payment_method_name = 'Invoice';
-						break;
-					case 'afterpay_account':
-						$payment_method_name = 'Account';
-						break;
-					case 'afterpay_part_payment':
-						$payment_method_name = 'Installment';
-						break;
-				}
-
-				$success = false;
-
-				// Check PreCheckCustomer response for available payment methods
-				foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
-					if ( $payment_option->PaymentMethod == $payment_method_name ) {
-						$success = true;
-					}
+			if( WC()->customer ) {
+				// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country)
+				if ( WC()->customer->get_country() == true && WC()->customer->get_country() != $this->afterpay_country ) {
+					return false;
 				}
 				
-				if ( $success ) {
-					return true;
-				} else {
+				// Check if payment method is configured
+				$payment_method 			= $this->id;
+				$country 					= strtolower(WC()->customer->get_country());
+				$payment_method_settings 	= get_option( 'woocommerce_' . $payment_method . '_settings' );
+				
+				if ( 'yes' !== $payment_method_settings['enabled'] ) {
+					return false;
+				}
+				
+				if ( '' == $payment_method_settings['username_' . $country] || '' == $payment_method_settings['password_' . $country] || '' == $payment_method_settings['client_id_' . $country] ) {
+					return false;
+				}
+				
+				// Don't display part payment and Account for Norwegian customers
+				if ( WC()->customer->get_country() == true && 'NO' == WC()->customer->get_country() && ( 'afterpay_part_payment' == $this->id || 'afterpay_account' == $this->id ) ) {
 					return false;
 				}
 			}
-
+			
+			if( WC()->session ) {
+				// Check if PreCheckCustomer allows this payment method
+				if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
+					switch ( $payment_method ) {
+						case 'afterpay_invoice':
+							$payment_method_name = 'Invoice';
+							break;
+						case 'afterpay_account':
+							$payment_method_name = 'Account';
+							break;
+						case 'afterpay_part_payment':
+							$payment_method_name = 'Installment';
+							break;
+					}
+					$success = false;
+					// Check PreCheckCustomer response for available payment methods
+					foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
+						if ( $payment_option->PaymentMethod == $payment_method_name ) {
+							$success = true;
+						}
+					}
+					
+					if ( $success ) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			}
 			return true;
 		}
 
@@ -191,6 +197,23 @@ function init_wc_gateway_afterpay_factory_class() {
 					'default'     => 'no',
 					'description' => sprintf( __( 'Log ' . $this->method_title . ' events in <code>%s</code>', 'woocommerce-gateway-afterpay' ), wc_get_log_file_path( 'afterpay-invoice' ) )
 				);
+				$form_fields['customer_type'] = array(
+					'title'       => __( 'Customer type', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'select',
+					'description'       => __( 'Select the type of customer that can make purchases through AfterPay', 'woocommerce-gateway-afterpay' ),
+					'options' => array(
+						'both'      => __( 'Both person and company', 'woocommerce-gateway-afterpay' ),
+						'private'   => __( 'Person', 'woocommerce-gateway-afterpay' ),
+						'company'   => __( 'Company', 'woocommerce-gateway-afterpay' ),
+					),
+					'default'     => 'both',
+				);
+				$form_fields['separate_shipping_companies'] = array(
+					'title'       => __( 'Separate shipping address', 'woocommerce-gateway-afterpay' ),
+					'type'        => 'checkbox',
+					'label'       => __( 'Enable separate shipping address for companies', 'woocommerce-gateway-afterpay' ),
+					'default'     => 'no',
+				);
 			}
 
 			$this->form_fields = $form_fields;
@@ -206,10 +229,9 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function process_payment( $order_id ) {
 			$order = wc_get_order( $order_id );
-			
 			// If needed, run PreCheckCustomer
-			if( ! WC()->session->get( 'afterpay_checkout_id' ) ) {
-				$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
+			$wc_afterpay_pre_check_customer = new WC_AfterPay_Pre_Check_Customer();
+			if( ! WC()->session->get( 'afterpay_checkout_id' ) || $wc_afterpay_pre_check_customer->check_against_fields($order) ) {
 				$response = $wc_afterpay_pre_check_customer->pre_check_customer_request( $_POST['afterpay-pre-check-customer-number'], $this->id, $_POST['afterpay_customer_category'], $order->billing_country, $order );
 				
 				if ( is_wp_error( $response ) ) {
@@ -219,7 +241,11 @@ function init_wc_gateway_afterpay_factory_class() {
 				}
 				
 				// Update the address if needed
-				$this->check_used_address( WC()->session->get( 'afterpay_customer_details' ), $order );
+				$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
+				$customer_type = $afterpay_settings['customer_type'];
+				if($customer_type === 'private') {
+					$this->check_used_address( WC()->session->get( 'afterpay_customer_details' ), $order );
+				}
 			}
 			
 			
@@ -355,7 +381,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		
 		/**
 		 * Check used address
-		 * Compare the address entered in the checkout with the registered address (returned from DIBS)
+		 * Compare the address entered in the checkout with the registered address (returned from AfterPay)
 		 **/
 		public function check_used_address( $posted, $order ) {
 			$changed_fields = array();
@@ -419,40 +445,48 @@ function init_wc_gateway_afterpay_factory_class() {
 		public function get_afterpay_info() {
 
 			switch ( get_woocommerce_currency() ) {
+
 				case 'NOK':
-					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
-					$terms_readmore 		= 'Les mer om Arvato <a href="' . $terms_url . '" target="_blank">her</a>.';
-					$terms_content 			= '<h3>Arvato Faktura</h3>';
-					if( 0 == $this->get_invoice_fee_price() ) {
-						$terms_content 		.= '<p>Vi tilbyr Arvato Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med Arvato faktura vil det ikke påløpe gebyr.</p>';
-					} else {
-					 	$terms_content 		.= '<p>Vi tilbyr Arvato Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med Arvato faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
-					}
-					$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
-					$terms_content			.= '<h3>Arvato Konto/Delbetalning</h3>';
-					$terms_content			.= '<p>Med Arvato får du tilbud om å dele opp betalingen når du mottar fakturaen. Det er to alternative måter å dele opp betalingen på; konto eller delbetaling.</p>';
-					$terms_content			.= '<p><strong>Arvato Konto</strong> er en fleksibel måte å betale din faktura på og du velger selv hvor mye du ønsker å betale hver måned. Minste beløp å betale vil til enhver tid være basert på utestående balanse og er presisert på den månedlige fakturaen. Priseksempel: 5000 kr o/ 9 mnd., effektiv rente 45,09 %. Samlet kredittkostnad: 820 kr.</p>';
-					$terms_content			.= '<p>Med <strong>Arvato Delbetaling</strong> velger du hvor mange måneder du ønsker å dele opp betalingen i. Du kan velge mellom 3, 6, 12, 24 eller 36 måneder. På den måten vil du alltid ha kontroll på hva du skal betale per måned. Priseksempel: 5000 kr o/ 12 mnd, effektiv rente 43,58 %. Samlet kredittkostnad: 1009 kr.</p>';
-					$terms_content 			.= '<p>' . $terms_readmore . '</p>';
+					//$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
+					//$terms_readmore 		= 'Les mer om AfterPay <a href="' . $terms_url . '" target="_blank">her</a>.';
+					//$terms_content 			= '<h3>AfterPay Faktura</h3>';
+					//if( 0 == $this->get_invoice_fee_price() ) {
+					//	$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det ikke påløpe gebyr.</p>';
+					//} else {
+					// 	$terms_content 		.= '<p>Vi tilbyr AfterPay Faktura i samarbeid med arvato Finance AS. Betalingsfristen er 14 dager. Hvis du velger å betale med AfterPay faktura vil det påløpe et gebyr på NOK ' . $this->get_invoice_fee_price() . '.</p>';
+					//}
+					//$terms_content 			.= '<p>For å betale med faktura må du ha fylt 18 år, være folkeregistrert i Norge samt bli godkjent i kredittvurderingen som gjennomføres ved kjøpet. På bakgrunn av kredittsjekken vil det genereres gjenpartsbrev. Faktura sendes på e-post. Ved forsinket betaling vil det bli sendt inkassovarsel og lovbestemte gebyrer kan påløpe. Dersom betaling fortsatt uteblir vil fakturaen bli sendt til inkasso og ytterligere omkostninger vil påløpe.</p>';
+					//$terms_content			.= '<h3>AfterPay Konto/Delbetalning</h3>';
+					//$terms_content			.= '<p>Med AfterPay får du tilbud om å dele opp betalingen når du mottar fakturaen. Det er to alternative måter å dele opp betalingen på; konto eller delbetaling.</p>';
+					//$terms_content			.= '<p><strong>AfterPay Konto</strong> er en fleksibel måte å betale din faktura på og du velger selv hvor mye du ønsker å betale hver måned. Minste beløp å betale vil til enhver tid være basert på utestående balanse og er presisert på den månedlige fakturaen. Priseksempel: 5000 kr o/ 9 mnd., effektiv rente 45,09 %. Samlet kredittkostnad: 820 kr.</p>';
+					//$terms_content			.= '<p>Med <strong>AfterPay Delbetaling</strong> velger du hvor mange måneder du ønsker å dele opp betalingen i. Du kan velge mellom 3, 6, 12, 24 eller 36 måneder. På den måten vil du alltid ha kontroll på hva du skal betale per måned. Priseksempel: 5000 kr o/ 12 mnd, effektiv rente 43,58 %. Samlet kredittkostnad: 1009 kr.</p>';
+					//$terms_content 			.= '<p>' . $terms_readmore . '</p>';
 					$short_readmore 		= 'Les mer her';
+					$afterpay_info ='<a target="_blank" href="https://www.afterpay.no/nb/vilkar">' . $short_readmore . '</a>';
 					break;
 				case 'SEK':
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( AFTERPAY_URL . '/templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
-					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
+					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
+					$afterpay_info = '<div id="afterpay-terms-content" style="display:none;">';
+					$afterpay_info .= $terms_content;
+					$afterpay_info .='</div>';
+					$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
 					break;
 				default:
-					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugin_dir_url( __FILE__ ) . 'templates/arvato-terms-' . $this->afterpay_country . '.html' ) );
-					$terms_readmore 		= 'Läs mer om Arvato <a href="' . $terms_url . '" target="_blank">här</a>.';
+					$terms_url   			= 'https://www.arvato.com/content/dam/arvato/documents/norway-ecomm-terms-and-conditions/Vilk%C3%A5r%20for%20AfterPay%20Faktura.pdf';
+					$terms_content			= wp_remote_retrieve_body( wp_remote_get( plugins_url() . '/afterpay-for-woocommerce/templates/afterpay-terms-' . $this->afterpay_country . '.html' ) );
+					$terms_readmore 		= 'Läs mer om AfterPay <a href="' . $terms_url . '" target="_blank">här</a>.';
 					$short_readmore 		= 'Läs mer här';
+					$afterpay_info = '<div id="afterpay-terms-content" style="display:none;">';
+					$afterpay_info .= $terms_content;
+					$afterpay_info .='</div>';
+					$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
 					break;
 			}
 			
 			add_thickbox();
-			$afterpay_info = '<div id="afterpay-terms-content" style="display:none;">';
-			$afterpay_info .= $terms_content;
-			$afterpay_info .='</div>';
-			$afterpay_info .='<a href="#TB_inline?width=600&height=550&inlineId=afterpay-terms-content" class="thickbox">' . $short_readmore . '</a>';
 			
 			return $afterpay_info;
 		}
