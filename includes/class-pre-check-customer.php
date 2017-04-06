@@ -371,7 +371,7 @@ class WC_AfterPay_Pre_Check_Customer {
 					'postcode'   => $response->Customer->AddressList->Address->PostalCode,
 					'city'       => $response->Customer->AddressList->Address->PostalPlace,
 				);
-				error_log(var_export($response, true));
+
 				// Set session data
 				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
 				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
