@@ -202,8 +202,8 @@ function init_wc_gateway_afterpay_factory_class() {
 					'type'        => 'select',
 					'description'       => __( 'Select the type of customer that can make purchases through AfterPay', 'woocommerce-gateway-afterpay' ),
 					'options' => array(
-						'both'      => __( 'Both', 'woocommerce-gateway-afterpay' ),
-						'private'   => __( 'Private person', 'woocommerce-gateway-afterpay' ),
+						'both'      => __( 'Both person and company', 'woocommerce-gateway-afterpay' ),
+						'private'   => __( 'Person', 'woocommerce-gateway-afterpay' ),
 						'company'   => __( 'Company', 'woocommerce-gateway-afterpay' ),
 					),
 					'default'     => 'both',
