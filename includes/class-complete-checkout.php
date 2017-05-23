@@ -41,16 +41,21 @@ class WC_AfterPay_Complete_Checkout {
 	 * @param $order_id          int    WooCommerce order ID
 	 * @param $payment_method_id string WooCommerce payment method id
 	 */
-	public function __construct( $order_id, $payment_method_id, $client_id, $username, $password ) {
-		$this->order_id          	= $order_id;
-		$this->payment_method_id 	= $payment_method_id;
-		$this->client_id 			= $client_id;
-		$this->username 			= $username;
-		$this->password				= $password;
-		$this->settings          	= get_option( 'woocommerce_' . $this->payment_method_id . '_settings' );
-
+	public function __construct( $order_id, $payment_method_id, $client_id, $username = '', $password = '' ) {
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->testmode = 'yes' == $afterpay_settings['testmode'] ? true : false;
+
+		if ( 'old' == $afterpay_settings['afterpay_version'] ) {
+			$this->order_id          = $order_id;
+			$this->payment_method_id = $payment_method_id;
+			$this->client_id         = $client_id;
+			$this->username          = $username;
+			$this->password          = $password;
+			$this->settings          = get_option( 'woocommerce_' . $this->payment_method_id . '_settings' );
+		}
+		if ( 'v3' == $afterpay_settings['afterpay_version'] ) {
+			$this->client_id          = $client_id;
+		}
 	}
 
 	/**
@@ -85,7 +90,7 @@ class WC_AfterPay_Complete_Checkout {
 				'Username' => $this->username,
 				'Password' => $this->password
 			),
-			
+
 			'OrderNo'         => $order->get_order_number(),
 			'CustomerNo'      => $customer_no,
 			'Amount'          => $order->get_total(),
@@ -130,7 +135,7 @@ class WC_AfterPay_Complete_Checkout {
 				return true;
 			} else {
 				WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request failed.' );
-				
+
 				WC()->session->__unset( 'afterpay_checkout_id' );
 				WC()->session->__unset( 'afterpay_customer_no' );
 				WC()->session->__unset( 'afterpay_personal_no' );
@@ -140,7 +145,7 @@ class WC_AfterPay_Complete_Checkout {
 
 				$error_message = WC_AfterPay_Error_Notice::get_error_message( $response->ResultCode, 'complete_checkout' );
 				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
-				
+
 			}
 		} catch ( Exception $e ) {
 			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );

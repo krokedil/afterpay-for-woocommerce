@@ -34,7 +34,6 @@ load_plugin_textdomain( 'woocommerce-gateway-afterpay', false, dirname( plugin_b
 /**
  * Check if SOAP extension is loaded, prevent plugin activation if it isn't.
  */
-register_activation_hook( __FILE__, 'woocommerce_gateway_afterpay_activation_check' );
 function woocommerce_gateway_afterpay_activation_check() {
 	if ( ! extension_loaded( 'soap' ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
@@ -42,11 +41,11 @@ function woocommerce_gateway_afterpay_activation_check() {
 	your hosting provider to see how you can enable it.', 'woocommerce-gateway-afterpay' ) );
 	}
 }
-
+register_activation_hook( __FILE__, 'woocommerce_gateway_afterpay_activation_check' );
 /**
  * If the plugin was activated in some other way, deactivate it if SOAP extension is not loaded.
  */
-add_action( 'admin_init', 'woocommerce_gateway_afterpay_soap_check' );
+
 function woocommerce_gateway_afterpay_soap_check() {
 	if ( ! extension_loaded( 'soap' ) ) {
 		if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
@@ -59,6 +58,7 @@ function woocommerce_gateway_afterpay_soap_check() {
 		}
 	}
 }
+add_action( 'admin_init', 'woocommerce_gateway_afterpay_soap_check' );
 
 /**
  * Print deactivation notice.
@@ -85,27 +85,25 @@ include_once( AFTERPAY_PATH . '/includes/class-create-contract.php' );
 include_once( AFTERPAY_PATH . '/includes/class-complete-checkout.php' );
 include_once( AFTERPAY_PATH . '/includes/class-capture.php' );
 include_once( AFTERPAY_PATH . '/includes/class-update-reservation.php' );
-include_once( AFTERPAY_PATH . '/includes/class-user-profile.php' );
 
 include_once( AFTERPAY_PATH . '/includes/class-process-order-lines.php' );
 include_once( AFTERPAY_PATH . '/includes/class-invoice-fee.php' );
 include_once( AFTERPAY_PATH . '/includes/class-error-notice.php' );
 include_once( AFTERPAY_PATH . '/includes/class-admin-notices.php' );
 
+// V3
+include_once( AFTERPAY_PATH . '/includes/requests/class-wc-afterpay-request.php' );
+include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-customer.php' );
+include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-available-payment-methods.php' );
+include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-authorize-payment.php' );
+include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-create-contract.php' );
+
 // Define server endpoints
 define(
 	'ARVATO_CHECKOUT_LIVE',
-	'https://api.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'
+	'https://api.afterpay.io'
 );
 define(
 	'ARVATO_CHECKOUT_TEST',
-	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/Checkout/v2/CheckoutServices.svc?wsdl'
-);
-define(
-	'ARVATO_ORDER_MAINTENANCE_LIVE',
-	'https://api.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
-);
-define(
-	'ARVATO_ORDER_MAINTENANCE_TEST',
-	'https://sandboxapi.horizonafs.com/eCommerceServices/eCommerce/OrderManagement/v2/OrderManagementServices.svc?wsdl'
+	'https://sandboxapi.horizonafs.com/eCommerceServicesWebApi'
 );

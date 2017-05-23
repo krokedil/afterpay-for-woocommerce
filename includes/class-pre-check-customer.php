@@ -23,6 +23,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	public function __construct() {
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->testmode    = 'yes' == $afterpay_settings['testmode'] ? true : false;
+		$this->x_auth_key		= $afterpay_settings['x_auth_key'];
 
 		// Enqueue JS file
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -40,54 +41,54 @@ class WC_AfterPay_Pre_Check_Customer {
 		// Filter checkout billing fields
 		add_filter( 'woocommerce_process_checkout_field_billing_first_name', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_billing_last_name', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_billing_address_1', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_billing_address_2', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_billing_postcode', array( $this, 'filter_pre_checked_value' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_city', array( $this, 'filter_pre_checked_value' ) );
 		add_filter( 'woocommerce_process_checkout_field_billing_company', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		// Filter checkout shipping fields
 		add_filter( 'woocommerce_process_checkout_field_shipping_first_name', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_last_name', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_address_1', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_address_2', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_postcode', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_city', array(
             $this,
-            'filter_pre_checked_value'
+            'filter_pre_checked_value',
         ) );
 		add_filter( 'woocommerce_process_checkout_field_shipping_company', array(
 			$this,
-			'filter_pre_checked_value'
+			'filter_pre_checked_value',
 		) );
 	}
 
@@ -95,14 +96,14 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * Run PreCheckCustomer on checkout load if we have a personal number and an AfterPay method is selected
 	 */
 	public function maybe_pre_check_customer() {
-		
+
 		WC()->cart->calculate_totals();
 		if ( WC()->session->get( 'afterpay_cart_total' ) == WC()->cart->total ) {
 			return;
 		}
-		
+
 		// Only perform PreCheckCustomer on checkout_init for Swedish customers
-		if( 'SE' != WC()->customer->get_country() ) {
+		if ( 'SE' != WC()->customer->get_billing_country() ) {
 			return;
 		}
 
@@ -118,9 +119,9 @@ class WC_AfterPay_Pre_Check_Customer {
 					$personal_no = get_user_meta( $user->ID, '_afterpay_personal_no', true );
 				}
 			}
-			
+
 			if ( '' != $personal_no ) {
-				$this->pre_check_customer_request( $personal_no, $chosen_payment_method, 'Person', WC()->customer->get_country() );
+				$this->pre_check_customer_request( $personal_no, $chosen_payment_method, 'Person', WC()->customer->get_billing_country() );
 			}
 		}
 	}
@@ -134,8 +135,9 @@ class WC_AfterPay_Pre_Check_Customer {
 			// Check if personal/organization number field is empty
 			if ( empty( $_POST['afterpay-pre-check-customer-number'] ) ) {
 				wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
-			} // Check if PreCheckCustomer was performed
-			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_country() ) {
+			} // End if().
+            // Check if PreCheckCustomer was performed
+			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_billing_country() ) {
 				wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
 			}
 		}
@@ -229,11 +231,10 @@ class WC_AfterPay_Pre_Check_Customer {
 		if ( $customer_category != 'Company' ) {
 			$customer_category = 'Person';
 		}
-
 		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country );
 		$data['response']            = $pre_check_customer_response;
 
-		if ( $pre_check_customer_response->IsSuccess ) {
+		if ( ! is_wp_error( $pre_check_customer_response ) ) {
 			$data['message'] = __(
 				'Address found and added to checkout form.',
 				'woocommerce-gateway-afterpay'
@@ -246,7 +247,6 @@ class WC_AfterPay_Pre_Check_Customer {
 			);
 			wp_send_json_error( $data );
 		}
-
 		wp_die();
 	}
 
@@ -291,122 +291,52 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * @return bool
 	 */
 	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country, $order = false ) {
+		$request  = new WC_AfterPay_Request_Available_Payment_Methods( $this->x_auth_key, $this->testmode );
+		$response = $request->response( $personal_number, $customer_category );
+		$response  = json_decode( $response );
 
-		// Prepare order lines for AfterPay
-		$order_lines_processor = new WC_AfterPay_Process_Order_Lines();
-		$order_lines           = $order_lines_processor->get_order_lines();
+		if ( ! is_wp_error( $response ) ) {
+		    //@TODO - check if we actually get an address. Otherwise throw an error.
+			// Customer information
+            $afterpay_customer_details = array(
+				'first_name' => $response->customer->firstName,
+				'last_name'  => $response->customer->lastName,
+				'address_1'  => $response->customer->addressList[0]->street,
+				'postcode'   => $response->customer->addressList[0]->postalCode,
+				'city'       => $response->customer->addressList[0]->postalPlace,
+				'country'    => $response->customer->addressList[0]->countryCode,
+			);
 
-		$payment_method_settings = get_option( 'woocommerce_' . $payment_method . '_settings' );
-		
+			WC()->session->set( 'afterpay_customer_no', $response->customer->customerNumber );
+			WC()->session->set( 'afterpay_personal_no', $personal_number );
+			WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
+			WC()->session->set( 'afterpay_cart_total', WC()->cart->total );
 
-		// Live or test checkout endpoint, based on payment gateway settings
-		$checkout_endpoint = $this->testmode ? ARVATO_CHECKOUT_TEST : ARVATO_CHECKOUT_LIVE;
 
-		// PreCheckCustomer
-		$soap_client = new SoapClient( $checkout_endpoint );
-		$args        = array(
-			'User'         => array(
-				'ClientID' => $payment_method_settings['client_id_' . strtolower($billing_country)],
-				'Username' => $payment_method_settings['username_' . strtolower($billing_country)],
-				'Password' => $payment_method_settings['password_' . strtolower($billing_country)]
-			),
-			'Customer'     => array(
-				'Address'                 => array(
-					'CountryCode' 	=> $billing_country,
-				),
-				'CustomerCategory'        => $customer_category,
-				'Organization_PersonalNo' => $personal_number,
-			),
-			'OrderDetails' => array(
-				'Amount'            => WC()->cart->total,
-				'CurrencyCode'      => get_woocommerce_currency(),
-				'OrderChannelType'  => 'Internet',
-				'OrderDeliveryType' => 'Normal',
-				'OrderLines'        => $order_lines
-			)
-		);
-		
-		// Send customer address for all countries except Sweden
-		if( 'SE' !== $billing_country && $order ) {
-			$args['Customer']['Address']['Street'] = $order->billing_address_1;
-			$args['Customer']['Address']['PostalCode'] = $order->billing_postcode;
-			$args['Customer']['Address']['PostalPlace'] = $order->billing_city;
-			
-			$args['Customer']['Email'] = $order->billing_email;
-			$args['Customer']['FirstName'] = $order->billing_first_name;
-			$args['Customer']['LastName'] = $order->billing_last_name;
-			$args['Customer']['MobilePhone'] = $order->billing_phone;
-		}
-		// Send delivery address if the option is selected and fields are different
-		if( $order && $this->check_against_fields($order) ) {
-			$args['DeliveryCustomer']['Address']['Street'] = $order->shipping_address_1;
-			$args['DeliveryCustomer']['Address']['PostalCode'] = $order->shipping_postcode;
-			$args['DeliveryCustomer']['Address']['PostalPlace'] = $order->shipping_city;
-			$args['DeliveryCustomer']['Address']['CountryCode'] = $order->shipping_country;
 
-			$args['DeliveryCustomer']['FirstName'] = $order->shipping_first_name;
-			$args['DeliveryCustomer']['LastName'] = $order->shipping_last_name;
-		}
-
-		WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer request: ' . var_export( $args, true ) );
-		
-		try {
-			$response = $soap_client->PreCheckCustomer( $args );
-			WC_Gateway_AfterPay_Factory::log( 'AfterPay PreCheckCustomer response: ' . var_export( $response, true ) );
-			if ( $response->IsSuccess ) {
-				// If only invoice is returned, response is an object, not a one element array
-				if ( is_array( $response->AllowedPaymentMethods->AllowedPaymentMethod ) ) {
-					$allowed_payment_methods = $response->AllowedPaymentMethods->AllowedPaymentMethod;
-				} else {
-					$allowed_payment_methods   = array();
-					$allowed_payment_methods[] = $response->AllowedPaymentMethods->AllowedPaymentMethod;
-				}
-
-				// Customer information
-				$afterpay_customer_details = array(
-					'first_name' => $response->Customer->FirstName,
-					'last_name'  => $response->Customer->LastName,
-					'address_1'  => $response->Customer->AddressList->Address->Street,
-					'address_2'  => $response->Customer->AddressList->Address->StreetNumber,
-					'postcode'   => $response->Customer->AddressList->Address->PostalCode,
-					'city'       => $response->Customer->AddressList->Address->PostalPlace,
-				);
-				error_log(var_export($response, true));
-				// Set session data
-				WC()->session->set( 'afterpay_checkout_id', $response->CheckoutID );
-				WC()->session->set( 'afterpay_customer_no', $response->Customer->CustomerNo );
-				WC()->session->set( 'afterpay_personal_no', $personal_number );
-				WC()->session->set( 'afterpay_allowed_payment_methods', $allowed_payment_methods );
-				WC()->session->set( 'afterpay_customer_details', $afterpay_customer_details );
-				WC()->session->set( 'afterpay_cart_total', WC()->cart->total );
-				
-				// Capture user's personal number as meta field, if logged in and is from Sweden
-				if ( is_user_logged_in() && 'SE' == $billing_country ) {
-					$user = wp_get_current_user();
-					add_user_meta( $user->ID, '_afterpay_personal_no', $personal_number, true );
-				}
-
-				// Send success
-				return $response;
-			} else {
-				WC()->session->__unset( 'afterpay_checkout_id' );
-				WC()->session->__unset( 'afterpay_customer_no' );
-				WC()->session->__unset( 'afterpay_personal_no' );
-				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
-				WC()->session->__unset( 'afterpay_customer_details' );
-				WC()->session->__unset( 'afterpay_cart_total' );
-			
-				$error_message = WC_AfterPay_Error_Notice::get_error_message( $response->ResultCode, 'pre_check_customer' );
-				return new WP_Error( 'failure', __( $error_message, 'woocommerce-gateway-afterpay' ) );
-				
+			// Set session data
+			WC()->session->set( 'afterpay_allowed_payment_methods', $response->paymentMethods );
+			WC()->session->set( 'afterpay_checkout_id', $response->checkoutId );
+			// Capture user's personal number as meta field, if logged in and is from Sweden
+			if ( is_user_logged_in() && 'SE' == $billing_country ) {
+				$user = wp_get_current_user();
+				add_user_meta( $user->ID, '_afterpay_personal_no', $personal_number, true );
 			}
-		} catch ( Exception $e ) {
-			WC_Gateway_AfterPay_Factory::log( $e->getMessage() );
-			echo '<div class="woocommerce-error">';
-			echo $e->getMessage();
-			echo '</div>';
+			// Send success
+			return $afterpay_customer_details;
+
+		} else {
+			WC()->session->__unset( 'afterpay_checkout_id' );
+			WC()->session->__unset( 'afterpay_customer_no' );
+			WC()->session->__unset( 'afterpay_personal_no' );
+			WC()->session->__unset( 'afterpay_allowed_payment_methods' );
+			WC()->session->__unset( 'afterpay_customer_details' );
+			WC()->session->__unset( 'afterpay_cart_total' );
+			return new WP_Error( 'failure', __( 'Fel', 'woocommerce-gateway-afterpay' ) );
 		}
+
 	}
+
 
 	/**
 	 * Filter checkout fields so they use data retrieved by PreCheckCustomer
@@ -416,7 +346,7 @@ class WC_AfterPay_Pre_Check_Customer {
 	 * @return mixed
 	 */
 	public function filter_pre_checked_value( $value ) {
-	    // Only do this for AfterPay methods
+		// Only do this for AfterPay methods
 		$chosen_payment_method = WC()->session->get( 'chosen_payment_method' );
 		if ( strpos( $chosen_payment_method, 'afterpay' ) !== false ) {
 			$current_filter = current_filter();
@@ -424,19 +354,12 @@ class WC_AfterPay_Pre_Check_Customer {
 				'woocommerce_process_checkout_field_billing_',
 				'woocommerce_process_checkout_field_shipping_'
 			), '', $current_filter );
-
-			if ( strpos($value, '**') !== false ) {
-                $customer_details = WC()->session->get( 'afterpay_customer_details' );
-                if ($current_field === 'company'){
-	                return $customer_details[ 'last_name' ];
-				} elseif ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
-                    return $customer_details[ $current_field ];
-                } else {
-                    return $value;
-                }
-            } else {
-                return $value;
-            }
+			$customer_details = WC()->session->get( 'afterpay_customer_details' );
+			if ( isset( $customer_details[ $current_field ] ) && '' != $customer_details[ $current_field ] ) {
+				return $customer_details[ $current_field ];
+			} else {
+				return $value;
+			}
 		}
 		return $value;
 	}

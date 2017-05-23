@@ -46,6 +46,8 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			$this->username_no    	= $this->get_option( 'username_no' );
 			$this->password_no    	= $this->get_option( 'password_no' );
 			$this->debug       		= $this->get_option( 'debug' );
+			$this->api_key       	= $this->get_option( 'api_key' );
+			$this->testmode       	= $this->get_option( 'testmode' );
 			
 			// Set country and merchant credentials based on currency.
 			switch ( get_woocommerce_currency() ) {
@@ -97,39 +99,50 @@ function init_wc_gateway_afterpay_part_payment_class() {
 		 */
 		public function payment_fields() {
 			parent::payment_fields();
-			
-			if ( WC()->session->get( 'afterpay_allowed_payment_methods' ) ) {
-				foreach( WC()->session->get( 'afterpay_allowed_payment_methods' ) as $payment_option ) {
-					if ( $payment_option->PaymentMethod == 'Installment' ) {
-						if ( sizeof( $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan ) >= 1 ) {
-							echo '<p>' . __( 'Please select a payment plan:', 'woocommerce-gateway-afterpay' ) . '</p>';
 
-							// Sort payment plans before displaying them
-							$payment_plans = $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan;
-							usort(
-								$payment_plans,
-								array( $this, 'sort_payment_plans' )
-							);
+			$payment_options = WC()->session->get( 'afterpay_allowed_payment_methods' );
+			$installment_plans = 0;
+			foreach($payment_options as $payment_option) {
 
-							foreach( $payment_plans as $key => $installment_plan ) {
-								$label = sprintf(
-									'%1$sx %2$s %3$s per month',
-									$installment_plan->NumberOfInstallments,
-									$installment_plan->InstallmentAmount,
-									'kr'
-								);
-
-								
-								echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '" value="' . $installment_plan->AccountProfileNumber . '" ' . checked( $key, 0, false ) . ' />';
-								echo '<label for="afterpay-installment-plan-' . $installment_plan->AccountProfileNumber . '"> ' . $label . '</label>';
-								echo '<br>';
-							}
-
-							$example = __( 'Example: 10000 kr over 12 months, effective interest rate 16.82%. Total credit amount 1682SEK, total repayment amount 11682 SEK.', 'woocommerce-gateway-afterpay'	);
-							echo '<p style="margin: 1.5em 0 0; font-size: 0.8em;">' . $example . '</p>';
-						}
-					}
+				//@TODO - Check with AfterPay why Installment seem to be returned as Account
+				if('Account' == $payment_option->type && 1 !== $payment_option->account->profileNo ) {
+					$installment_plans++;
 				}
+			}
+
+			if ( $installment_plans >= 1 ) {
+				echo '<p>' . __( 'Please select a payment plan:', 'woocommerce-gateway-afterpay' ) . '</p>';
+				foreach( $payment_options as $key => $installment_plan ) {
+
+
+					if( 'Account' == $installment_plan->type && 1 !== $installment_plan->account->profileNo ) {
+
+						// Sort payment plans before displaying them
+						/*$payment_plans = $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan;
+						usort(
+							$payment_plans,
+							array( $this, 'sort_payment_plans' )
+						);
+						*/
+						//foreach( $payment_plans as $key => $installment_plan ) {
+						$label = sprintf(
+							'%1$s x %2$s %3$s per month',
+							$installment_plan->account->numberOfPayments,
+							$installment_plan->account->monthlyPaymentAmount,
+							get_woocommerce_currency()
+						);
+
+						echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->account->profileNo . '" value="' . $installment_plan->account->profileNo . '" ' . checked( $key, 0, false ) . ' />';
+						echo '<label for="afterpay-installment-plan-' . $installment_plan->account->profileNo . '"> ' . $label . '</label>';
+						echo '<br>';
+						//}
+
+					}
+
+				}
+
+				$example = __( 'Example: 10000 kr over 12 months, effective interest rate 16.82%. Total credit amount 1682SEK, total repayment amount 11682 SEK.', 'woocommerce-gateway-afterpay'	);
+				echo '<p style="margin: 1.5em 0 0; font-size: 0.8em;">' . $example . '</p>';
 			}
 		}
 

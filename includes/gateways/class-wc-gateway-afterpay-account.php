@@ -36,7 +36,7 @@ function init_wc_gateway_afterpay_account_class() {
 			$this->has_fields         = true;
 			$this->method_description = __( 'Allows payments through ' . $this->method_title . '.', 'woocommerce-gateway-afterpay' );
 
-			// Define user set variables
+			// Define user set variables.
 			$this->title       		= $this->get_option( 'title' );
 			$this->description 		= $this->get_option( 'description' );
 			$this->client_id_se   	= $this->get_option( 'client_id_se' );
@@ -46,6 +46,8 @@ function init_wc_gateway_afterpay_account_class() {
 			$this->username_no    	= $this->get_option( 'username_no' );
 			$this->password_no    	= $this->get_option( 'password_no' );
 			$this->debug       		= $this->get_option( 'debug' );
+			$this->api_key       	= $this->get_option( 'api_key' );
+			$this->testmode       	= $this->get_option( 'testmode' );
 			
 			// Set country and merchant credentials based on currency.
 			switch ( get_woocommerce_currency() ) {

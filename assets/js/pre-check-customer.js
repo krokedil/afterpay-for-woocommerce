@@ -198,15 +198,14 @@ jQuery(function ($) {
 
 							$('body').trigger('update_checkout');
 
-							customer_data = response.data.response.Customer;
+							customer_data = response.data.response;
 
 							customer_info_fetched = true;
-							customer_first_name   = customer_data.FirstName;
-							customer_last_name    = customer_data.LastName;
-							customer_address_1    = customer_data.AddressList.Address.Street;
-							customer_address_2    = customer_data.AddressList.Address.StreetNumber;
-							customer_postcode     = customer_data.AddressList.Address.PostalCode;
-							customer_city         = customer_data.AddressList.Address.PostalPlace;
+							customer_first_name   = customer_data.first_name;
+							customer_last_name    = customer_data.last_name;
+							customer_address_1    = customer_data.address_1;
+							customer_postcode     = customer_data.postcode;
+							customer_city         = customer_data.city;
 
 							populate_afterpay_fields();
 

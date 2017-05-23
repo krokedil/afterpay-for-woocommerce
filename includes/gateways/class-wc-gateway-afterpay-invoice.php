@@ -39,6 +39,10 @@ function init_wc_gateway_afterpay_invoice_class() {
 			// Define user set variables
 			$this->title       		= $this->get_option( 'title' );
 			$this->description 		= $this->get_option( 'description' );
+			$this->debug       		= $this->get_option( 'debug' );
+
+			$this->title       		= $this->get_option( 'title' );
+			$this->description 		= $this->get_option( 'description' );
 			$this->client_id_se   	= $this->get_option( 'client_id_se' );
 			$this->username_se    	= $this->get_option( 'username_se' );
 			$this->password_se    	= $this->get_option( 'password_se' );
@@ -47,12 +51,15 @@ function init_wc_gateway_afterpay_invoice_class() {
 			$this->password_no    	= $this->get_option( 'password_no' );
 			$this->invoice_fee_id	= $this->get_option( 'invoice_fee_id' );
 			$this->debug       		= $this->get_option( 'debug' );
-			
+			$this->api_key       	= $this->get_option( 'api_key' );
+			$this->x_auth_key       = $this->get_option( 'x_auth_key' );
+			$this->testmode       	= $this->get_option( 'testmode' );
+
 			// Invoice fee
 			if ( '' == $this->invoice_fee_id ) {
 				$this->invoice_fee_id = 0;
 			}
-			
+
 			// Set country and merchant credentials based on currency.
 			switch ( get_woocommerce_currency() ) {
 				case 'NOK' :
@@ -72,6 +79,12 @@ function init_wc_gateway_afterpay_invoice_class() {
 					$this->client_id  			= '';
 					$this->username     		= '';
 					$this->password     		= '';
+			}
+
+			
+			// Invoice fee
+			if ( '' == $this->invoice_fee_id ) {
+				$this->invoice_fee_id = 0;
 			}
 
 			// Load the settings.

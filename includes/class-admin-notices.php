@@ -20,7 +20,7 @@ class WC_AfterPay_Admin_Notices {
 	public function __construct() {
 		$afterpay_invoice_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->enabled 		= $afterpay_invoice_settings['enabled'];
-		$this->username 	= $afterpay_invoice_settings['username'];
+		//$this->username 	= $afterpay_invoice_settings['username'];
 		$this->username_se 	= $afterpay_invoice_settings['username_se'];
 		
 		add_action( 'admin_init', array( $this, 'check_settings' ) );

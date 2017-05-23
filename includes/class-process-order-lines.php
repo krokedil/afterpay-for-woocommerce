@@ -39,38 +39,41 @@ class WC_AfterPay_Process_Order_Lines {
 	private function get_order_lines_from_order( $order_id ) {
 		$order       = new WC_Order( $order_id );
 		$order_lines = array();
-
 		// Process order lines
 		if ( sizeof( $order->get_items() ) > 0 ) {
 			foreach ( $order->get_items() as $item_key => $item ) {
 				$_product      = $order->get_product_from_item( $item );
 				$order_lines[] = array(
-					'GrossUnitPrice'  => $order->get_item_total( $item, true ),
-					'ItemDescription' => $item['name'],
-					'ItemID'          => $this->get_item_reference( $_product ),
-					'ItemGroupId'     => $_product->id,
-					'LineNumber'      => $item_key,
-					'NetUnitPrice'    => $order->get_item_total( $item, false ),
-					'Quantity'        => $item['qty'],
-					'VatPercent'      => round( $order->get_item_tax( $item ) / $order->get_item_total( $item, false ), 4 ) * 100
+					'grossUnitPrice'  	=> $order->get_item_total( $item, true ),
+					'description' 		=> $item['name'],
+					'productId'         => $this->get_item_reference( $_product ),
+					'groupId'     		=> $_product->get_id(),
+					'lineNumber'      	=> $item_key,
+					'netUnitPrice'    	=> $order->get_item_total( $item, false ),
+					'quantity'        	=> $item['qty'],
+					'vatPercent'      	=> round( $order->get_item_tax( $item ) / $order->get_item_total( $item, false ), 4 ) * 100,
 				);
 			}
 		}
 
 		// Process shipping
 		if ( $order->get_total_shipping() > 0 ) {
-			foreach ( $order->get_shipping_methods() as $shipping_method_key => $shipping_method_value ) {
-				$shipping_method_tax = array_sum( maybe_unserialize( $shipping_method_value['taxes'] ) );
-
+			$shipping_methods = $order->get_shipping_methods();
+			foreach ( $shipping_methods as $shipping_method_key => $shipping_method_value ) {
+				$shipping_method_taxes = $shipping_method_value['taxes']['total'];
+				$shipping_method_tax = 0;
+				foreach ( $shipping_method_taxes as $key => $value ) {
+					$shipping_method_tax = $shipping_method_tax + floatval( $value );
+				}
 				$order_lines[] = array(
-					'GrossUnitPrice'  => $shipping_method_tax + $shipping_method_value['cost'],
-					'ItemDescription' => $shipping_method_value['name'],
-					'ItemID'          => $shipping_method_value['type'],
-					'ItemGroupId'     => $shipping_method_value['type'],
-					'LineNumber'      => $shipping_method_key,
-					'NetUnitPrice'    => $shipping_method_value['cost'],
-					'Quantity'        => 1,
-					'VatPercent'      => round( $shipping_method_tax / $shipping_method_value['cost'], 4 ) * 100
+					'grossUnitPrice'  	=> $shipping_method_tax + $shipping_method_value['cost'],
+					'description' 		=> $shipping_method_value['name'],
+					'productId'			=> $shipping_method_value['type'],
+					'groupId'     		=> $shipping_method_value['type'],
+					'lineNumber'      	=> $shipping_method_key,
+					'netUnitPrice'    	=> floatval( $shipping_method_value['cost'] ),
+					'quantity'        	=> 1,
+					'vatPercent'      	=> round( $shipping_method_tax / $shipping_method_value['cost'], 4 ) * 100,
 				);
 			}
 		}
@@ -80,14 +83,14 @@ class WC_AfterPay_Process_Order_Lines {
 		if ( ! empty( $order_fees ) ) {
 			foreach ( $order->get_fees() as $order_fee_key => $order_fee_value ) {
 				$order_lines[] = array(
-					'GrossUnitPrice'  => round( ( $order_fee_value['line_tax'] + $order_fee_value['line_total'] ), 2 ),
-					'ItemDescription' => $order_fee_value['name'],
-					'ItemID'          => $order_fee_value['type'],
-					'ItemGroupId'     => $order_fee_value['type'],
-					'LineNumber'      => $order_fee_key,
-					'NetUnitPrice'    => $order_fee_value['line_total'],
-					'Quantity'        => 1,
-					'VatPercent'      => round( $order_fee_value['line_tax'] / $order_fee_value['line_total'], 4 ) * 100
+					'grossUnitPrice'  	=> round( ( $order_fee_value['line_tax'] + $order_fee_value['line_total'] ), 2 ),
+					'description' 		=> $order_fee_value['name'],
+					'productId'			=> $order_fee_value['type'],
+					'groupId'     		=> $order_fee_value['type'],
+					'lineNumber'      	=> $order_fee_key,
+					'netUnitPrice'    	=> $order_fee_value['line_total'],
+					'quantity'        	=> 1,
+					'vatPercent'      	=> round( $order_fee_value['line_tax'] / $order_fee_value['line_total'], 4 ) * 100
 				);
 			}
 		}
@@ -108,13 +111,13 @@ class WC_AfterPay_Process_Order_Lines {
 			foreach ( WC()->cart->cart_contents as $item_key => $item ) {
 				$_product      = wc_get_product( $item['product_id'] );;
 				$order_lines[] = array(
-					'GrossUnitPrice'  => ( $item['line_tax'] + $item['line_total'] ) / $item['quantity'],
-					'ItemDescription' => get_the_title( $item['product_id'] ),
-					'ItemID'          => $this->get_item_reference( $_product ),
-					'LineNumber'      => $item_key,
-					'NetUnitPrice'    => $item['line_total'] / $item['quantity'],
-					'Quantity'        => $item['quantity'],
-					'VatPercent'      => round( $item['line_tax'] / $item['line_total'], 4 ) * 100
+					'grossUnitPrice'  => ( $item['line_tax'] + $item['line_total'] ) / $item['quantity'],
+					'description' => get_the_title( $item['product_id'] ),
+					'productId'          => $this->get_item_reference( $_product ),
+					'lineNumber'      => $item_key,
+					'netUnitPrice'    => $item['line_total'] / $item['quantity'],
+					'quantity'        => $item['quantity'],
+					'vatPercent'      => round( $item['line_tax'] / $item['line_total'], 4 ) * 100
 				);
 			}
 		}
@@ -135,13 +138,13 @@ class WC_AfterPay_Process_Order_Lines {
 						}
 
 						$order_lines[] = array(
-							'GrossUnitPrice'  => $shipping_tax + $shipping_rate_value->cost,
-							'ItemDescription' => $shipping_rate_value->label,
-							'ItemID'          => $shipping_rate_value->id,
-							'LineNumber'      => $shipping_rate_key,
-							'NetUnitPrice'    => $shipping_rate_value->cost,
-							'Quantity'        => 1,
-							'VatPercent'      => $vat_percent
+							'grossUnitPrice'  	=> $shipping_tax + $shipping_rate_value->cost,
+							'description' 		=> $shipping_rate_value->label,
+							'productId'			=> $shipping_rate_value->id,
+							'lineNumber'		=> $shipping_rate_key,
+							'netUnitPrice'		=> $shipping_rate_value->cost,
+							'quantity'			=> 1,
+							'vatPercent'		=> $vat_percent
 						);
 					}
 				}
@@ -155,13 +158,13 @@ class WC_AfterPay_Process_Order_Lines {
 				$cart_fee_tax = array_sum( $cart_fee->tax_data );
 
 				$order_lines[] = array(
-					'GrossUnitPrice'  => round( ( $cart_fee->amount + $cart_fee_tax ), 2 ),
-					'ItemDescription' => $cart_fee->name,
-					'ItemID'          => $cart_fee->id,
-					'LineNumber'      => $cart_fee->id,
-					'NetUnitPrice'    => $cart_fee->amount,
-					'Quantity'        => 1,
-					'VatPercent'      => round( $cart_fee_tax / $cart_fee->amount, 4 ) * 100
+					'grossUnitPrice'  => round( ( $cart_fee->amount + $cart_fee_tax ), 2 ),
+					'description' => $cart_fee->name,
+					'productId'          => $cart_fee->id,
+					'lineNumber'      => $cart_fee->id,
+					'netUnitPrice'    => $cart_fee->amount,
+					'quantity'        => 1,
+					'vatPercent'      => round( $cart_fee_tax / $cart_fee->amount, 4 ) * 100
 				);
 			}
 		}
@@ -179,10 +182,10 @@ class WC_AfterPay_Process_Order_Lines {
 	public function get_item_reference( $_product ) {
 		if ( $_product->get_sku() ) {
 			$item_reference = $_product->get_sku();
-		} elseif ( $_product->variation_id ) {
-			$item_reference = $_product->variation_id;
+		} elseif ( $_product->get_id() ) {
+			$item_reference = $_product->get_id();
 		} else {
-			$item_reference = $_product->id;
+			$item_reference = $_product->get_id();
 		}
 
 		return strval( $item_reference );
