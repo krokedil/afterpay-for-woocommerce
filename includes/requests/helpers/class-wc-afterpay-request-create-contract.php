@@ -24,7 +24,7 @@ class WC_AfterPay_Request_CreateContract extends WC_AfterPay_Request {
 	public function response( $checkout_id, $payment_method_name ) {
 		$request_url = 'https://sandbox.afterpay.io' . $this->request_path . '/' . $checkout_id . '/contract';
 		$request     = wp_remote_request( $request_url, $this->get_request_args( $checkout_id, $payment_method_name ) );
-		if( ! is_wp_error( $request ) && 200 == $request['response']['code'] ) {
+		if ( ! is_wp_error( $request ) && 200 == $request['response']['code'] ) {
 			return wp_remote_retrieve_body( $request );
 		} else {
 			return new WP_Error( 'error', wp_remote_retrieve_body( $request ) );

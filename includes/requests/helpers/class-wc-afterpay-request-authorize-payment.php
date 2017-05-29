@@ -38,7 +38,7 @@ class WC_AfterPay_Request_Authorize_Payment extends WC_AfterPay_Request {
 	private function get_request_args( $order_id, $payment_method_name, $profile_no = false ) {
 		$request_args = array(
 			'headers' => $this->request_header(),
-			'body'    => $this->get_request_body( $order_id, $payment_method_name, $profile_no = false ),
+			'body'    => $this->get_request_body( $order_id, $payment_method_name, $profile_no ),
 			'method'  => $this->request_method
 		);
 		return $request_args;
@@ -56,7 +56,10 @@ class WC_AfterPay_Request_Authorize_Payment extends WC_AfterPay_Request {
 		$net_total_amount = 0;
 		foreach ( $order_lines as $key => $value )
 		{
-			$net_total_amount = $net_total_amount + floatval( $value['netUnitPrice'] );
+			$net_total_amount = $net_total_amount + ( floatval( $value['netUnitPrice'] * $value['quantity'] ) );
+		}
+		if ( 'Installment' === $payment_method_name	) {
+			$payment_method_name = 'Account';
 		}
 		$formatted_request_body = array(
 			'payment'       	=> array( 'type' => $payment_method_name ),
@@ -82,16 +85,13 @@ class WC_AfterPay_Request_Authorize_Payment extends WC_AfterPay_Request {
 			),
 		);
 		// Add profileNo for Account and Partpayment
-		if ( 'Account' == $payment_method_name ) {
-			$formatted_request_body['payment']['account'] = array(
-				'profileNo' => 1
-			);
-		} elseif ( 'Installment' == $payment_method_name ) { // part_payment
-			if ( isset( $profile_no ) ) {
-				$formatted_request_body['payment']['account'] = array(
-					'profileNo' => $profile_no
-				);
+		if ( isset( $profile_no ) && 'Account' === $payment_method_name ) {
+			if ( $profile_no < 1 ) {
+				$profile_no = 1;
 			}
+			$formatted_request_body['payment']['account'] = array(
+				'profileNo' => $profile_no,
+			);
 		}
 		return wp_json_encode( $formatted_request_body );
 	}

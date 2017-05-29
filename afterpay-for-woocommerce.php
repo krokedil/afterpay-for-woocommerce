@@ -7,9 +7,9 @@
  * @package WC_Gateway_AfterPay
  *
  * @wordpress-plugin
- * Plugin Name:     AfterPay for WooCommerce
+ * Plugin Name:     AfterPay v3 for WooCommerce
  * Plugin URI:      https://krokedil.se/produkt/afterpay/
- * Description:     Provides AfterPay payment gateway for WooCommerce.
+ * Description:     Provides AfterPay v3 payment gateway for WooCommerce.
  * Version:         1.2
  * Author:          Krokedil
  * Author URI:      http://krokedil.com/
@@ -83,7 +83,6 @@ include_once( AFTERPAY_PATH . '/includes/class-pre-check-customer.php' );
 include_once( AFTERPAY_PATH . '/includes/class-cancel-reservation.php' );
 include_once( AFTERPAY_PATH . '/includes/class-create-contract.php' );
 include_once( AFTERPAY_PATH . '/includes/class-complete-checkout.php' );
-include_once( AFTERPAY_PATH . '/includes/class-capture.php' );
 include_once( AFTERPAY_PATH . '/includes/class-update-reservation.php' );
 
 include_once( AFTERPAY_PATH . '/includes/class-process-order-lines.php' );
@@ -93,10 +92,12 @@ include_once( AFTERPAY_PATH . '/includes/class-admin-notices.php' );
 
 // V3
 include_once( AFTERPAY_PATH . '/includes/requests/class-wc-afterpay-request.php' );
+include_once( AFTERPAY_PATH . '/includes/class-capture.php' );
 include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-customer.php' );
 include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-available-payment-methods.php' );
 include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-authorize-payment.php' );
 include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-create-contract.php' );
+include_once( AFTERPAY_PATH . '/includes/requests/helpers/class-wc-afterpay-request-capture-payment.php' );
 
 // Define server endpoints
 define(

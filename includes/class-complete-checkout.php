@@ -123,15 +123,6 @@ class WC_AfterPay_Complete_Checkout {
 			if ( $response->IsSuccess ) {
 				update_post_meta( $order->id, '_afterpay_reservation_id', $response->ReservationID );
 
-				// Unset AfterPay session values
-				/*
-				WC()->session->__unset( 'afterpay_checkout_id' );
-				WC()->session->__unset( 'afterpay_customer_no' );
-				WC()->session->__unset( 'afterpay_personal_no' );
-				WC()->session->__unset( 'afterpay_allowed_payment_methods' );
-				WC()->session->__unset( 'afterpay_customer_details' );
-				WC()->session->__unset( 'afterpay_cart_total' );
-				*/
 				return true;
 			} else {
 				WC_Gateway_AfterPay_Factory::log( 'CompleteCheckout request failed.' );

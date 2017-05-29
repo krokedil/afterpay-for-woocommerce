@@ -44,6 +44,10 @@ function init_wc_gateway_afterpay_factory_class() {
 
 		public $x_auth_key = '';
 
+		public function __construct() {
+			add_action( 'woocommerce_order_status_completed', array( $this, 'afterpay_order_completed' ) );
+		}
+
 		/**
 		 * Check if payment method is available for current customer.
 		 */
@@ -523,6 +527,11 @@ function init_wc_gateway_afterpay_factory_class() {
 					$payment_method_name = '';
 			}
 			return $payment_method_name;
+		}
+
+		public function afterpay_order_completed( $order_id ) {
+			$request  = new WC_AfterPay_Request_Capture_Payment;
+			$response = $request->response( $order_id );
 		}
 	}
 }

@@ -94,7 +94,6 @@ class WC_AfterPay_Process_Order_Lines {
 				);
 			}
 		}
-
 		return $order_lines;
 	}
 
@@ -168,7 +167,6 @@ class WC_AfterPay_Process_Order_Lines {
 				);
 			}
 		}
-		
 		return $order_lines;
 	}
 

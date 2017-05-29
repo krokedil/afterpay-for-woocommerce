@@ -47,6 +47,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			$this->password_no    	= $this->get_option( 'password_no' );
 			$this->debug       		= $this->get_option( 'debug' );
 			$this->api_key       	= $this->get_option( 'api_key' );
+			$this->x_auth_key       = $this->get_option( 'x_auth_key' );
 			$this->testmode       	= $this->get_option( 'testmode' );
 			
 			// Set country and merchant credentials based on currency.
@@ -102,7 +103,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 
 			$payment_options = WC()->session->get( 'afterpay_allowed_payment_methods' );
 			$installment_plans = 0;
-			foreach($payment_options as $payment_option) {
+			foreach ( $payment_options as $payment_option ) {
 
 				//@TODO - Check with AfterPay why Installment seem to be returned as Account
 				if('Account' == $payment_option->type && 1 !== $payment_option->account->profileNo ) {
@@ -117,14 +118,6 @@ function init_wc_gateway_afterpay_part_payment_class() {
 
 					if( 'Account' == $installment_plan->type && 1 !== $installment_plan->account->profileNo ) {
 
-						// Sort payment plans before displaying them
-						/*$payment_plans = $payment_option->AllowedInstallmentPlans->AllowedInstallmentPlan;
-						usort(
-							$payment_plans,
-							array( $this, 'sort_payment_plans' )
-						);
-						*/
-						//foreach( $payment_plans as $key => $installment_plan ) {
 						$label = sprintf(
 							'%1$s x %2$s %3$s per month',
 							$installment_plan->account->numberOfPayments,
@@ -135,8 +128,6 @@ function init_wc_gateway_afterpay_part_payment_class() {
 						echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->account->profileNo . '" value="' . $installment_plan->account->profileNo . '" ' . checked( $key, 0, false ) . ' />';
 						echo '<label for="afterpay-installment-plan-' . $installment_plan->account->profileNo . '"> ' . $label . '</label>';
 						echo '<br>';
-						//}
-
 					}
 
 				}

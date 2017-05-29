@@ -40,9 +40,6 @@ function init_wc_gateway_afterpay_invoice_class() {
 			$this->title       		= $this->get_option( 'title' );
 			$this->description 		= $this->get_option( 'description' );
 			$this->debug       		= $this->get_option( 'debug' );
-
-			$this->title       		= $this->get_option( 'title' );
-			$this->description 		= $this->get_option( 'description' );
 			$this->client_id_se   	= $this->get_option( 'client_id_se' );
 			$this->username_se    	= $this->get_option( 'username_se' );
 			$this->password_se    	= $this->get_option( 'password_se' );
@@ -102,7 +99,7 @@ function init_wc_gateway_afterpay_invoice_class() {
 				'process_admin_options'
 			) );
 			add_action( 'woocommerce_thankyou', array( 
-				$this, 
+				$this,
 				'clear_afterpay_sessions' 
 			) );
 			add_action( 'woocommerce_checkout_process', array( 

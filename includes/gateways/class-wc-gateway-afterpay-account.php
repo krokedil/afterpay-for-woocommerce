@@ -47,6 +47,7 @@ function init_wc_gateway_afterpay_account_class() {
 			$this->password_no    	= $this->get_option( 'password_no' );
 			$this->debug       		= $this->get_option( 'debug' );
 			$this->api_key       	= $this->get_option( 'api_key' );
+			$this->x_auth_key       = $this->get_option( 'x_auth_key' );
 			$this->testmode       	= $this->get_option( 'testmode' );
 			
 			// Set country and merchant credentials based on currency.
