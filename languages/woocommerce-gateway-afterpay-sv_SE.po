@@ -428,7 +428,7 @@ msgstr "https://Krokedil.se/produkt/afterpay/"
 
 #. Description of the plugin/theme
 msgid "Provides AfterPay payment gateway for WooCommerce."
-msgstr "Tillhandahåller en AfterPay betalmodul för WooCommerce."
+msgstr "Tillhandahåller en AfterPay v3 betalmodul för WooCommerce."
 
 #. Author of the plugin/theme
 msgid "Krokedil"

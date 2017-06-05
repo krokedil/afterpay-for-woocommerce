@@ -52,7 +52,7 @@ function init_wc_gateway_afterpay_factory_class() {
 		 * Check if payment method is available for current customer.
 		 */
 		public function is_available() {
-			
+
 			if( WC()->customer ) {
 				// Only activate the payment gateway if the customers country is the same as the shop country ($this->afterpay_country)
 				if ( WC()->customer->get_billing_country() == true && WC()->customer->get_billing_country() != $this->afterpay_country ) {
@@ -63,15 +63,6 @@ function init_wc_gateway_afterpay_factory_class() {
 				$payment_method 			= $this->id;
 				$country 					= strtolower(WC()->customer->get_billing_country());
 				$payment_method_settings 	= get_option( 'woocommerce_' . $payment_method . '_settings' );
-				/*
-				if ( 'yes' !== $payment_method_settings['enabled'] ) {
-					return false;
-				}
-
-				if ( '' == $payment_method_settings['username_' . $country] || '' == $payment_method_settings['password_' . $country] || '' == $payment_method_settings['client_id_' . $country] ) {
-					return false;
-				}
-				*/
 				// Don't display part payment and Account for Norwegian customers
 				if ( WC()->customer->get_billing_country() == true && 'NO' == WC()->customer->get_billing_country() && ( 'afterpay_part_payment' == $this->id || 'afterpay_account' == $this->id ) ) {
 					return false;
@@ -352,10 +343,10 @@ function init_wc_gateway_afterpay_factory_class() {
 		 */
 		public function can_refund_order( $order, $amount ) {
 			// Check if there's a transaction ID (invoice number).
-			if ( ! $order->get_transaction_id() ) {
-				$this->log( 'Refund failed: No AfterPay invoice number ID.' );
-				return new WP_Error( 'error', __( 'Refund failed: No AfterPay invoice number ID.', 'woocommerce' ) );
-			}
+			//if ( ! $order->get_transaction_id() ) {
+			//	$this->log( 'Refund failed: No AfterPay invoice number ID.' );
+			//	return new WP_Error( 'error', __( 'Refund failed: No AfterPay invoice number ID.', 'woocommerce' ) );
+			//}
 			// At the moment, only full refund is possible, because we can't send refunded order lines to AfterPay.
 			if ( $amount !== $order->get_total() ) {
 				$this->log( 'Refund failed: Only full order amount can be refunded via AfterPay.' );
@@ -531,7 +522,7 @@ function init_wc_gateway_afterpay_factory_class() {
 
 		public function afterpay_order_completed( $order_id ) {
 			$request  = new WC_AfterPay_Request_Capture_Payment;
-			$response = $request->response( $order_id );
+			$request->response( $order_id );
 		}
 	}
 }
