@@ -24,7 +24,7 @@ class WC_AfterPay_Request_Cancel_Payment extends WC_AfterPay_Request {
 
 		$this->request_path = '/api/v3/orders/' . $order_number . '/voids';
 
-		$request_url = 'https://sandboxapi.horizonafs.com/eCommerceServicesWebApi' . $this->request_path;
+		$request_url = $this->base_url . $this->request_path;
 		$request     = wp_remote_request( $request_url, $this->get_request_args( ) );
 		if ( ! is_wp_error( $request ) && 200 == $request['response']['code'] ) {
 			return wp_remote_retrieve_body( $request );

@@ -22,7 +22,7 @@ class WC_AfterPay_Request {
 	 *
 	 * @var string
 	 */
-	private $base_url;
+	public $base_url;
 	/**
 	 * AfterPay API request resource url.
 	 *
@@ -75,4 +75,4 @@ class WC_AfterPay_Request {
 		}
 	}
 }
-$wc_afterpay_request = new WC_AfterPay_Request();
+//$wc_afterpay_request = new WC_AfterPay_Request();

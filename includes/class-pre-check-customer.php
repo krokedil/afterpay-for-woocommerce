@@ -24,6 +24,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		$afterpay_settings = get_option( 'woocommerce_afterpay_invoice_settings' );
 		$this->testmode    = 'yes' == $afterpay_settings['testmode'] ? true : false;
 		$this->x_auth_key		= $afterpay_settings['x_auth_key'];
+		error_log( 'precheck xauth ' . $this->x_auth_key );
 
 		// Enqueue JS file
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -103,7 +104,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		}
 
 		// Only perform PreCheckCustomer on checkout_init for Swedish customers
-		if ( 'SE' != WC()->customer->get_billing_country() ) {
+		if ( 'SE' != WC()->customer->get_country() ) {
 			return;
 		}
 
@@ -137,7 +138,7 @@ class WC_AfterPay_Pre_Check_Customer {
 				wc_add_notice( __( 'Personal/organization number is a required field.', 'woocommerce-gateway-afterpay' ), 'error' );
 			} // End if().
             // Check if PreCheckCustomer was performed
-			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_billing_country() ) {
+			elseif ( ! WC()->session->get( 'afterpay_allowed_payment_methods' ) && 'SE' == WC()->customer->get_country() ) {
 				wc_add_notice( __( 'Please use get address feature first, before using one of AfterPay payment methods.', 'woocommerce-gateway-afterpay' ), 'error' );
 			}
 		}
@@ -164,7 +165,6 @@ class WC_AfterPay_Pre_Check_Customer {
                 if ( $customer_type === 'both' ) {
             ?>
                     <p>
-                        <label for="klarna_invoice_pno"><?php _e( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
                         <input type="radio" class="input-radio" value="Person" name="afterpay_customer_category"
                                id="afterpay-customer-category-person" checked/>
                         <label for="afterpay-customer-category-person"><?php _e( 'Person', 'woocommerce-gateway-afterpay' ); ?></label>
@@ -173,27 +173,32 @@ class WC_AfterPay_Pre_Check_Customer {
                                id="afterpay-customer-category-company"/>
                         <label
                             for="afterpay-customer-category-company"><?php _e( 'Company', 'woocommerce-gateway-afterpay' ); ?></label>
+	                    <?php $label = __( 'Personal/organization number', 'woocommerce-gateway-afterpay' ); ?>
                     </p>
                 <?php } else if ( $customer_type === 'private' ) {?>
                     <p>
-                        <label for="klarna_invoice_pno"><?php _e( 'Personal number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
                         <input type="radio" value="Person" name="afterpay_customer_category"
                                id="afterpay-customer-category-person" checked style="display:none;"/>
                     </p>
                     <style> #billing_company_field{ display:none; } </style>
+	                <?php $label = __( 'Personal number', 'woocommerce-gateway-afterpay' ); ?>
                 <?php } else if ( $customer_type === 'company' ) { ?>
                     <p>
-                        <label for="klarna_invoice_pno"><?php _e( 'Organization number', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label><br/>
                         <input type="radio" value="Company" name="afterpay_customer_category"
                                id="afterpay-customer-category-company" checked style="display:none;"/>
                         <input type="hidden" id="separate_shipping_companies" value="<?php echo $separate_shipping_companies ?>">
+                        <?php $label = __( 'Organization number', 'woocommerce-gateway-afterpay' ); ?>
                     </p>
                 <?php } ?>
+            <br>
 			<p class="form-row form-row-wide validate-required">
-				<input type="text" name="afterpay-pre-check-customer-number" id="afterpay-pre-check-customer-number"
+                <label for="afterpay-pre-check-customer-number"><?php echo $label; ?> <span class="required">*</span></label><br/>
+                <input type="text" name="afterpay-pre-check-customer-number" id="afterpay-pre-check-customer-number"
 				       class="afterpay-pre-check-customer-number"
 				       placeholder="<?php _e( 'YYMMDDNNNN', 'woocommerce-gateway-afterpay' ); ?>"
 				       value="<?php echo $personal_number; ?>"/>
+                <label for="afterpay_customer_email"><?php _e( 'Email', 'woocommerce-gateway-afterpay' ); ?> <span class="required">*</span></label>
+                <input type="email" id="afterpay-customer-email" name="afterpay_customer_email" >
 				<button type="button" style="margin-top:0.5em"
 				        class="afterpay-get-address-button button"><?php _e( 'Get address', 'woocommerce-gateway-afterpay' ); ?></button>
 			</p>
@@ -224,6 +229,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		$data = array();
 
 		$personal_number   = $_REQUEST['personal_number'];
+		$email             = $_REQUEST['email'];
 		$payment_method    = $_REQUEST['payment_method'];
 		$customer_category = $_REQUEST['customer_category'];
 		$billing_country   = $_REQUEST['billing_country'];
@@ -231,7 +237,7 @@ class WC_AfterPay_Pre_Check_Customer {
 		if ( $customer_category != 'Company' ) {
 			$customer_category = 'Person';
 		}
-		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country );
+		$pre_check_customer_response = $this->pre_check_customer_request( $personal_number, $email, $payment_method, $customer_category, $billing_country );
 		$data['response']            = $pre_check_customer_response;
 
 		if ( ! is_wp_error( $pre_check_customer_response ) ) {
@@ -290,10 +296,11 @@ class WC_AfterPay_Pre_Check_Customer {
 	 *
 	 * @return bool
 	 */
-	public function pre_check_customer_request( $personal_number, $payment_method, $customer_category, $billing_country, $order = false ) {
+	public function pre_check_customer_request( $personal_number, $email, $payment_method, $customer_category, $billing_country, $order = false ) {
 		$request  = new WC_AfterPay_Request_Available_Payment_Methods( $this->x_auth_key, $this->testmode );
-		$response = $request->response( $personal_number, $customer_category );
+		$response = $request->response( $personal_number, $email, $customer_category );
 		$response  = json_decode( $response );
+		error_log( var_export( $response, true ) );
 
 		if ( ! is_wp_error( $response ) ) {
 		    //@TODO - check if we actually get an address. Otherwise throw an error.

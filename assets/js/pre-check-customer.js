@@ -76,10 +76,12 @@ jQuery(function ($) {
 		if ( 'Person' == selected_customer_category ) {
 			$('#billing_first_name').val(mask_form_field(customer_first_name)).prop('readonly', true);
 			$('#billing_last_name').val(mask_form_field(customer_last_name)).prop('readonly', true);
+            $('#billing_email').val($('#afterpay-customer-email').val());
 			$('#billing_company').val('').prop('readonly', false);
 		} else {
 			$('#billing_first_name').val('').prop('readonly', false);
 			$('#billing_last_name').val('').prop('readonly', false);
+			$('#billing_email').val($('#afterpay-customer-email').val());
 			$('#billing_company').val(mask_form_field(customer_last_name)).prop('readonly', true);
 		}
 		$('#billing_address_1').val(mask_form_field(customer_address_1)).prop('readonly', true);
@@ -90,10 +92,12 @@ jQuery(function ($) {
 		if ( 'Person' == selected_customer_category ) {
 			$('#shipping_first_name').val(mask_form_field(customer_first_name)).prop('readonly', true);
 			$('#shipping_last_name').val(mask_form_field(customer_last_name)).prop('readonly', true);
+            $('#shipping_email').val($('#afterpay-customer-email').val());
 			$('#shipping_company').val('').prop('readonly', false);
 		} else {
 			$('#shipping_first_name').val('').prop('readonly', false);
 			$('#shipping_last_name').val('').prop('readonly', false);
+            $('#shipping_email').val($('#afterpay-customer-email').val());
 			$('#shipping_company').val(mask_form_field(customer_last_name));
 		}
 		$('#shipping_address_1').val(mask_form_field(customer_address_1));
@@ -123,6 +127,7 @@ jQuery(function ($) {
 	$(document).on('init_checkout', function (event) {
 		var do_focus = 'yes';
 		maybe_show_pre_checkout_form(do_focus);
+		$('#billing_email_field').hide();
 	});
 	$(document).on('updated_checkout', function (event) {
 		var do_focus = 'no';
@@ -172,6 +177,7 @@ jQuery(function ($) {
 		var selected_payment_method = $('input[name="payment_method"]:checked').val();
 		var selected_customer_category = $('input[name="afterpay_customer_category"]:checked').val();
 		var entered_personal_number = $('#afterpay-pre-check-customer .afterpay-pre-check-customer-number').val();
+		var entered_email = $('#afterpay-customer-email').val();
 		var selected_billing_country = $("#billing_country").val();
 		$('.afterpay-pre-check-customer-number').val(entered_personal_number);
 
@@ -187,6 +193,7 @@ jQuery(function ($) {
 					data: {
 						action: 'afterpay_pre_check_customer',
 						personal_number: entered_personal_number,
+						email: entered_email,
 						payment_method: selected_payment_method,
 						customer_category: selected_customer_category,
 						billing_country: selected_billing_country,

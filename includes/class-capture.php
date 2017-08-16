@@ -25,6 +25,8 @@ class WC_AfterPay_Capture {
 
 		$this->x_auth_key = $afterpay_settings['x_auth_key'];
 		$this->testmode = $afterpay_settings['testmode'];
+		$this->order_management = 'yes' == $afterpay_settings['order_management'] ? true : false;
+		$this->log_enabled = 'yes' == $afterpay_settings['debug'] ? true : false;
 
 		add_action( 'woocommerce_order_status_completed', array( $this, 'capture_full' ) );
 	}

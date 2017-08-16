@@ -11,14 +11,13 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class WC_AfterPay_Request_Capture_Payment
  */
 class WC_AfterPay_Request_Capture_Payment extends WC_AfterPay_Request {
-
 	/** @var string AfterPay API request method. */
 	private $request_method = 'POST';
 
 	public function response( $order_id ) {
 		$wc_order = wc_get_order( $order_id );
 		$order_number = $wc_order->get_order_number();
-		$request_url = 'https://sandboxapi.horizonafs.com/eCommerceServicesWebApi/api/v3/orders/' . $order_number . '/captures';
+		$request_url = $this->base_url . '/api/v3/orders/' . $order_number . '/captures';
 		$request     = wp_remote_retrieve_body( wp_remote_request( $request_url, $this->get_request_args( $order_id ) ) );
 		return $request;
 	}

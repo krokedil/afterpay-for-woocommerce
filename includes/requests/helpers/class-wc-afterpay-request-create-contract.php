@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Class WC_AfterPay_Request_CreateContract
  */
 class WC_AfterPay_Request_CreateContract extends WC_AfterPay_Request {
-
 	/** @var string AfterPay API request path. */
 	private $request_path   = '/api/v3/checkout';
 	/** @var string AfterPay API request method. */

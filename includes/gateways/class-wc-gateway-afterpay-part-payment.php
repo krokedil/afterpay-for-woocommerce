@@ -106,7 +106,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			foreach ( $payment_options as $payment_option ) {
 
 				//@TODO - Check with AfterPay why Installment seem to be returned as Account
-				if('Account' == $payment_option->type && 1 !== $payment_option->account->profileNo ) {
+				if( 'Installment' === $payment_option->type ) {
 					$installment_plans++;
 				}
 			}
@@ -114,22 +114,18 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			if ( $installment_plans >= 1 ) {
 				echo '<p>' . __( 'Please select a payment plan:', 'woocommerce-gateway-afterpay' ) . '</p>';
 				foreach( $payment_options as $key => $installment_plan ) {
-
-
-					if( 'Account' == $installment_plan->type && 1 !== $installment_plan->account->profileNo ) {
-
+					if( 'Installment' === $installment_plan->type ) {
 						$label = sprintf(
-							'%1$s x %2$s %3$s per month',
-							$installment_plan->account->numberOfPayments,
-							$installment_plan->account->monthlyPaymentAmount,
+							'%1$s x %2$s %3$s per month test',
+							$installment_plan->installment->numberOfInstallments,
+							$installment_plan->installment->installmentAmount,
 							get_woocommerce_currency()
 						);
 
-						echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->account->profileNo . '" value="' . $installment_plan->account->profileNo . '" ' . checked( $key, 0, false ) . ' />';
-						echo '<label for="afterpay-installment-plan-' . $installment_plan->account->profileNo . '"> ' . $label . '</label>';
+						echo '<input type="radio" name="afterpay_installment_plan" id="afterpay-installment-plan-' . $installment_plan->installment->installmentProfileNumber . '" value="' . $installment_plan->installment->installmentProfileNumber . '" ' . checked( $key, 0, false ) . ' />';
+						echo '<label for="afterpay-installment-plan-' . $installment_plan->installment->installmentProfileNumber . '"> ' . $label . '</label>';
 						echo '<br>';
 					}
-
 				}
 
 				$example = __( 'Example: 10000 kr over 12 months, effective interest rate 16.82%. Total credit amount 1682SEK, total repayment amount 11682 SEK.', 'woocommerce-gateway-afterpay'	);
