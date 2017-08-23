@@ -49,7 +49,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			$this->api_key       	= $this->get_option( 'api_key' );
 			$this->x_auth_key       = $this->get_option( 'x_auth_key' );
 			$this->testmode       	= $this->get_option( 'testmode' );
-			
+
 			// Set country and merchant credentials based on currency.
 			switch ( get_woocommerce_currency() ) {
 				case 'NOK' :
@@ -114,7 +114,7 @@ function init_wc_gateway_afterpay_part_payment_class() {
 			if ( $installment_plans >= 1 ) {
 				echo '<p>' . __( 'Please select a payment plan:', 'woocommerce-gateway-afterpay' ) . '</p>';
 				foreach( $payment_options as $key => $installment_plan ) {
-					if( 'Installment' === $installment_plan->type ) {
+					if( 'Installment' === $installment_plan->type && $installment_plan->installment->installmentProfileNumber < 11 ) {
 						$label = sprintf(
 							'%1$s x %2$s %3$s per month test',
 							$installment_plan->installment->numberOfInstallments,

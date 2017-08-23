@@ -92,6 +92,7 @@ class WC_AfterPay_Request_Authorize_Payment extends WC_AfterPay_Request {
 				'profileNo' => $profile_no,
 			);
 		}
+
 		return wp_json_encode( $formatted_request_body );
 	}
 }

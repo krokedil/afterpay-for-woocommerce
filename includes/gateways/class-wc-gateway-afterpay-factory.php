@@ -26,6 +26,7 @@ function init_wc_gateway_afterpay_factory_class() {
 
 		/** @var WC_Logger Logger instance */
 		public static $log = false;
+		public $testmode = '';
 
 		/**
 		 * Logging method.
@@ -79,8 +80,8 @@ function init_wc_gateway_afterpay_factory_class() {
 						$payment_method_name = 'Account';
 						break;
 					case 'afterpay_part_payment':
-						//$payment_method_name = 'Installment';
-						$payment_method_name = 'Account';
+						$payment_method_name = 'Installment';
+						//$payment_method_name = 'Account';
 						break;
 					default:
 						$payment_method_name = '';
@@ -143,14 +144,6 @@ function init_wc_gateway_afterpay_factory_class() {
 					'label'   => __( 'Enable separate shipping address for companies', 'woocommerce-gateway-afterpay' ),
 					'default' => 'no',
 				),
-				'api_key' => array(
-					'title'       => __( 'AfterPay API Key', 'woocommerce-gateway-afterpay' ),
-					'type'        => 'text',
-					'description' => __(
-						'Please enter your AfterPay API key; this is needed in order to take payment.',
-						'woocommerce-gateway-afterpay'
-					),
-				),
 				'x_auth_key' => array(
 					'title'       => __( 'AfterPay X-Auth-Key', 'woocommerce-gateway-afterpay' ),
 					'type'        => 'text',
@@ -172,36 +165,34 @@ function init_wc_gateway_afterpay_factory_class() {
 				);
 			}
 			// Logging, test mode and order management toggles for all payment methods are in AfterPay Invoice settings.
-			if ( 'afterpay_invoice' === $this->id ) {
-				$form_fields['order_management'] = array(
-					'title'   => __( 'Enable Order Management', 'woocommerce-gateway-afterpay' ),
-					'type'    => 'checkbox',
-					'label'   => __(
-						'Enable AfterPay order capture on WooCommerce order completion and AfterPay order cancellation on WooCommerce order cancellation',
+			$form_fields['order_management'] = array(
+				'title'   => __( 'Enable Order Management', 'woocommerce-gateway-afterpay' ),
+				'type'    => 'checkbox',
+				'label'   => __(
+					'Enable AfterPay order capture on WooCommerce order completion and AfterPay order cancellation on WooCommerce order cancellation',
+					'woocommerce-gateway-afterpay'
+				),
+				'default' => 'yes',
+			);
+			$form_fields['testmode'] = array(
+				'title'   => __( 'AfterPay testmode', 'woocommerce-gateway-afterpay' ),
+				'type'    => 'checkbox',
+				'label'   => __( 'Enable AfterPay testmode', 'woocommerce-gateway-afterpay' ),
+				'default' => 'no',
+			);
+			$form_fields['debug'] = array(
+				'title'       => __( 'Debug Log', 'woocommerce-gateway-afterpay' ),
+				'type'        => 'checkbox',
+				'label'       => __( 'Enable logging', 'woocommerce-gateway-afterpay' ),
+				'default'     => 'no',
+				'description' => sprintf(
+					__(
+						'Log AfterPay events in <code>%s</code>',
 						'woocommerce-gateway-afterpay'
 					),
-					'default' => 'yes',
-				);
-				$form_fields['testmode'] = array(
-					'title'   => __( 'AfterPay testmode', 'woocommerce-gateway-afterpay' ),
-					'type'    => 'checkbox',
-					'label'   => __( 'Enable AfterPay testmode', 'woocommerce-gateway-afterpay' ),
-					'default' => 'no',
-				);
-				$form_fields['debug'] = array(
-					'title'       => __( 'Debug Log', 'woocommerce-gateway-afterpay' ),
-					'type'        => 'checkbox',
-					'label'       => __( 'Enable logging', 'woocommerce-gateway-afterpay' ),
-					'default'     => 'no',
-					'description' => sprintf(
-						__(
-							'Log AfterPay events in <code>%s</code>',
-							'woocommerce-gateway-afterpay'
-						),
-						wc_get_log_file_path( 'afterpay-invoice' )
-					),
-				);
-			}
+					wc_get_log_file_path( 'afterpay-invoice' )
+				),
+			);
 			$this->form_fields = $form_fields;
 		}
 
@@ -241,7 +232,6 @@ function init_wc_gateway_afterpay_factory_class() {
 				WC()->session->set( 'afterpay_allowed_payment_methods', $response->paymentMethods );
 				WC()->session->set( 'afterpay_checkout_id', $response->checkoutId );
 			}
-
 			$request  = new WC_AfterPay_Request_Authorize_Payment( $this->x_auth_key, $this->testmode );
 			$response = $request->response( $order_id, $this->get_formatted_payment_method_name(), $profile_no );
 
